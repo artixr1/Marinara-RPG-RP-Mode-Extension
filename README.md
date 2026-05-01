@@ -65,17 +65,19 @@ alone; see `AUTHORING-PROMPT.md`.
 ## Install (target audience: testers, not vibecoders)
 
 The install path is identical to the Game-Mode extension's path. Two
-pastes, end to end:
+imports, end to end:
 
-1. **Paste the framework.** Open Marinara at `http://localhost:7860`.
-   Settings → Extensions → Add Extension. Copy the entire contents of
-   `extension/ruleset-loader.js`, paste into the JS field. Leave CSS
-   field empty (CSS is embedded into the JS). Save and enable.
+1. **Import the framework JS file.** Open Marinara at
+   `http://localhost:7860`. Settings → Extensions → Add Extension →
+   import `extension/ruleset-loader.js` (Marinara's Extensions UI is
+   file-import, not text-paste). CSS is embedded inline in the JS, so
+   you only import the one file. Save and enable.
 
-2. **Paste a ruleset bundle.** A new "Ruleset" button appears in the
-   chat header. Click it, paste the entire contents of
-   `rulesets/dnd5e/bundle.json` (or `rulesets/exalted3e/bundle.json`)
-   into the dialog, click Install.
+2. **Import a ruleset bundle.** A new "Ruleset" button appears in the
+   chat header. Click it, then either import the `bundle.json` file
+   directly (file-import button in the dialog) or paste its contents
+   into the textarea. Click Install. Use either
+   `rulesets/dnd5e/bundle.json` or `rulesets/exalted3e/bundle.json`.
 
 The installer creates / updates one custom agent and one lorebook in
 your Marinara database. Re-installing the same bundle is idempotent —

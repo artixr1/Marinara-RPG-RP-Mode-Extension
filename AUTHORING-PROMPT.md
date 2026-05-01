@@ -165,15 +165,18 @@ will silently corrupt narration.
 
 ## After the AI produces the bundle
 
-1. Copy the JSON output. Save it as `bundle.json` somewhere local (a
-   text editor, a gist, anywhere).
+1. Save the JSON output as `my-bundle.json` somewhere local (a text
+   editor's save dialog, a gist, anywhere — just make sure it's a
+   `.json` file on disk).
 2. Open Marinara at `http://localhost:7860` (or wherever your install
    lives).
 3. Install the framework if you haven't yet — Settings → Extensions →
-   Add Extension → paste the contents of `extension/ruleset-loader.js`
-   from this repo's release zip.
+   Add Extension → import `extension/ruleset-loader.js` from this
+   repo's release zip. (Marinara's Extensions UI is file-import, not
+   text-paste.)
 4. Click the Ruleset button that appears in the chat header.
-5. Paste your bundle JSON into the dialog.
+5. Either import your `my-bundle.json` file (file-import button in the
+   dialog) or paste its contents into the textarea.
 6. Click Install. The dialog will report success and provision the
    custom agent + lorebook automatically.
 
