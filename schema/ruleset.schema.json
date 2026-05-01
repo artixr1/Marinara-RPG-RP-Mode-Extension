@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Kenhito/Marinara-RPG-RP-Mode-Extension/schema/ruleset.schema.json",
   "title": "Marinara RPG Ruleset",
-  "description": "Declarative spec for a tabletop RPG ruleset that the Marinara-RPG-RP-Mode-Extension overlay applies to Marinara Engine's Game Mode. The overlay reads this file to render the character sheet, format dice tags, instruct the GM agent, and validate skill resolution. One ruleset per Game Mode chat.",
+  "description": "Declarative spec for a tabletop RPG ruleset that the Marinara-RPG-RP-Mode-Extension overlay applies to Marinara Engine's Roleplay Mode. The overlay reads this file to render the character sheet, format dice tags, instruct the overlay agent, and validate skill resolution. One ruleset per Roleplay Mode chat.",
   "type": "object",
   "required": ["id", "name", "version", "dice", "resolution", "attributes", "skills"],
   "additionalProperties": false,

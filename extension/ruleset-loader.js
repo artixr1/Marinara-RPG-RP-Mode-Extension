@@ -418,7 +418,7 @@ function installBundle(bundle, progressCb) {
       var promptTemplate = prefix + " " + (ag.promptTemplate || "");
       var body = {
         type: MRRP_AGENT_TYPE,
-        name: "MRR: " + (ag.name || rulesetId),
+        name: "MRRP: " + (ag.name || rulesetId),
         description: ag.description || "",
         phase: ag.phase || "pre_generation",
         enabled: true,

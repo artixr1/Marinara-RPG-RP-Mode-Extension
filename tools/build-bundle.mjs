@@ -65,8 +65,8 @@ function buildBundle(dir) {
     generator: { name: "build-bundle.mjs", version: "1.0.0" },
     ruleset,
     gmAgent: {
-      name: ruleset.name + " Ruleset Override",
-      description: "Enforces " + ruleset.name + " skill resolution and dice formatting in Game Mode narration.",
+      name: ruleset.name + " Ruleset Helper",
+      description: "Provides " + ruleset.name + " skill resolution and dice formatting guidance for Roleplay Mode narration, alongside the engine's default roleplay agents.",
       phase: "pre_generation",
       promptTemplate,
       settings: {}

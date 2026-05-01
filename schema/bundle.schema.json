@@ -46,7 +46,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "Display name. Will be prefixed with \"MRR: \" by the installer for grouping."
+          "description": "Display name. Will be prefixed with \"MRRP: \" by the installer for grouping."
         },
         "description": { "type": "string" },
         "phase": {
