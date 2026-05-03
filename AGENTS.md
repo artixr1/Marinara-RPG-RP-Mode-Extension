@@ -21,7 +21,7 @@ targets `chatMode: "game"`.
 
 The extension consists of:
 
-1. A single-paste **client extension** — `extension/ruleset-loader.js`,
+1. A single-paste **client extension** — `extension/RPG-Extension-RP-Mode.js`,
    loaded into Marinara via Settings → Extensions. CSS is embedded
    inline into the JS string.
 2. Per-ruleset **install bundles** — `rulesets/<system>/bundle.json` —
@@ -91,7 +91,7 @@ The `marinara` object exposes (`packages/client/src/components/CustomThemeInject
 - `observe(target, cb, opts)` — MutationObserver helper
 - `onCleanup(fn)` — runs when extension is disabled
 
-**Critical invariant:** the entire `ruleset-loader.js` file runs as a
+**Critical invariant:** the entire `RPG-Extension-RP-Mode.js` file runs as a
 Function body. **No `import`, `export`, or top-level `await`.** All
 top-level statements run on extension load.
 
@@ -196,15 +196,15 @@ node tools/build-bundle.mjs --all
 # Validate every bundle.json under rulesets/
 node tools/validate-bundle.mjs --all
 
-# Re-embed CSS into ruleset-loader.js after editing ruleset-loader.css
+# Re-embed CSS into RPG-Extension-RP-Mode.js after editing RPG-Extension-RP-Mode.css
 node tools/embed-css.mjs
 ```
 
 The single-source-of-truth for the embedded CSS is
-`extension/ruleset-loader.css`. After editing the CSS, run
+`extension/RPG-Extension-RP-Mode.css`. After editing the CSS, run
 `embed-css.mjs` to update the `EMBEDDED_CSS` string between the
 `/* EMBEDDED_CSS_BEGIN */` and `/* EMBEDDED_CSS_END */` markers in
-`ruleset-loader.js`.
+`RPG-Extension-RP-Mode.js`.
 
 ---
 
@@ -226,7 +226,7 @@ Both paths produce identical `bundle.json` artifacts.
 ## Things to remember when editing this repo
 
 - **Never introduce `mrr-` identifiers.** Always `mrrp-`.
-- **Run `node --check extension/ruleset-loader.js` after any JS edit.**
+- **Run `node --check extension/RPG-Extension-RP-Mode.js` after any JS edit.**
   The file is loaded into a `new Function` and a syntax error breaks
   the whole extension silently.
 - **Run `node tools/embed-css.mjs` after editing the CSS.** The

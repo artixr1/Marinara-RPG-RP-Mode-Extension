@@ -171,7 +171,7 @@ will silently corrupt narration.
 2. Open Marinara at `http://localhost:7860` (or wherever your install
    lives).
 3. Install the framework if you haven't yet — Settings → Extensions →
-   Add Extension → import `extension/ruleset-loader.js` from this
+   Add Extension → import `extension/RPG-Extension-RP-Mode.js` from this
    repo's release zip. (Marinara's Extensions UI is file-import, not
    text-paste.)
 4. Click the Ruleset button that appears in the chat header.

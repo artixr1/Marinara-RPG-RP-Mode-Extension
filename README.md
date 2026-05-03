@@ -46,8 +46,8 @@ lore-lookup agents that don't fit the GM-mode single-narrator pattern.
 
 ## What ships in v0.0.1
 
-- **Framework:** `extension/ruleset-loader.js` (single-paste client
-  extension; CSS embedded inline) plus `extension/ruleset-loader.css`
+- **Framework:** `extension/RPG-Extension-RP-Mode.js` (single-paste client
+  extension; CSS embedded inline) plus `extension/RPG-Extension-RP-Mode.css`
   (companion stylesheet for direct edits).
 - **Schema:** `schema/bundle.schema.json` — install bundle envelope
   with discriminator `"schema": "mrrp-bundle"`.
@@ -69,7 +69,7 @@ imports, end to end:
 
 1. **Import the framework JS file.** Open Marinara at
    `http://localhost:7860`. Settings → Extensions → Add Extension →
-   import `extension/ruleset-loader.js` (Marinara's Extensions UI is
+   import `extension/RPG-Extension-RP-Mode.js` (Marinara's Extensions UI is
    file-import, not text-paste). CSS is embedded inline in the JS, so
    you only import the one file. Save and enable.
 
@@ -126,8 +126,8 @@ system.
 
 ```
 extension/
-  ruleset-loader.js      # Single-paste client extension. CSS embedded.
-  ruleset-loader.css     # Source CSS — edit, then `npm run embed-css`.
+  RPG-Extension-RP-Mode.js      # Single-paste client extension. CSS embedded.
+  RPG-Extension-RP-Mode.css     # Source CSS — edit, then `npm run embed-css`.
 schema/
   bundle.schema.json     # Install bundle envelope schema.
   ruleset.schema.json    # Ruleset-data schema (shared semantics with GM ext).
@@ -135,7 +135,7 @@ tools/
   build-bundle.mjs       # ruleset.json + gm-agent.md + lorebook.json -> bundle.json
   validate-bundle.mjs    # Schema-validates bundle.json files.
   validate-ruleset.mjs   # Schema-validates ruleset.json files.
-  embed-css.mjs          # Embed ruleset-loader.css into ruleset-loader.js.
+  embed-css.mjs          # Embed RPG-Extension-RP-Mode.css into RPG-Extension-RP-Mode.js.
 rulesets/
   dnd5e/
   exalted3e/

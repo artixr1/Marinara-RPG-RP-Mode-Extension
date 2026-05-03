@@ -1,6 +1,6 @@
 /*
- * Marinara-RPG-RP-Mode-Extension — ruleset-loader.css
- * Companion stylesheet for ruleset-loader.js. Paste this CSS into Marinara
+ * Marinara-RPG-RP-Mode-Extension — RPG-Extension-RP-Mode.css
+ * Companion stylesheet for RPG-Extension-RP-Mode.js. Paste this CSS into Marinara
  * Engine -> Settings -> Extensions -> Add Extension -> CSS field.
  *
  * License: MIT
@@ -934,3 +934,80 @@
 }
 
 .mrrp-row__bonus--neg { color: var(--mrrp-fail); }
+
+
+/*  ─────  state-mutator tag visual hiding  ───── */
+/* The state-mutator agent instructs the main model to emit
+   [mrrp-state: ...] tags inline at paragraph ends. The extension's
+   chat observer parses + applies them, then wraps each tag in a
+   span.mrrp-state-tag for this CSS rule to hide visually. The state
+   change itself has already been applied to localStorage; the tag
+   is purely a wire-format artifact and should not appear in chat. */
+.mrrp-state-tag { display: none; }
+
+
+/*  ─────  state mutation confirmation toast  ───── */
+/* Top-right floating stack of brief notifications shown when the
+   state-mutator agent's tags fire. Each toast confirms one mutation:
+   prefix (HP / Condition / Inventory), change (signed delta or +/- name),
+   and the agent-reported reason. Stacks vertically; auto-dismisses. */
+.mrrp-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.mrrp-toast {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-left: 3px solid var(--mrrp-accent);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  box-shadow: var(--mrrp-shadow);
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  max-width: 320px;
+}
+
+.mrrp-toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mrrp-toast__prefix {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrrp-text-dim);
+  flex-shrink: 0;
+}
+
+.mrrp-toast__change {
+  font-family: var(--mrrp-mono);
+  font-weight: 700;
+  color: var(--mrrp-accent);
+  flex-shrink: 0;
+}
+
+.mrrp-toast__reason {
+  color: var(--mrrp-text-dim);
+  font-size: 11px;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
