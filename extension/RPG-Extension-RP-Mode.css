@@ -102,6 +102,39 @@
   gap: 4px;
 }
 
+/* Identity row — sits below the character switcher, holds two label+input
+   pairs whose labels are ruleset-driven (Race+Class for D&D, Ancestry+
+   Class for PF2e, Exalt Type+Caste for Exalted, Concept+Trouble for Fate).
+   Inputs flex to share the row evenly; labels stay tight and dim. */
+.mrrp-sheet__identity-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  align-items: center;
+  gap: 4px 6px;
+  margin-top: 2px;
+}
+
+.mrrp-sheet__id-label {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  white-space: nowrap;
+}
+
+.mrrp-sheet__id-input {
+  width: 100%;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.mrrp-sheet__id-input:focus {
+  outline: none;
+  border-color: var(--mrrp-accent);
+}
+
 .mrrp-sheet__char-label {
   font-size: 11px;
   color: var(--mrrp-text-dim);
@@ -216,6 +249,104 @@
   font-family: var(--mrrp-mono);
 }
 
+/* Editable numeric input — replaces the historical value <span> on every
+   numeric sheet row (attributes, skills, derived, backgrounds, custom
+   skills, bar current values). Visually flush with the surrounding row;
+   the user types directly. The browser's native number-input spinners
+   are suppressed because the +/- stepper next to the field already
+   provides the same affordance and double controls are visual noise. */
+.mrrp-row__value--editable {
+  width: 48px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 1px 4px;
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  text-align: right;
+  -moz-appearance: textfield;
+}
+.mrrp-row__value--editable:focus {
+  outline: none;
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-bg);
+}
+.mrrp-row__value--editable::-webkit-outer-spin-button,
+.mrrp-row__value--editable::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Condition row inline effect summary — small, dim, italic so it
+   reads as metadata next to the condition name without competing for
+   the row's primary attention. */
+.mrrp-condition-effect {
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  font-style: italic;
+  flex: 1;
+  margin-left: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Advantage / disadvantage toggle row in the d20 dice widget. Three
+   buttons sit beside a label; the active mode picks up the accent
+   color so the player can see at a glance which mode is armed. */
+.mrrp-dice__adv-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+.mrrp-dice__adv-row label {
+  flex: 0 0 80px;
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-adv-btn {
+  flex: 1;
+  padding: 4px 8px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.mrrp-adv-btn:hover { background: var(--mrrp-accent-dim); }
+.mrrp-adv-btn--active {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+}
+
+/* "/" separator that sits between the editable current and editable
+   max inputs on bars without an engine-declared cap (D&D HP, etc.).
+   Dimmed because it's a visual cue, not a control. */
+.mrrp-bar__sep {
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  color: var(--mrrp-text-dim);
+  padding: 0 2px;
+}
+
+/* Auto-calculated derived stat — value computed from `valueFormula` every
+   time the stat context changes. Read-only by design; the formula IS the
+   override path. Subtle accent stripe on the left distinguishes it from
+   manually-entered values without screaming for attention. */
+.mrrp-row__value--autocalc {
+  min-width: 32px;
+  text-align: right;
+  font-family: var(--mrrp-mono);
+  color: var(--mrrp-accent);
+  border-left: 2px solid var(--mrrp-accent-dim);
+  padding-left: 6px;
+}
+
 .mrrp-row__roll {
   font-size: 11px;
   padding: 2px 6px;
@@ -293,6 +424,21 @@
   padding: 2px 6px;
   font-family: inherit;
   font-size: 11px;
+}
+
+/* Custom skill / lore row — inherits the specialty layout but adds an
+   attribute selector between the name and the value so user-added skills
+   can declare which attribute they roll under. The select stays compact
+   so the row's grid columns line up with the existing specialty rows. */
+.mrrp-custom-skill-row { grid-template-columns: 1fr auto auto auto auto auto; }
+.mrrp-custom-skill-attr {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 1px 4px;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
 }
 
 .mrrp-skill-spec-label {
@@ -430,6 +576,30 @@
 .mrrp-track__cell--extra {
   border-style: dashed;
   border-color: var(--mrrp-accent-dim);
+}
+
+/*  ─────  Damage-type tones  ─────
+    Used by rulesets that declare damageTypes on a track-renderAs derived
+    stat (Exalted, WoD, anything Storyteller-flavored). Bashing is mild
+    (warning yellow), Lethal is severe (fail red, same hue as legacy
+    single-fill), Aggravated is dire (deep maroon — meant to read as
+    'something supernatural just hit you'). The renderer overlays the
+    damage-type label (B/L/A) on the cell when filled. */
+.mrrp-track__cell--bashing {
+  background: var(--mrrp-warning);
+  color: #1a0f0f;
+  border-color: var(--mrrp-warning);
+}
+.mrrp-track__cell--lethal {
+  background: var(--mrrp-fail);
+  color: var(--mrrp-on-fail);
+  border-color: var(--mrrp-fail);
+}
+.mrrp-track__cell--aggravated {
+  background: #5a1a1a;
+  color: #f5f0ff;
+  border-color: #7a2a2a;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .mrrp-track-ctrl {
@@ -741,6 +911,7 @@
 
 .mrrp-dialog__buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
   margin-top: 12px;
@@ -821,6 +992,17 @@
   font-family: var(--mrrp-mono);
   font-size: 10px;
   color: var(--mrrp-text-dim);
+}
+
+/* Damage cell on a weapon row — visually distinct from the slot tag so a
+   skim of the inventory tells the player at a glance which items hit
+   and how much. Color picks up the warning hue (the cue for "this is
+   the violent thing"). */
+.mrrp-inv-item__damage {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-warning);
+  white-space: nowrap;
 }
 
 .mrrp-inv-item__bonus-summary {
@@ -935,6 +1117,16 @@
 
 .mrrp-row__bonus--neg { color: var(--mrrp-fail); }
 
+/*  ─────  Derived value cap suffix ("/ max")  ───── */
+
+.mrrp-row__cap {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
 
 /*  ─────  state-mutator tag visual hiding  ───── */
 /* The state-mutator agent instructs the main model to emit
@@ -1009,5 +1201,117 @@
   font-style: italic;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*  ─────  Spellbook flyout (third floating panel, system-labeled)  ───── */
+/* Per-ruleset abilities/charms/stunts panel. Toggled from the main sheet's
+   spellbook row; renders one collapsible category section per
+   ruleset.abilities.categories[]. Position persists to mrrp-spellbook-pos.
+   Mirrors GM-mode architecture; mrrp- namespace. */
+
+.mrrp-spellbook {
+  position: fixed;
+  top: 80px;
+  left: 360px;
+  width: 320px;
+  max-height: 70vh;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border-strong);
+  border-radius: var(--mrrp-radius);
+  padding: var(--mrrp-pad);
+  box-shadow: var(--mrrp-shadow);
+  z-index: 9996;
+  font-size: 13px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mrrp-spellbook--open { display: flex; }
+
+.mrrp-spellbook__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mrrp-border);
+  cursor: grab;
+  user-select: none;
+}
+
+.mrrp-spellbook__header:active { cursor: grabbing; }
+
+.mrrp-spellbook__title {
+  font-weight: 600;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-spellbook__body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrrp-spellbook-row { cursor: default; }
+.mrrp-spellbook-row__btn { width: 100%; text-align: left; }
+
+.mrrp-spellbook-cat {
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+  padding: 4px 6px;
+}
+
+.mrrp-spellbook-cat__head {
+  width: 100%;
+  background: transparent;
+  color: var(--mrrp-text);
+  border: 0;
+  padding: 4px 2px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-spellbook-cat__head:hover { color: var(--mrrp-accent); }
+
+.mrrp-spellbook-cat__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__list,
+.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__add {
+  display: none;
+}
+
+.mrrp-spellbook-cat__add { margin-top: 4px; }
+
+.mrrp-spellbook-ab {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  background: var(--mrrp-bg-elev);
+  border-radius: var(--mrrp-radius-sm);
+  border: 1px solid var(--mrrp-border);
+}
+
+.mrrp-spellbook-ab__name { font-weight: 500; font-size: 12px; }
+.mrrp-spellbook-ab__cost {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
   white-space: nowrap;
 }

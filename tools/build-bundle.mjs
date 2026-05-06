@@ -96,27 +96,19 @@ function loadAdditionalAgents(rulesetName, rulesetDir) {
 
 function buildBundle(dir) {
   const ruleset = JSON.parse(readFileSync(join(dir, "ruleset.json"), "utf8"));
-  const gmMd = readFileSync(join(dir, "gm-agent.md"), "utf8");
   const lb = JSON.parse(readFileSync(join(dir, "lorebook.json"), "utf8"));
 
-  const promptTemplate = extractPromptBlock(gmMd);
-  const additionalAgents = loadAdditionalAgents(ruleset.name, dir);
-
+  /* Agents decoupled from the bundle as of v0.4. Use build-agents.mjs to
+     produce per-ruleset agents.json files; users install them via the
+     extension's "Import Agents" dialog (delete-then-replace, no
+     duplicate-accumulation). The bundle ships ruleset + lorebook only. */
   const bundle = {
     schema: "mrrp-bundle",
     version: 1,
-    minExtensionVersion: "0.3.0",
+    minExtensionVersion: "0.4.0",
     authorId: "kenhito",
-    generator: { name: "build-bundle.mjs", version: "1.0.0" },
+    generator: { name: "build-bundle.mjs", version: "1.1.0" },
     ruleset,
-    gmAgent: {
-      name: ruleset.name + " Ruleset Helper",
-      description: "Provides " + ruleset.name + " skill resolution and dice formatting guidance for Roleplay Mode narration, alongside the engine's default roleplay agents.",
-      phase: "pre_generation",
-      promptTemplate,
-      settings: {}
-    },
-    additionalAgents,
     lorebook: {
       name: lb.name,
       description: lb.description || "",

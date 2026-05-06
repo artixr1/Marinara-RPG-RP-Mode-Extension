@@ -1,5 +1,41 @@
 # AGENTS.md — AI-Agent Reference for Marinara-RPG-RP-Mode-Extension
 
+> **For AUTHORING A NEW RULESET (e.g., GURPS, Cyberpunk, Mörk Borg, etc.):** the canonical, system-agnostic, self-contained build documentation is at [`releases/v0.2.0/docs-for-ai/`](releases/v0.2.0/docs-for-ai/) — seven numbered Markdown files designed to be fed to any chat AI. Use those for new-ruleset authoring.
+>
+> This file (AGENTS.md) is for the deeper architectural concerns of working ON the framework itself.
+
+## v0.2.1 changes — important context
+
+Major changes since v0.2.0 (sheet ergonomics, item lifecycle, multi-system damage). All twenty-two rounds are itemized in `CHANGELOG.md` under `[v0.2.1]`; this is the cliff-notes view for anyone porting a new ruleset.
+
+1. **State-mutator inventory tags accept the full dialog field set.** `[mrrp-state: action="add" field="inventory" add="X" ...]` now reads optional attrs `slot`, `damage`, `attack_attr`, `attack_proficient` (bool), `use_effect`, `consumable` (bool), `notes`, and `category` (`"equipment"` or `"item"`). Snake-case keys are LLM-friendly inside a tag. Empty strings are treated as "leave alone" so repeated adds with the same name bump quantity and enrich blank fields without clobbering populated ones. Document this in your per-ruleset state-mutator override under `# Inventory schema (full field list — extension-confirmed)`.
+2. **Inventory items are normalized at every load.** `mergeSheet` runs every loaded item through `normalizeInventoryItem(it, idx)` which assigns a deterministic `item-heal-{nameSlug}-{idx}` id and fills missing dialog fields. Pre-fix items (no id, no category) self-heal in place — no migration script needed. Equipment-slot references survive across reloads because the synthetic id is name+index-keyed (stable).
+3. **Damage parser is multi-system.** `parseDamageExpression(s)` returns one of three kinds: `dnd` (NdM[+K] [type], sums dice), `exalted` (`12L`/`12B`/`12A`/`12dL`/`12 Lethal`, rolls Nd10 and counts 7+ as successes per Exalted 3e damage convention — 10s do NOT double on damage), `flat` (`5 fire`, posts the value as-is). All three call sites — `rollWeaponDamage`, `useItem`, `castSpell` (`ability.damageDice`) — route through it. Add new ruleset notations by extending the parser; the call sites stay unchanged.
+4. **Bars always show editable max alongside current.** `renderBar` no longer gates the max input behind `!hasExplicitMax`. For ruleset-capped bars (Exalted Motes via `maxFormula`, anything with literal `max`) the input default-displays the formula/literal value; typing persists to `state.sheet.derivedMax[name]` and overrides. `computeMax()` checks `derivedMax` FIRST so manual edits stick. `refresh()` re-syncs both inputs to current state after every state-mutator delta — fixes the "stale UI confuses the GM agent on next refresh" bug.
+5. **Per-character bar caps via removal of literal `max`.** The exalted3e Willpower derived-stat dropped its `"max": 10` so each character's WP cap is user-set (canonically 5–10 for Solars). When porting a ruleset, only declare a literal `max` if the cap is universal across all characters; otherwise omit it and let `derivedMax` carry per-character values.
+6. **Renderer for `renderAs: "value"` shows "/N" cap inline** when the derived stat has `max` or `maxFormula` declared. Essence reads "5 / 10" instead of bare "5". CSS class: `.mrrp-row__cap`.
+7. **Header labels are per-ruleset** via `header.raceLabel` / `header.classLabel`. Exalted ships `"Type"` / `"Caste/Aspect"` (slash works for both Caste-using Exalted types and Aspect-using Dragon-Bloods). D&D ships `"Race"` / `"Class"`. Defaults to "Race"/"Class" when unset.
+
+When in doubt about state-mutator inventory schema or damage notation, check `CHANGELOG.md [v0.2.1]` Round 18 / Round 19 / Round 22 entries — they document the wire format with worked examples.
+
+---
+
+## v0.2 changes — important context
+
+Major architectural changes since v0.0.1:
+
+1. **Agents decoupled from bundle.** `tools/build-bundle.mjs` produces `bundle.json` (ruleset + lorebook only). `tools/build-agents.mjs` produces a separate `agents.json`. Users install agents through Marinara's Import Agents dialog.
+2. **System-agnostic agent baselines + per-system overrides.** Five role agents have shared baselines at `agents/<role>.md`. Per-system overrides at `rulesets/<system>/agents/<role>.md` win when present.
+3. **Typed damage** on tracks via `damageTypes: [...]` on `renderAs: "track"` derived stats.
+4. **Sorcery / multi-turn casting** ability category and state-mutator workflow.
+5. **CSP-safe formula evaluator** using recursive-descent instead of `new Function`.
+6. **State-mutator resolver normalization, max-clamp, persisted dedupe.**
+7. **Lorebook install rewritten** — per-entry POST with delete-then-add.
+
+When in doubt, `releases/v0.2.0/docs-for-ai/` is the current truth for ruleset authoring.
+
+---
+
 This file is the dense reference for AI agents (Claude, Codex, ChatGPT)
 that need to make targeted changes to this repository. It pairs with
 the (more user-facing) `README.md` and the (vibecoder-facing)
@@ -181,6 +217,38 @@ reference it). The displayed agent name is up to the bundle author.
 For RP-mode overlays, prefer something like `"<System> Ruleset Helper"`
 or `"<System> Rules Reference"` rather than the GM-mode-style
 `"Override"` framing.
+
+A bundle MAY also ship `additionalAgents[]` — see the next section.
+
+---
+
+## Sub-agent install behavior (`additionalAgents[]`, post-2026-05-04)
+
+The installer treats the bundle's main `gmAgent` and its optional `additionalAgents[]` differently:
+
+**Main `gmAgent`:** installs `enabled: true`. On re-install (PATCH), continues to set `enabled: true`. Load-bearing — the bundle doesn't work without it.
+
+**Sub-agents in `additionalAgents[]`:** install **`enabled: false` by default.** Bundle authors can opt a specific sub-agent into enabled-on-install by setting `"enabled": true` on the additionalAgents item. The installer reads `ag.enabled === true` from the bundle data; absent or any non-true value → installer creates the agent disabled. Rationale: every enabled sub-agent fires every turn and costs a model call; users should explicitly enable only the ones they want via Marinara → Settings → Agents.
+
+**Toggle preservation on re-install (PATCH):** the install code carries `enabled` only in the CREATE (POST) body, never in the UPDATE (PATCH) body. So if a user enables a sub-agent in Settings → Agents and later re-installs the bundle, their enabled choice survives:
+
+```js
+// extension/RPG-Extension-RP-Mode.js (around line 460-490)
+var subBody = { /* full body including enabled: ag.enabled === true */ };
+var subBodyForUpdate = Object.assign({}, subBody);
+delete subBodyForUpdate.enabled;       // preserve user toggle on re-install
+return existingSub
+  ? apiFetch("/agents/" + existingSub.id, { method: "PATCH", body: JSON.stringify(subBodyForUpdate) })
+  : apiFetch("/agents", { method: "POST", body: JSON.stringify(subBody) });
+```
+
+**Schema:** `bundle.schema.json` `additionalAgents` items declare `enabled` as an optional boolean (default false). Additive — existing bundles in production stay valid.
+
+**Sub-agent prompt content** (`additionalAgents[].promptTemplate`): each sub-agent must follow RP-mode framing rules. No "Game Mode" / "GM model" / "you are the GM" language. The cooperating-with-default-agents posture extends to every agent the bundle ships. The reference prompts at `agents/<role>.md` in this repo are the source-of-truth — copy from there into the bundle.
+
+**Lorebook documentation convention:** every bundle that ships sub-agents should also include one lorebook entry titled "Optional Sub-Agents — what they do and how to enable" so the user can ask the chat about them in-engine. The dnd5e/exalted3e reference bundles show the canonical content.
+
+**Chat-message observer hardening (post-2026-05-04):** the chat-message `MutationObserver` no longer watches `characterData` mutations. The debounce uses `marinara.setTimeout` plus a monotonic-token cancel pattern instead of raw `setTimeout`/`clearTimeout`, so pending parses cannot fire after the extension is disabled. See `function watchChatMessages()` around line 3065 of `extension/RPG-Extension-RP-Mode.js`.
 
 ---
 

@@ -1,5 +1,11 @@
 # AUTHORING-PROMPT.md — Vibecoder One-Paste Template
 
+> **NEW IN v0.2:** the canonical AI-authoring documentation now lives at [`releases/v0.2.0/docs-for-ai/`](releases/v0.2.0/docs-for-ai/) — seven numbered Markdown files plus example prompts. Use those instead of this single-paste prompt for new ruleset authoring; they cover the system-agnostic agent architecture, typed damage, sorcery/multi-turn casting, the build pipeline, and copy-paste prompts for Claude.ai / ChatGPT / Gemini.
+>
+> This file remains as a pre-v0.2 single-paste template. For the current state, start with [`releases/v0.2.0/BUILD-YOUR-OWN-RULESET.md`](releases/v0.2.0/BUILD-YOUR-OWN-RULESET.md).
+
+---
+
 Copy everything below the `--- BEGIN PROMPT ---` line into a chat-AI
 window (Claude, ChatGPT, Gemini, etc.). Replace `<RPG SYSTEM NAME>`
 with the system you want a bundle for. The AI will produce a single
@@ -114,6 +120,18 @@ The `promptTemplate` should:
 `mrrpManaged: true`, `mrrpBundleSchema: "mrrp-bundle"`,
 `mrrpRulesetId: <ruleset.id>`, `mrrpAuthorId: <authorId>` automatically
 on install.
+
+## Optional sub-agents (`additionalAgents[]`)
+
+A bundle MAY include up to five focused `pre_generation` sub-agents in `additionalAgents[]`: `state-mutator`, `state-reminder`, `combat-adjudicator`, `lore-query`, `npc-bookkeeper`. Each is a distinct agent with its own `promptTemplate` and `role`-based idempotency key. The five reference prompts live at `agents/<role>.md` in this repo — copy their content into `additionalAgents[].promptTemplate` for parity with what the existing reference bundles ship.
+
+**Install posture:** sub-agents install **disabled by default** (post-2026-05-04 behavior). The user opts in per-agent in Marinara → Settings → Agents. If a specific sub-agent is so essential to your bundle that it should fire on first install, set `"enabled": true` on that item in `additionalAgents[]` — the installer reads the field and creates the agent enabled. Use sparingly; every enabled sub-agent costs one model call per turn, and the cooperative roleplay-mode posture argues for opt-in over opt-out.
+
+**On re-install (PATCH), the user's enabled-toggle is preserved.** The installer carries `enabled` only on the initial CREATE. So a user who toggled a sub-agent on after install still has it on after re-install of the bundle.
+
+**Document each sub-agent in the lorebook.** Conventionally, ship one lorebook entry titled "Optional Sub-Agents — what they do and how to enable" that lists each agent's purpose + the Settings → Agents flow. The dnd5e and exalted3e reference bundles in this repo show the canonical content.
+
+**RP-mode framing for the sub-agent prompts.** Each sub-agent should follow the same cooperative framing rules as the main `gmAgent`: no "Game Mode" / "GM model" / "you are the GM" language. The cooperating-with-default-agents posture extends to every agent the bundle ships.
 
 ## Lorebook content rules
 
