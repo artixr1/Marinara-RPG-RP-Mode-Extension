@@ -127,6 +127,19 @@ imports, end to end:
    into the textarea. Click Install. Use either
    `rulesets/dnd5e/bundle.json` or `rulesets/exalted3e/bundle.json`.
 
+   ![Marinara RPG Ruleset dialog. URL field at the top with a raw mrrp- bundle URL example, then a multi-line textarea showing a bundle.json paste. Top button row: Manage agents, Import agents — these handle the standalone agents.json import described in step 3 below. Following button row: Fetch URL, Choose file..., Clear, Uninstall server data, Save and reload (highlighted as the primary action). Below that a Library section listing previously installed rulesets with Switch buttons.](docs/screenshots/ruleset-ui.png)
+
+3. **Import the agents file (optional but recommended).** As of v0.2.0
+   the optional sub-agents ship as a separate `agents.json` file rather
+   than inside the bundle, so prompt updates can roll out without
+   forcing a full ruleset reinstall. In the same Ruleset dialog click
+   **Import agents**, then either choose the `agents.json` file or
+   paste its contents into the textarea, and click **Apply (replace
+   agents)**. Existing agents tagged with the same `rulesetId` are
+   deleted and replaced — no duplicate accumulation.
+
+   ![Marinara Import RP Agents dialog. Header reads "Import RP Agents" with the explanation "Paste an mrrp-agents JSON or import a file. Existing agents tagged with the same rulesetId will be DELETED and replaced — no duplicates." A multi-line textarea sits below for pasting agent JSON, followed by buttons: Import file..., Cancel, Apply (replace agents) highlighted as the primary action.](docs/screenshots/agent-import-ui.png)
+
 The installer creates / updates one custom agent and one lorebook in
 your Marinara database. Re-installing the same bundle is idempotent —
 matched by `mrrpManaged: true` settings flag and lorebook tags.
