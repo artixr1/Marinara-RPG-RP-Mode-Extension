@@ -1346,6 +1346,34 @@
   background: rgba(180, 90, 40, 0.20);
 }
 
+/* Commitment chips — surface per-item magic-binding state on the inventory
+   row. Attuned and Invested share the accent palette (the system's "magic
+   is active" cue). Mote uses the warning hue since Exalted essence reads
+   as "energy held in reserve" rather than a passive enchantment. */
+.mrrp-chip--attuned {
+  color: var(--mrrp-on-accent);
+  background: var(--mrrp-accent);
+  border-color: var(--mrrp-accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--invested {
+  color: var(--mrrp-on-accent);
+  background: var(--mrrp-accent);
+  border-color: var(--mrrp-accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--mote {
+  color: #1a0f0f;
+  background: var(--mrrp-warning);
+  border-color: var(--mrrp-warning);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
 .mrrp-chip--intimacy-kind {
   cursor: pointer;
   background: var(--mrrp-tint-2);
