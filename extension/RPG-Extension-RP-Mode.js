@@ -27,6 +27,7 @@ var LS_CHARACTER_PFX = "mrrp-character-";  // chat-independent character library
 var LS_SHEET_SIZE    = LS_SHEET_PFX + "size";
 var LS_SHEET_COLLAPSED_PFX = LS_SHEET_PFX + "collapsed-";
 var LS_SPELLBOOK_POS = "mrrp-spellbook-pos";
+var LS_INTIMACIES_POS = "mrrp-intimacies-pos";
 var LS_SPELLBOOK_LB_PFX = "mrrp-spellbook-lb-";   // appended with chatId
 var LS_PROCESSED_MSGS_PFX = "mrrp-processed-msgs-"; // appended with chatId — set of message ids whose state-mutator tags have already applied; persisted so hard-refresh doesn't re-apply historic mutations
 var MRR_TAG_SPELLBOOK = "mrrp-spellbook";
@@ -45,7 +46,7 @@ var MRRP_PROMPT_PFX   = "[mrrp-v1:";
 var EMBED_STYLE_ID   = "mrrp-embedded-style";
 
 /* EMBEDDED_CSS_BEGIN */
-var EMBEDDED_CSS = "/*\n * Marinara-RPG-RP-Mode-Extension — RPG-Extension-RP-Mode.css\n * Companion stylesheet for RPG-Extension-RP-Mode.js. Paste this CSS into Marinara\n * Engine -> Settings -> Extensions -> Add Extension -> CSS field.\n *\n * License: MIT\n * Source:  https://github.com/Kenhito/Marinara-RPG-RP-Mode-Extension\n */\n\n:root {\n  --mrrp-bg:           rgba(20, 16, 28, 0.92);\n  --mrrp-bg-elev:      rgba(40, 32, 56, 0.92);\n  --mrrp-border:       rgba(255, 255, 255, 0.10);\n  --mrrp-border-strong:rgba(255, 255, 255, 0.20);\n  --mrrp-text:         #f5f0ff;\n  --mrrp-text-dim:     rgba(245, 240, 255, 0.65);\n  --mrrp-accent:       #d4a8ff;\n  --mrrp-accent-dim:   rgba(212, 168, 255, 0.30);\n  --mrrp-success:      #6ee7b7;\n  --mrrp-fail:         #fb7185;\n  --mrrp-warning:      #fbbf24;\n  --mrrp-on-accent:    #1a0f2a;\n  --mrrp-on-fail:      #1a0f0f;\n  --mrrp-tint-1:       rgba(255, 255, 255, 0.04);\n  --mrrp-tint-2:       rgba(255, 255, 255, 0.06);\n  --mrrp-tint-strong:  rgba(255, 255, 255, 0.20);\n  --mrrp-radius:       8px;\n  --mrrp-radius-sm:    4px;\n  --mrrp-pad:          10px;\n  --mrrp-gap:          6px;\n  --mrrp-shadow:       0 8px 24px rgba(0, 0, 0, 0.35);\n  --mrrp-mono:         ui-monospace, \"Cascadia Code\", \"Fira Code\", Menlo, Monaco, monospace;\n  --mrrp-z-sheet:      9997;\n  --mrrp-z-dice:       9998;\n  --mrrp-z-dialog:     9999;\n}\n\n.mrrp-hidden { display: none !important; }\n.mrrp-msg--hidden,\n.mrrp-dice__result--hidden { display: none; }\n\n/*  ─────  Sheet panel (replaces the hidden built-in attribute panel) ───── */\n\n.mrrp-sheet {\n  display: flex;\n  flex-direction: column;\n  gap: var(--mrrp-gap);\n  background: var(--mrrp-bg);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  margin: var(--mrrp-gap) 0;\n  color: var(--mrrp-text);\n  font-size: 13px;\n}\n\n.mrrp-sheet--floating {\n  position: fixed;\n  left: 16px;\n  top: 80px;\n  width: 320px;\n  min-width: 280px;\n  max-width: calc(100vw - 32px);\n  min-height: 200px;\n  max-height: 70vh;\n  overflow: auto;\n  resize: both;\n  z-index: var(--mrrp-z-sheet);\n}\n\n.mrrp-sheet__header {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n  padding-bottom: 6px;\n  margin-bottom: 4px;\n}\n\n.mrrp-sheet__title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  width: 100%;\n}\n\n.mrrp-sheet__title {\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-sheet__meta {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  font-family: var(--mrrp-mono);\n}\n\n.mrrp-sheet__char-row {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n\n/* Identity row — sits below the character switcher, holds two label+input\n   pairs whose labels are ruleset-driven (Race+Class for D&D, Ancestry+\n   Class for PF2e, Exalt Type+Caste for Exalted, Concept+Trouble for Fate).\n   Inputs flex to share the row evenly; labels stay tight and dim. */\n.mrrp-sheet__identity-row {\n  display: grid;\n  grid-template-columns: auto 1fr auto 1fr;\n  align-items: center;\n  gap: 4px 6px;\n  margin-top: 2px;\n}\n\n.mrrp-sheet__id-label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  white-space: nowrap;\n}\n\n.mrrp-sheet__id-input {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n.mrrp-sheet__id-input:focus {\n  outline: none;\n  border-color: var(--mrrp-accent);\n}\n\n.mrrp-sheet__char-label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-char-select {\n  flex: 1;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-char-btn {\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-size: 11px;\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-char-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-char-btn--danger:hover {\n  background: rgba(251, 113, 133, 0.30);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-char-btn--accent {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n}\n\n.mrrp-char-btn--dashed {\n  border-style: dashed;\n  border-color: var(--mrrp-accent-dim);\n}\n\n.mrrp-draggable-handle { cursor: grab; user-select: none; touch-action: none; }\n.mrrp-draggable-handle:active { cursor: grabbing; }\n\n.mrrp-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px;\n  background: var(--mrrp-bg-elev);\n}\n\n.mrrp-section__title {\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: var(--mrrp-text-dim);\n  margin-bottom: 2px;\n}\n\n.mrrp-group {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  margin-bottom: 6px;\n}\n\n.mrrp-group__label {\n  font-size: 10px;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-accent);\n  margin-top: 4px;\n}\n\n.mrrp-row {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 4px;\n  border-radius: var(--mrrp-radius-sm);\n}\n\n.mrrp-row:hover {\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-row--compact {\n  grid-template-columns: 1fr auto auto;\n}\n\n.mrrp-row__name {\n  font-weight: 500;\n}\n\n.mrrp-row__abbr {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-row__value {\n  min-width: 32px;\n  text-align: right;\n  font-family: var(--mrrp-mono);\n}\n\n/* Editable numeric input — replaces the historical value <span> on every\n   numeric sheet row (attributes, skills, derived, backgrounds, custom\n   skills, bar current values). Visually flush with the surrounding row;\n   the user types directly. The browser's native number-input spinners\n   are suppressed because the +/- stepper next to the field already\n   provides the same affordance and double controls are visual noise. */\n.mrrp-row__value--editable {\n  width: 48px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 4px;\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  text-align: right;\n  -moz-appearance: textfield;\n}\n.mrrp-row__value--editable:focus {\n  outline: none;\n  border-color: var(--mrrp-accent);\n  background: var(--mrrp-bg);\n}\n.mrrp-row__value--editable::-webkit-outer-spin-button,\n.mrrp-row__value--editable::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Condition row inline effect summary — small, dim, italic so it\n   reads as metadata next to the condition name without competing for\n   the row's primary attention. */\n.mrrp-condition-effect {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  font-style: italic;\n  flex: 1;\n  margin-left: 6px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n/* Advantage / disadvantage toggle row in the d20 dice widget. Three\n   buttons sit beside a label; the active mode picks up the accent\n   color so the player can see at a glance which mode is armed. */\n.mrrp-dice__adv-row {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  margin: 4px 0;\n}\n.mrrp-dice__adv-row label {\n  flex: 0 0 80px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n.mrrp-adv-btn {\n  flex: 1;\n  padding: 4px 8px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  font-family: inherit;\n  font-size: 11px;\n  cursor: pointer;\n}\n.mrrp-adv-btn:hover { background: var(--mrrp-accent-dim); }\n.mrrp-adv-btn--active {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n}\n\n/* \"/\" separator that sits between the editable current and editable\n   max inputs on bars without an engine-declared cap (D&D HP, etc.).\n   Dimmed because it's a visual cue, not a control. */\n.mrrp-bar__sep {\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  color: var(--mrrp-text-dim);\n  padding: 0 2px;\n}\n\n/* Auto-calculated derived stat — value computed from `valueFormula` every\n   time the stat context changes. Read-only by design; the formula IS the\n   override path. Subtle accent stripe on the left distinguishes it from\n   manually-entered values without screaming for attention. */\n.mrrp-row__value--autocalc {\n  min-width: 32px;\n  text-align: right;\n  font-family: var(--mrrp-mono);\n  color: var(--mrrp-accent);\n  border-left: 2px solid var(--mrrp-accent-dim);\n  padding-left: 6px;\n}\n\n.mrrp-row__roll {\n  font-size: 11px;\n  padding: 2px 6px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-accent-dim);\n  border: 1px solid var(--mrrp-accent-dim);\n  color: var(--mrrp-text);\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-row__roll:hover { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }\n\n/*  ─────  Skill proficiency tier button + specialty sub-row  ───── */\n\n/* Shared base for the small letter buttons that sit inside the stepper\n   group on each skill row. Kept separate from `.mrrp-stepper button` so\n   the stepper can be 18×18 (numeric +/-) while these are 22×18 (single\n   uppercase letter or \"+S\") without re-spec'ing every property. */\n.mrrp-skill-tier-btn,\n.mrrp-skill-spec-btn {\n  width: 22px;\n  height: 18px;\n  padding: 0;\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  font-weight: 700;\n  line-height: 1;\n}\n\n.mrrp-skill-tier-btn { letter-spacing: 0.04em; }\n.mrrp-skill-spec-btn { border-style: dashed; border-color: var(--mrrp-accent-dim); }\n\n.mrrp-skill-tier-btn:hover,\n.mrrp-skill-spec-btn:hover { background: var(--mrrp-accent-dim); }\n\n/* Tier modifier classes — visual cue for the active tier. The renderer\n   adds `--<code>` for the active tier; codes are ruleset-defined so\n   these mappings cover the common cases (PF2e U/T/E/M/L, Exalted U/C/F,\n   D&D U/T/E). Untrained-equivalent stays at the default tint. */\n.mrrp-skill-tier-btn--T,\n.mrrp-skill-tier-btn--C { background: var(--mrrp-tint-strong); }\n.mrrp-skill-tier-btn--E,\n.mrrp-skill-tier-btn--F { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent-dim); }\n.mrrp-skill-tier-btn--M { background: var(--mrrp-accent); color: var(--mrrp-on-accent); border-color: var(--mrrp-accent); }\n.mrrp-skill-tier-btn--L {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n  box-shadow: 0 0 0 1px var(--mrrp-accent-dim);\n}\n\n.mrrp-skill-spec-row {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 4px 2px 18px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  margin-top: 2px;\n}\n\n.mrrp-skill-spec-name {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 11px;\n}\n\n/* Custom skill / lore row — inherits the specialty layout but adds an\n   attribute selector between the name and the value so user-added skills\n   can declare which attribute they roll under. The select stays compact\n   so the row's grid columns line up with the existing specialty rows. */\n.mrrp-custom-skill-row { grid-template-columns: 1fr auto auto auto auto auto; }\n.mrrp-custom-skill-attr {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 4px;\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n}\n\n.mrrp-skill-spec-label {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  font-family: var(--mrrp-mono);\n}\n\n/*  ─────  Dice widget specialty pane  ───── */\n\n.mrrp-dice__specs {\n  margin-top: 8px;\n  padding: 6px 8px;\n  border: 1px dashed var(--mrrp-accent-dim);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-dice__specs-title {\n  font-size: 10px;\n  font-weight: 700;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-accent);\n  margin-bottom: 4px;\n}\n\n.mrrp-dice__spec-row {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 0;\n  cursor: pointer;\n}\n\n.mrrp-dice__spec-checkbox {\n  margin: 0;\n  cursor: pointer;\n}\n\n.mrrp-stepper {\n  display: inline-flex;\n  gap: 2px;\n}\n\n.mrrp-stepper button {\n  width: 18px;\n  height: 18px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  background: var(--mrrp-tint-2);\n  border: 1px solid var(--mrrp-border);\n  color: var(--mrrp-text);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  padding: 0;\n  line-height: 1;\n}\n\n.mrrp-stepper button:hover { background: var(--mrrp-accent-dim); }\n.mrrp-stepper button:disabled { opacity: 0.4; cursor: not-allowed; }\n\n/*  ─────  Derived stats  ───── */\n\n.mrrp-derived {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-derived__formula {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-bar {\n  position: relative;\n  height: 14px;\n  background: var(--mrrp-tint-2);\n  border-radius: var(--mrrp-radius-sm);\n  overflow: hidden;\n}\n\n.mrrp-bar__fill {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(90deg, var(--mrrp-accent-dim), var(--mrrp-accent));\n  width: 0;\n  transition: width 0.18s ease-out;\n}\n\n.mrrp-bar__label {\n  position: relative;\n  z-index: 1;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  text-align: center;\n  line-height: 14px;\n  color: var(--mrrp-text);\n  text-shadow: 0 0 2px rgba(0,0,0,0.6);\n}\n\n.mrrp-track {\n  display: flex;\n  gap: 3px;\n  flex-wrap: wrap;\n}\n\n.mrrp-track__cell {\n  min-width: 38px;\n  padding: 2px 6px;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  text-align: center;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  cursor: pointer;\n  user-select: none;\n}\n\n.mrrp-track__cell--filled {\n  background: var(--mrrp-fail);\n  color: var(--mrrp-on-fail);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-track__cell--active {\n  outline: 2px solid var(--mrrp-warning);\n}\n\n.mrrp-track__cell--extra {\n  border-style: dashed;\n  border-color: var(--mrrp-accent-dim);\n}\n\n/*  ─────  Damage-type tones  ─────\n    Used by rulesets that declare damageTypes on a track-renderAs derived\n    stat (Exalted, WoD, anything Storyteller-flavored). Bashing is mild\n    (warning yellow), Lethal is severe (fail red, same hue as legacy\n    single-fill), Aggravated is dire (deep maroon — meant to read as\n    'something supernatural just hit you'). The renderer overlays the\n    damage-type label (B/L/A) on the cell when filled. */\n.mrrp-track__cell--bashing {\n  background: var(--mrrp-warning);\n  color: #1a0f0f;\n  border-color: var(--mrrp-warning);\n}\n.mrrp-track__cell--lethal {\n  background: var(--mrrp-fail);\n  color: var(--mrrp-on-fail);\n  border-color: var(--mrrp-fail);\n}\n.mrrp-track__cell--aggravated {\n  background: #5a1a1a;\n  color: #f5f0ff;\n  border-color: #7a2a2a;\n  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);\n}\n\n.mrrp-track-ctrl {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 4px;\n  margin-top: 4px;\n}\n\n.mrrp-track-ctrl__label {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  margin-right: 2px;\n}\n\n.mrrp-track-add-btn {\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 6px;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  cursor: pointer;\n}\n\n.mrrp-track-add-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-track-add-btn--danger:hover {\n  background: rgba(251, 113, 133, 0.30);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-saved-indicator {\n  font-size: 10px;\n  color: var(--mrrp-success);\n  font-family: var(--mrrp-mono);\n  margin-left: 6px;\n  white-space: nowrap;\n}\n\n/*  ─────  States (anima banner / stunt tier / D&D conditions)  ───── */\n\n.mrrp-state {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 6px;\n  padding: 4px 0;\n}\n\n.mrrp-state__name { font-weight: 500; }\n\n.mrrp-state__select {\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n/*  ─────  Floating dice widget  ───── */\n\n.mrrp-dice {\n  position: fixed;\n  top: 80px;\n  right: 16px;\n  width: 280px;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  box-shadow: var(--mrrp-shadow);\n  z-index: var(--mrrp-z-dice);\n  font-size: 13px;\n  display: none;\n}\n\n.mrrp-dice--open { display: block; }\n\n.mrrp-dice__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 6px;\n  padding-bottom: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n}\n\n.mrrp-dice__title {\n  font-weight: 600;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-dice__close {\n  background: transparent;\n  border: 0;\n  color: var(--mrrp-text-dim);\n  font-size: 18px;\n  cursor: pointer;\n  line-height: 1;\n}\n\n.mrrp-dice__row {\n  display: flex;\n  gap: 6px;\n  align-items: center;\n  margin: 4px 0;\n}\n\n.mrrp-dice__row label {\n  flex: 0 0 80px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-dice__input {\n  flex: 1;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: var(--mrrp-mono);\n  font-size: 13px;\n  width: 100%;\n}\n\n.mrrp-dice__btn {\n  width: 100%;\n  margin-top: 6px;\n  padding: 6px 10px;\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border: 0;\n  border-radius: var(--mrrp-radius-sm);\n  font-weight: 600;\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-dice__btn:hover { filter: brightness(1.1); }\n\n.mrrp-dice__btn--secondary {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n}\n\n.mrrp-dice__btn--row-spaced { margin-top: 4px; }\n\n.mrrp-dice__result {\n  margin-top: 8px;\n  padding: 8px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-bg-elev);\n  border: 1px solid var(--mrrp-border);\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  white-space: pre-wrap;\n}\n\n.mrrp-dice__result--success { border-color: var(--mrrp-success); }\n.mrrp-dice__result--fail    { border-color: var(--mrrp-fail); }\n.mrrp-dice__result--botch   { border-color: var(--mrrp-warning); background: rgba(251, 191, 36, 0.10); }\n.mrrp-dice__result--tie     { border-color: var(--mrrp-warning); }\n\n.mrrp-dice__faces {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 3px;\n  margin-top: 6px;\n}\n\n.mrrp-dice__face {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 22px;\n  height: 22px;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-dice__face--success { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent); }\n.mrrp-dice__face--double  { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }\n.mrrp-dice__face--one     { background: rgba(251, 113, 133, 0.20); border-color: var(--mrrp-fail); }\n\n/*  ─────  Header gear button + dialog  ───── */\n\n.mrrp-gear-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n  margin-left: 8px;\n  padding: 4px 8px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-gear-btn:hover { background: var(--mrrp-accent-dim); }\n\n/*  ─────  Header sheet-toggle button (scroll icon)  ───── */\n\n.mrrp-sheet-toggle-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 32px;\n  height: 32px;\n  margin-left: 8px;\n  padding: 0;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: 50%;\n  cursor: pointer;\n  font-family: inherit;\n  vertical-align: middle;\n}\n\n.mrrp-sheet-toggle-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-sheet-toggle-btn--active {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n}\n\n.mrrp-sheet-toggle-btn svg {\n  width: 18px;\n  height: 18px;\n  display: block;\n}\n\n.mrrp-dialog-backdrop {\n  position: fixed;\n  inset: 0;\n  background: rgba(0, 0, 0, 0.55);\n  z-index: var(--mrrp-z-dialog);\n  display: none;\n  align-items: center;\n  justify-content: center;\n}\n\n.mrrp-dialog-backdrop--open { display: flex; }\n\n.mrrp-dialog {\n  width: min(560px, 92vw);\n  max-height: 80vh;\n  overflow: auto;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: 16px;\n  box-shadow: var(--mrrp-shadow);\n}\n\n.mrrp-dialog h3 {\n  margin: 0 0 8px;\n  color: var(--mrrp-accent);\n  font-size: 16px;\n}\n\n.mrrp-dialog p {\n  color: var(--mrrp-text-dim);\n  font-size: 12px;\n  margin: 4px 0 8px;\n}\n\n.mrrp-dialog textarea {\n  width: 100%;\n  min-height: 220px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  resize: vertical;\n}\n\n.mrrp-dialog__row {\n  display: flex;\n  gap: 6px;\n  align-items: center;\n  margin: 8px 0;\n}\n\n.mrrp-dialog__label {\n  flex: 0 0 50px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-dialog__buttons {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 6px;\n  justify-content: flex-end;\n  margin-top: 12px;\n}\n\n.mrrp-dialog__lib-title {\n  margin-top: 18px;\n  border-top: 1px solid var(--mrrp-border);\n  padding-top: 14px;\n}\n.mrrp-dialog__lib-help {\n  font-size: 12px;\n  opacity: 0.8;\n  margin-top: 4px;\n}\n.mrrp-dialog__lib {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  margin-top: 8px;\n}\n.mrrp-dialog__lib-row {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 6px 8px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: rgba(0, 0, 0, 0.15);\n}\n.mrrp-dialog__lib-name {\n  flex: 1;\n  font-family: var(--mrrp-mono);\n  font-size: 13px;\n}\n\n.mrrp-msg {\n  margin-top: 6px;\n  padding: 6px 8px;\n  border-radius: var(--mrrp-radius-sm);\n  font-size: 12px;\n  font-family: var(--mrrp-mono);\n}\n\n.mrrp-msg--ok    { background: rgba(110, 231, 183, 0.12); border: 1px solid var(--mrrp-success); }\n.mrrp-msg--err   { background: rgba(251, 113, 133, 0.12); border: 1px solid var(--mrrp-fail); }\n.mrrp-msg--info  { background: rgba(212, 168, 255, 0.10); border: 1px solid var(--mrrp-accent-dim); }\n\n/*  ─────  Inventory section + item editor  ───── */\n\n.mrrp-inv-list {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-inv-item {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 4px 6px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-inv-item--equipped {\n  border-color: var(--mrrp-accent);\n  background: var(--mrrp-tint-2);\n}\n\n.mrrp-inv-item__name {\n  font-weight: 500;\n}\n\n.mrrp-inv-item__slot {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n}\n\n/* Damage cell on a weapon row — visually distinct from the slot tag so a\n   skim of the inventory tells the player at a glance which items hit\n   and how much. Color picks up the warning hue (the cue for \"this is\n   the violent thing\"). */\n.mrrp-inv-item__damage {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-warning);\n  white-space: nowrap;\n}\n\n.mrrp-inv-item__bonus-summary {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-accent);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n.mrrp-inv-empty {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  font-style: italic;\n}\n\n.mrrp-item-form__row {\n  display: grid;\n  grid-template-columns: 70px 1fr;\n  align-items: center;\n  gap: 12px;\n  margin: 6px 0;\n}\n\n.mrrp-item-form__row label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  text-align: right;\n}\n\n.mrrp-item-form__input,\n.mrrp-item-form__select {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-item-form__textarea {\n  width: 100%;\n  min-height: 50px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: inherit;\n  font-size: 12px;\n  resize: vertical;\n}\n\n.mrrp-bonus-list {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  margin-top: 4px;\n  padding: 6px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: rgba(0, 0, 0, 0.10);\n}\n\n.mrrp-bonus-list__title {\n  font-size: 10px;\n  font-weight: 700;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-bonus-row {\n  display: grid;\n  grid-template-columns: 2fr 50px 70px 1.2fr auto;\n  align-items: center;\n  gap: 4px;\n}\n\n.mrrp-bonus-row__input {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 4px;\n  font-family: inherit;\n  font-size: 11px;\n}\n\n/* <option> elements ignore most parent styling on Linux/Chromium and fall back\n   to OS-default (often white bg + inherited near-white text => invisible until\n   highlighted). Explicit colors here force a readable dark dropdown panel. */\n.mrrp-bonus-row__input option,\n.mrrp-item-form__select option,\n.mrrp-item-form__input option {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n}\n\n/*  ─────  Derived / skill row equipment-bonus suffix  ───── */\n\n.mrrp-row__bonus {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-success);\n  margin-left: 2px;\n}\n\n.mrrp-row__bonus--neg { color: var(--mrrp-fail); }\n\n/*  ─────  Derived value cap suffix (\"/ max\")  ───── */\n\n.mrrp-row__cap {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  margin-left: 2px;\n  white-space: nowrap;\n}\n\n\n/*  ─────  state-mutator tag visual hiding  ───── */\n/* The state-mutator agent instructs the main model to emit\n   [mrrp-state: ...] tags inline at paragraph ends. The extension's\n   chat observer parses + applies them, then wraps each tag in a\n   span.mrrp-state-tag for this CSS rule to hide visually. The state\n   change itself has already been applied to localStorage; the tag\n   is purely a wire-format artifact and should not appear in chat. */\n.mrrp-state-tag { display: none; }\n\n\n/*  ─────  state mutation confirmation toast  ───── */\n/* Top-right floating stack of brief notifications shown when the\n   state-mutator agent's tags fire. Each toast confirms one mutation:\n   prefix (HP / Condition / Inventory), change (signed delta or +/- name),\n   and the agent-reported reason. Stacks vertically; auto-dismisses. */\n.mrrp-toast-container {\n  position: fixed;\n  top: 16px;\n  right: 16px;\n  z-index: 10000;\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  pointer-events: none;\n}\n\n.mrrp-toast {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-left: 3px solid var(--mrrp-accent);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px 12px;\n  font-family: inherit;\n  font-size: 12px;\n  box-shadow: var(--mrrp-shadow);\n  opacity: 0;\n  transform: translateX(20px);\n  transition: opacity 0.25s ease-out, transform 0.25s ease-out;\n  pointer-events: auto;\n  display: flex;\n  gap: 8px;\n  align-items: baseline;\n  max-width: 320px;\n}\n\n.mrrp-toast--visible {\n  opacity: 1;\n  transform: translateX(0);\n}\n\n.mrrp-toast__prefix {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--mrrp-text-dim);\n  flex-shrink: 0;\n}\n\n.mrrp-toast__change {\n  font-family: var(--mrrp-mono);\n  font-weight: 700;\n  color: var(--mrrp-accent);\n  flex-shrink: 0;\n}\n\n.mrrp-toast__reason {\n  color: var(--mrrp-text-dim);\n  font-size: 11px;\n  font-style: italic;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n/*  ─────  Spellbook flyout (third floating panel, system-labeled)  ───── */\n/* Per-ruleset abilities/charms/stunts panel. Toggled from the main sheet's\n   spellbook row; renders one collapsible category section per\n   ruleset.abilities.categories[]. Position persists to mrrp-spellbook-pos.\n   Mirrors GM-mode architecture; mrrp- namespace. */\n\n.mrrp-spellbook {\n  position: fixed;\n  top: 80px;\n  left: 360px;\n  width: 320px;\n  max-height: 70vh;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  box-shadow: var(--mrrp-shadow);\n  z-index: 9996;\n  font-size: 13px;\n  display: none;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n.mrrp-spellbook--open { display: flex; }\n\n.mrrp-spellbook__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 6px;\n  padding-bottom: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n  cursor: grab;\n  user-select: none;\n}\n\n.mrrp-spellbook__header:active { cursor: grabbing; }\n\n.mrrp-spellbook__title {\n  font-weight: 600;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-spellbook__body {\n  flex: 1;\n  overflow-y: auto;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-spellbook-row { cursor: default; }\n.mrrp-spellbook-row__btn { width: 100%; text-align: left; }\n\n.mrrp-spellbook-cat {\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  padding: 4px 6px;\n}\n\n.mrrp-spellbook-cat__head {\n  width: 100%;\n  background: transparent;\n  color: var(--mrrp-text);\n  border: 0;\n  padding: 4px 2px;\n  font-family: inherit;\n  font-size: 12px;\n  font-weight: 600;\n  text-align: left;\n  cursor: pointer;\n  letter-spacing: 0.04em;\n}\n\n.mrrp-spellbook-cat__head:hover { color: var(--mrrp-accent); }\n\n.mrrp-spellbook-cat__list {\n  display: flex;\n  flex-direction: column;\n  gap: 3px;\n  margin-top: 4px;\n}\n\n.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__list,\n.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__add {\n  display: none;\n}\n\n.mrrp-spellbook-cat__add { margin-top: 4px; }\n\n.mrrp-spellbook-ab {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto;\n  align-items: center;\n  gap: 4px;\n  padding: 2px 4px;\n  background: var(--mrrp-bg-elev);\n  border-radius: var(--mrrp-radius-sm);\n  border: 1px solid var(--mrrp-border);\n}\n\n.mrrp-spellbook-ab__name { font-weight: 500; font-size: 12px; }\n.mrrp-spellbook-ab__cost {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  white-space: nowrap;\n}\n";
+var EMBEDDED_CSS = "/*\n * Marinara-RPG-RP-Mode-Extension — RPG-Extension-RP-Mode.css\n * Companion stylesheet for RPG-Extension-RP-Mode.js. Paste this CSS into Marinara\n * Engine -> Settings -> Extensions -> Add Extension -> CSS field.\n *\n * License: MIT\n * Source:  https://github.com/Kenhito/Marinara-RPG-RP-Mode-Extension\n */\n\n:root {\n  --mrrp-bg:           rgba(20, 16, 28, 0.92);\n  --mrrp-bg-elev:      rgba(40, 32, 56, 0.92);\n  --mrrp-border:       rgba(255, 255, 255, 0.10);\n  --mrrp-border-strong:rgba(255, 255, 255, 0.20);\n  --mrrp-text:         #f5f0ff;\n  --mrrp-text-dim:     rgba(245, 240, 255, 0.65);\n  --mrrp-accent:       #d4a8ff;\n  --mrrp-accent-dim:   rgba(212, 168, 255, 0.30);\n  --mrrp-success:      #6ee7b7;\n  --mrrp-fail:         #fb7185;\n  --mrrp-warning:      #fbbf24;\n  --mrrp-on-accent:    #1a0f2a;\n  --mrrp-on-fail:      #1a0f0f;\n  --mrrp-tint-1:       rgba(255, 255, 255, 0.04);\n  --mrrp-tint-2:       rgba(255, 255, 255, 0.06);\n  --mrrp-tint-strong:  rgba(255, 255, 255, 0.20);\n  --mrrp-radius:       8px;\n  --mrrp-radius-sm:    4px;\n  --mrrp-pad:          10px;\n  --mrrp-gap:          6px;\n  --mrrp-shadow:       0 8px 24px rgba(0, 0, 0, 0.35);\n  --mrrp-mono:         ui-monospace, \"Cascadia Code\", \"Fira Code\", Menlo, Monaco, monospace;\n  --mrrp-z-sheet:      9997;\n  --mrrp-z-dice:       9998;\n  --mrrp-z-dialog:     9999;\n}\n\n.mrrp-hidden { display: none !important; }\n.mrrp-msg--hidden,\n.mrrp-dice__result--hidden { display: none; }\n\n/*  ─────  Sheet panel (replaces the hidden built-in attribute panel) ───── */\n\n.mrrp-sheet {\n  display: flex;\n  flex-direction: column;\n  gap: var(--mrrp-gap);\n  background: var(--mrrp-bg);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  margin: var(--mrrp-gap) 0;\n  color: var(--mrrp-text);\n  font-size: 13px;\n}\n\n.mrrp-sheet--floating {\n  position: fixed;\n  left: 16px;\n  top: 80px;\n  width: 320px;\n  min-width: 280px;\n  max-width: calc(100vw - 32px);\n  min-height: 200px;\n  max-height: 70vh;\n  overflow: auto;\n  resize: both;\n  z-index: var(--mrrp-z-sheet);\n}\n\n.mrrp-sheet__header {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n  padding-bottom: 6px;\n  margin-bottom: 4px;\n}\n\n.mrrp-sheet__title-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  width: 100%;\n}\n\n.mrrp-sheet__title {\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-sheet__meta {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  font-family: var(--mrrp-mono);\n}\n\n.mrrp-sheet__char-row {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n\n/* Identity row — sits below the character switcher, holds two label+input\n   pairs whose labels are ruleset-driven (Race+Class for D&D, Ancestry+\n   Class for PF2e, Exalt Type+Caste for Exalted, Concept+Trouble for Fate).\n   Inputs flex to share the row evenly; labels stay tight and dim. */\n.mrrp-sheet__identity-row {\n  display: grid;\n  grid-template-columns: auto 1fr auto 1fr;\n  align-items: center;\n  gap: 4px 6px;\n  margin-top: 2px;\n}\n\n.mrrp-sheet__id-label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  white-space: nowrap;\n}\n\n.mrrp-sheet__id-input {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n.mrrp-sheet__id-input:focus {\n  outline: none;\n  border-color: var(--mrrp-accent);\n}\n\n.mrrp-sheet__char-label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-char-select {\n  flex: 1;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-char-btn {\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-size: 11px;\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-char-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-char-btn--danger:hover {\n  background: rgba(251, 113, 133, 0.30);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-char-btn--accent {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n}\n\n.mrrp-char-btn--dashed {\n  border-style: dashed;\n  border-color: var(--mrrp-accent-dim);\n}\n\n.mrrp-draggable-handle { cursor: grab; user-select: none; touch-action: none; }\n.mrrp-draggable-handle:active { cursor: grabbing; }\n\n.mrrp-section {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px;\n  background: var(--mrrp-bg-elev);\n}\n\n.mrrp-section__title {\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: var(--mrrp-text-dim);\n  margin-bottom: 2px;\n}\n\n.mrrp-group {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  margin-bottom: 6px;\n}\n\n.mrrp-group__label {\n  font-size: 10px;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-accent);\n  margin-top: 4px;\n}\n\n.mrrp-row {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 4px;\n  border-radius: var(--mrrp-radius-sm);\n}\n\n.mrrp-row:hover {\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-row--compact {\n  grid-template-columns: 1fr auto auto;\n}\n\n.mrrp-row__name {\n  font-weight: 500;\n}\n\n.mrrp-row__abbr {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-row__value {\n  min-width: 32px;\n  text-align: right;\n  font-family: var(--mrrp-mono);\n}\n\n/* Editable numeric input — replaces the historical value <span> on every\n   numeric sheet row (attributes, skills, derived, backgrounds, custom\n   skills, bar current values). Visually flush with the surrounding row;\n   the user types directly. The browser's native number-input spinners\n   are suppressed because the +/- stepper next to the field already\n   provides the same affordance and double controls are visual noise. */\n.mrrp-row__value--editable {\n  width: 48px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 4px;\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  text-align: right;\n  -moz-appearance: textfield;\n}\n.mrrp-row__value--editable:focus {\n  outline: none;\n  border-color: var(--mrrp-accent);\n  background: var(--mrrp-bg);\n}\n.mrrp-row__value--editable::-webkit-outer-spin-button,\n.mrrp-row__value--editable::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Condition row inline effect summary — small, dim, italic so it\n   reads as metadata next to the condition name without competing for\n   the row's primary attention. */\n.mrrp-condition-effect {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  font-style: italic;\n  flex: 1;\n  margin-left: 6px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n/* Advantage / disadvantage toggle row in the d20 dice widget. Three\n   buttons sit beside a label; the active mode picks up the accent\n   color so the player can see at a glance which mode is armed. */\n.mrrp-dice__adv-row {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  margin: 4px 0;\n}\n.mrrp-dice__adv-row label {\n  flex: 0 0 80px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n.mrrp-adv-btn {\n  flex: 1;\n  padding: 4px 8px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  font-family: inherit;\n  font-size: 11px;\n  cursor: pointer;\n}\n.mrrp-adv-btn:hover { background: var(--mrrp-accent-dim); }\n.mrrp-adv-btn--active {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n}\n\n/* \"/\" separator that sits between the editable current and editable\n   max inputs on bars without an engine-declared cap (D&D HP, etc.).\n   Dimmed because it's a visual cue, not a control. */\n.mrrp-bar__sep {\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  color: var(--mrrp-text-dim);\n  padding: 0 2px;\n}\n\n/* Auto-calculated derived stat — value computed from `valueFormula` every\n   time the stat context changes. Read-only by design; the formula IS the\n   override path. Subtle accent stripe on the left distinguishes it from\n   manually-entered values without screaming for attention. */\n.mrrp-row__value--autocalc {\n  min-width: 32px;\n  text-align: right;\n  font-family: var(--mrrp-mono);\n  color: var(--mrrp-accent);\n  border-left: 2px solid var(--mrrp-accent-dim);\n  padding-left: 6px;\n}\n\n.mrrp-row__roll {\n  font-size: 11px;\n  padding: 2px 6px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-accent-dim);\n  border: 1px solid var(--mrrp-accent-dim);\n  color: var(--mrrp-text);\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-row__roll:hover { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }\n\n/*  ─────  Skill proficiency tier button + specialty sub-row  ───── */\n\n/* Shared base for the small letter buttons that sit inside the stepper\n   group on each skill row. Kept separate from `.mrrp-stepper button` so\n   the stepper can be 18×18 (numeric +/-) while these are 22×18 (single\n   uppercase letter or \"+S\") without re-spec'ing every property. */\n.mrrp-skill-tier-btn,\n.mrrp-skill-spec-btn {\n  width: 22px;\n  height: 18px;\n  padding: 0;\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  font-weight: 700;\n  line-height: 1;\n}\n\n.mrrp-skill-tier-btn { letter-spacing: 0.04em; }\n.mrrp-skill-spec-btn { border-style: dashed; border-color: var(--mrrp-accent-dim); }\n\n.mrrp-skill-tier-btn:hover,\n.mrrp-skill-spec-btn:hover { background: var(--mrrp-accent-dim); }\n\n/* Tier modifier classes — visual cue for the active tier. The renderer\n   adds `--<code>` for the active tier; codes are ruleset-defined so\n   these mappings cover the common cases (PF2e U/T/E/M/L, Exalted U/C/F,\n   D&D U/T/E). Untrained-equivalent stays at the default tint. */\n.mrrp-skill-tier-btn--T,\n.mrrp-skill-tier-btn--C { background: var(--mrrp-tint-strong); }\n.mrrp-skill-tier-btn--E,\n.mrrp-skill-tier-btn--F { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent-dim); }\n.mrrp-skill-tier-btn--M { background: var(--mrrp-accent); color: var(--mrrp-on-accent); border-color: var(--mrrp-accent); }\n.mrrp-skill-tier-btn--L {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n  box-shadow: 0 0 0 1px var(--mrrp-accent-dim);\n}\n\n.mrrp-skill-spec-row {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 4px 2px 18px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  margin-top: 2px;\n}\n\n.mrrp-skill-spec-name {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 11px;\n}\n\n/* Custom skill / lore row — inherits the specialty layout but adds an\n   attribute selector between the name and the value so user-added skills\n   can declare which attribute they roll under. The select stays compact\n   so the row's grid columns line up with the existing specialty rows. */\n.mrrp-custom-skill-row { grid-template-columns: 1fr auto auto auto auto auto; }\n.mrrp-custom-skill-attr {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 4px;\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n}\n\n.mrrp-skill-spec-label {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  font-family: var(--mrrp-mono);\n}\n\n/*  ─────  Dice widget specialty pane  ───── */\n\n.mrrp-dice__specs {\n  margin-top: 8px;\n  padding: 6px 8px;\n  border: 1px dashed var(--mrrp-accent-dim);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-dice__specs-title {\n  font-size: 10px;\n  font-weight: 700;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-accent);\n  margin-bottom: 4px;\n}\n\n.mrrp-dice__spec-row {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 0;\n  cursor: pointer;\n}\n\n.mrrp-dice__spec-checkbox {\n  margin: 0;\n  cursor: pointer;\n}\n\n.mrrp-stepper {\n  display: inline-flex;\n  gap: 2px;\n}\n\n.mrrp-stepper button {\n  width: 18px;\n  height: 18px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  background: var(--mrrp-tint-2);\n  border: 1px solid var(--mrrp-border);\n  color: var(--mrrp-text);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  padding: 0;\n  line-height: 1;\n}\n\n.mrrp-stepper button:hover { background: var(--mrrp-accent-dim); }\n.mrrp-stepper button:disabled { opacity: 0.4; cursor: not-allowed; }\n\n/*  ─────  Derived stats  ───── */\n\n.mrrp-derived {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-derived__formula {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-bar {\n  position: relative;\n  height: 14px;\n  background: var(--mrrp-tint-2);\n  border-radius: var(--mrrp-radius-sm);\n  overflow: hidden;\n}\n\n.mrrp-bar__fill {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(90deg, var(--mrrp-accent-dim), var(--mrrp-accent));\n  width: 0;\n  transition: width 0.18s ease-out;\n}\n\n.mrrp-bar__label {\n  position: relative;\n  z-index: 1;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  text-align: center;\n  line-height: 14px;\n  color: var(--mrrp-text);\n  text-shadow: 0 0 2px rgba(0,0,0,0.6);\n}\n\n.mrrp-track {\n  display: flex;\n  gap: 3px;\n  flex-wrap: wrap;\n}\n\n.mrrp-track__cell {\n  min-width: 38px;\n  padding: 2px 6px;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  text-align: center;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  cursor: pointer;\n  user-select: none;\n}\n\n.mrrp-track__cell--filled {\n  background: var(--mrrp-fail);\n  color: var(--mrrp-on-fail);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-track__cell--active {\n  outline: 2px solid var(--mrrp-warning);\n}\n\n.mrrp-track__cell--extra {\n  border-style: dashed;\n  border-color: var(--mrrp-accent-dim);\n}\n\n/*  ─────  Damage-type tones  ─────\n    Used by rulesets that declare damageTypes on a track-renderAs derived\n    stat (Exalted, WoD, anything Storyteller-flavored). Bashing is mild\n    (warning yellow), Lethal is severe (fail red, same hue as legacy\n    single-fill), Aggravated is dire (deep maroon — meant to read as\n    'something supernatural just hit you'). The renderer overlays the\n    damage-type label (B/L/A) on the cell when filled. */\n.mrrp-track__cell--bashing {\n  background: var(--mrrp-warning);\n  color: #1a0f0f;\n  border-color: var(--mrrp-warning);\n}\n.mrrp-track__cell--lethal {\n  background: var(--mrrp-fail);\n  color: var(--mrrp-on-fail);\n  border-color: var(--mrrp-fail);\n}\n.mrrp-track__cell--aggravated {\n  background: #5a1a1a;\n  color: #f5f0ff;\n  border-color: #7a2a2a;\n  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);\n}\n\n.mrrp-track-ctrl {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 4px;\n  margin-top: 4px;\n}\n\n.mrrp-track-ctrl__label {\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  margin-right: 2px;\n}\n\n.mrrp-track-add-btn {\n  background: var(--mrrp-tint-2);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 1px 6px;\n  font-size: 10px;\n  font-family: var(--mrrp-mono);\n  cursor: pointer;\n}\n\n.mrrp-track-add-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-track-add-btn--danger:hover {\n  background: rgba(251, 113, 133, 0.30);\n  border-color: var(--mrrp-fail);\n}\n\n.mrrp-saved-indicator {\n  font-size: 10px;\n  color: var(--mrrp-success);\n  font-family: var(--mrrp-mono);\n  margin-left: 6px;\n  white-space: nowrap;\n}\n\n/*  ─────  States (anima banner / stunt tier / D&D conditions)  ───── */\n\n.mrrp-state {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 6px;\n  padding: 4px 0;\n}\n\n.mrrp-state__name { font-weight: 500; }\n\n.mrrp-state__select {\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n/*  ─────  Floating dice widget  ───── */\n\n.mrrp-dice {\n  position: fixed;\n  top: 80px;\n  right: 16px;\n  width: 280px;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  box-shadow: var(--mrrp-shadow);\n  z-index: var(--mrrp-z-dice);\n  font-size: 13px;\n  display: none;\n}\n\n.mrrp-dice--open { display: block; }\n\n.mrrp-dice__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 6px;\n  padding-bottom: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n}\n\n.mrrp-dice__title {\n  font-weight: 600;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-dice__close {\n  background: transparent;\n  border: 0;\n  color: var(--mrrp-text-dim);\n  font-size: 18px;\n  cursor: pointer;\n  line-height: 1;\n}\n\n.mrrp-dice__row {\n  display: flex;\n  gap: 6px;\n  align-items: center;\n  margin: 4px 0;\n}\n\n.mrrp-dice__row label {\n  flex: 0 0 80px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-dice__input {\n  flex: 1;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: var(--mrrp-mono);\n  font-size: 13px;\n  width: 100%;\n}\n\n.mrrp-dice__btn {\n  width: 100%;\n  margin-top: 6px;\n  padding: 6px 10px;\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border: 0;\n  border-radius: var(--mrrp-radius-sm);\n  font-weight: 600;\n  cursor: pointer;\n  font-family: inherit;\n}\n\n.mrrp-dice__btn:hover { filter: brightness(1.1); }\n\n.mrrp-dice__btn--secondary {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n}\n\n.mrrp-dice__btn--row-spaced { margin-top: 4px; }\n\n.mrrp-dice__result {\n  margin-top: 8px;\n  padding: 8px;\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-bg-elev);\n  border: 1px solid var(--mrrp-border);\n  font-family: var(--mrrp-mono);\n  font-size: 12px;\n  white-space: pre-wrap;\n}\n\n.mrrp-dice__result--success { border-color: var(--mrrp-success); }\n.mrrp-dice__result--fail    { border-color: var(--mrrp-fail); }\n.mrrp-dice__result--botch   { border-color: var(--mrrp-warning); background: rgba(251, 191, 36, 0.10); }\n.mrrp-dice__result--tie     { border-color: var(--mrrp-warning); }\n\n.mrrp-dice__faces {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 3px;\n  margin-top: 6px;\n}\n\n.mrrp-dice__face {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 22px;\n  height: 22px;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-dice__face--success { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent); }\n.mrrp-dice__face--double  { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }\n.mrrp-dice__face--one     { background: rgba(251, 113, 133, 0.20); border-color: var(--mrrp-fail); }\n\n/*  ─────  Header gear button + dialog  ───── */\n\n.mrrp-gear-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n  margin-left: 8px;\n  padding: 4px 8px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  cursor: pointer;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-gear-btn:hover { background: var(--mrrp-accent-dim); }\n\n/*  ─────  Header sheet-toggle button (scroll icon)  ───── */\n\n.mrrp-sheet-toggle-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 32px;\n  height: 32px;\n  margin-left: 8px;\n  padding: 0;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: 50%;\n  cursor: pointer;\n  font-family: inherit;\n  vertical-align: middle;\n}\n\n.mrrp-sheet-toggle-btn:hover { background: var(--mrrp-accent-dim); }\n\n.mrrp-sheet-toggle-btn--active {\n  background: var(--mrrp-accent);\n  color: var(--mrrp-on-accent);\n  border-color: var(--mrrp-accent);\n}\n\n.mrrp-sheet-toggle-btn svg {\n  width: 18px;\n  height: 18px;\n  display: block;\n}\n\n.mrrp-dialog-backdrop {\n  position: fixed;\n  inset: 0;\n  background: rgba(0, 0, 0, 0.55);\n  z-index: var(--mrrp-z-dialog);\n  display: none;\n  align-items: center;\n  justify-content: center;\n}\n\n.mrrp-dialog-backdrop--open { display: flex; }\n\n.mrrp-dialog {\n  width: min(560px, 92vw);\n  max-height: 80vh;\n  overflow: auto;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: 16px;\n  box-shadow: var(--mrrp-shadow);\n}\n\n.mrrp-dialog h3 {\n  margin: 0 0 8px;\n  color: var(--mrrp-accent);\n  font-size: 16px;\n}\n\n.mrrp-dialog p {\n  color: var(--mrrp-text-dim);\n  font-size: 12px;\n  margin: 4px 0 8px;\n}\n\n.mrrp-dialog textarea {\n  width: 100%;\n  min-height: 220px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px;\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  resize: vertical;\n}\n\n.mrrp-dialog__row {\n  display: flex;\n  gap: 6px;\n  align-items: center;\n  margin: 8px 0;\n}\n\n.mrrp-dialog__label {\n  flex: 0 0 50px;\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-dialog__buttons {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 6px;\n  justify-content: flex-end;\n  margin-top: 12px;\n}\n\n.mrrp-dialog__lib-title {\n  margin-top: 18px;\n  border-top: 1px solid var(--mrrp-border);\n  padding-top: 14px;\n}\n.mrrp-dialog__lib-help {\n  font-size: 12px;\n  opacity: 0.8;\n  margin-top: 4px;\n}\n.mrrp-dialog__lib {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  margin-top: 8px;\n}\n.mrrp-dialog__lib-row {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 6px 8px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: rgba(0, 0, 0, 0.15);\n}\n.mrrp-dialog__lib-name {\n  flex: 1;\n  font-family: var(--mrrp-mono);\n  font-size: 13px;\n}\n\n.mrrp-msg {\n  margin-top: 6px;\n  padding: 6px 8px;\n  border-radius: var(--mrrp-radius-sm);\n  font-size: 12px;\n  font-family: var(--mrrp-mono);\n}\n\n.mrrp-msg--ok    { background: rgba(110, 231, 183, 0.12); border: 1px solid var(--mrrp-success); }\n.mrrp-msg--err   { background: rgba(251, 113, 133, 0.12); border: 1px solid var(--mrrp-fail); }\n.mrrp-msg--info  { background: rgba(212, 168, 255, 0.10); border: 1px solid var(--mrrp-accent-dim); }\n\n/*  ─────  Inventory section + item editor  ───── */\n\n.mrrp-inv-list {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-inv-item {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto auto;\n  align-items: center;\n  gap: 6px;\n  padding: 4px 6px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n}\n\n.mrrp-inv-item--equipped {\n  border-color: var(--mrrp-accent);\n  background: var(--mrrp-tint-2);\n}\n\n.mrrp-inv-item__name {\n  font-weight: 500;\n}\n\n.mrrp-inv-item__slot {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n}\n\n/* Damage cell on a weapon row — visually distinct from the slot tag so a\n   skim of the inventory tells the player at a glance which items hit\n   and how much. Color picks up the warning hue (the cue for \"this is\n   the violent thing\"). */\n.mrrp-inv-item__damage {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-warning);\n  white-space: nowrap;\n}\n\n.mrrp-inv-item__bonus-summary {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-accent);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n.mrrp-inv-empty {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  font-style: italic;\n}\n\n.mrrp-item-form__row {\n  display: grid;\n  grid-template-columns: 70px 1fr;\n  align-items: center;\n  gap: 12px;\n  margin: 6px 0;\n}\n\n.mrrp-item-form__row label {\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  text-align: right;\n}\n\n.mrrp-item-form__input,\n.mrrp-item-form__select {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: inherit;\n  font-size: 12px;\n}\n\n.mrrp-item-form__textarea {\n  width: 100%;\n  min-height: 50px;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: inherit;\n  font-size: 12px;\n  resize: vertical;\n}\n\n.mrrp-bonus-list {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  margin-top: 4px;\n  padding: 6px;\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: rgba(0, 0, 0, 0.10);\n}\n\n.mrrp-bonus-list__title {\n  font-size: 10px;\n  font-weight: 700;\n  letter-spacing: 0.10em;\n  text-transform: uppercase;\n  color: var(--mrrp-text-dim);\n}\n\n.mrrp-bonus-row {\n  display: grid;\n  grid-template-columns: 2fr 50px 70px 1.2fr auto;\n  align-items: center;\n  gap: 4px;\n}\n\n.mrrp-bonus-row__input {\n  width: 100%;\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 4px;\n  font-family: inherit;\n  font-size: 11px;\n}\n\n/* <option> elements ignore most parent styling on Linux/Chromium and fall back\n   to OS-default (often white bg + inherited near-white text => invisible until\n   highlighted). Explicit colors here force a readable dark dropdown panel. */\n.mrrp-bonus-row__input option,\n.mrrp-item-form__select option,\n.mrrp-item-form__input option {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n}\n\n/*  ─────  Derived / skill row equipment-bonus suffix  ───── */\n\n.mrrp-row__bonus {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-success);\n  margin-left: 2px;\n}\n\n.mrrp-row__bonus--neg { color: var(--mrrp-fail); }\n\n/*  ─────  Derived value cap suffix (\"/ max\")  ───── */\n\n.mrrp-row__cap {\n  font-family: var(--mrrp-mono);\n  font-size: 11px;\n  color: var(--mrrp-text-dim);\n  margin-left: 2px;\n  white-space: nowrap;\n}\n\n\n/*  ─────  state-mutator tag visual hiding  ───── */\n/* The state-mutator agent instructs the main model to emit\n   [mrrp-state: ...] tags inline at paragraph ends. The extension's\n   chat observer parses + applies them, then wraps each tag in a\n   span.mrrp-state-tag for this CSS rule to hide visually. The state\n   change itself has already been applied to localStorage; the tag\n   is purely a wire-format artifact and should not appear in chat. */\n.mrrp-state-tag { display: none; }\n\n\n/*  ─────  state mutation confirmation toast  ───── */\n/* Top-right floating stack of brief notifications shown when the\n   state-mutator agent's tags fire. Each toast confirms one mutation:\n   prefix (HP / Condition / Inventory), change (signed delta or +/- name),\n   and the agent-reported reason. Stacks vertically; auto-dismisses. */\n.mrrp-toast-container {\n  position: fixed;\n  top: 16px;\n  right: 16px;\n  z-index: 10000;\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  pointer-events: none;\n}\n\n.mrrp-toast {\n  background: var(--mrrp-bg-elev);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-left: 3px solid var(--mrrp-accent);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 8px 12px;\n  font-family: inherit;\n  font-size: 12px;\n  box-shadow: var(--mrrp-shadow);\n  opacity: 0;\n  transform: translateX(20px);\n  transition: opacity 0.25s ease-out, transform 0.25s ease-out;\n  pointer-events: auto;\n  display: flex;\n  gap: 8px;\n  align-items: baseline;\n  max-width: 320px;\n}\n\n.mrrp-toast--visible {\n  opacity: 1;\n  transform: translateX(0);\n}\n\n.mrrp-toast__prefix {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--mrrp-text-dim);\n  flex-shrink: 0;\n}\n\n.mrrp-toast__change {\n  font-family: var(--mrrp-mono);\n  font-weight: 700;\n  color: var(--mrrp-accent);\n  flex-shrink: 0;\n}\n\n.mrrp-toast__reason {\n  color: var(--mrrp-text-dim);\n  font-size: 11px;\n  font-style: italic;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n/*  ─────  Spellbook flyout (third floating panel, system-labeled)  ───── */\n/* Per-ruleset abilities/charms/stunts panel. Toggled from the main sheet's\n   spellbook row; renders one collapsible category section per\n   ruleset.abilities.categories[]. Position persists to mrrp-spellbook-pos.\n   Mirrors GM-mode architecture; mrrp- namespace. */\n\n.mrrp-spellbook {\n  position: fixed;\n  top: 80px;\n  left: 360px;\n  width: 320px;\n  max-height: 70vh;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border-strong);\n  border-radius: var(--mrrp-radius);\n  padding: var(--mrrp-pad);\n  box-shadow: var(--mrrp-shadow);\n  z-index: 9996;\n  font-size: 13px;\n  display: none;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n.mrrp-spellbook--open { display: flex; }\n\n.mrrp-spellbook__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 6px;\n  padding-bottom: 6px;\n  border-bottom: 1px solid var(--mrrp-border);\n  cursor: grab;\n  user-select: none;\n}\n\n.mrrp-spellbook__header:active { cursor: grabbing; }\n\n.mrrp-spellbook__title {\n  font-weight: 600;\n  color: var(--mrrp-accent);\n}\n\n.mrrp-spellbook__body {\n  flex: 1;\n  overflow-y: auto;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n\n.mrrp-spellbook-row { cursor: default; }\n.mrrp-spellbook-row__btn { width: 100%; text-align: left; }\n\n.mrrp-spellbook-cat {\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  background: var(--mrrp-tint-1);\n  padding: 4px 6px;\n}\n\n.mrrp-spellbook-cat__head {\n  width: 100%;\n  background: transparent;\n  color: var(--mrrp-text);\n  border: 0;\n  padding: 4px 2px;\n  font-family: inherit;\n  font-size: 12px;\n  font-weight: 600;\n  text-align: left;\n  cursor: pointer;\n  letter-spacing: 0.04em;\n}\n\n.mrrp-spellbook-cat__head:hover { color: var(--mrrp-accent); }\n\n.mrrp-spellbook-cat__list {\n  display: flex;\n  flex-direction: column;\n  gap: 3px;\n  margin-top: 4px;\n}\n\n.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__list,\n.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__add {\n  display: none;\n}\n\n.mrrp-spellbook-cat__add { margin-top: 4px; }\n\n.mrrp-spellbook-ab {\n  display: grid;\n  grid-template-columns: 1fr auto auto auto;\n  align-items: center;\n  gap: 4px;\n  padding: 2px 4px;\n  background: var(--mrrp-bg-elev);\n  border-radius: var(--mrrp-radius-sm);\n  border: 1px solid var(--mrrp-border);\n}\n\n.mrrp-spellbook-ab__name { font-weight: 500; font-size: 12px; }\n.mrrp-spellbook-ab__cost {\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  color: var(--mrrp-text-dim);\n  white-space: nowrap;\n}\n\n/*  ─────  Chip primitive  ─────────────────────────────────────────────────\n    Small inline pill used for status-flavored item details: Hardness,\n    Overwhelming, intimacy kind. Tints lean on existing CSS variables so\n    the palette stays consistent. */\n.mrrp-chip {\n  display: inline-flex;\n  align-items: center;\n  font-family: var(--mrrp-mono);\n  font-size: 10px;\n  line-height: 1;\n  padding: 2px 6px;\n  border-radius: 999px;\n  border: 1px solid var(--mrrp-border);\n  background: var(--mrrp-tint-1);\n  color: var(--mrrp-text-dim);\n  white-space: nowrap;\n}\n\n.mrrp-chip--hardness {\n  color: #b9d8ff;\n  border-color: rgba(133, 173, 220, 0.45);\n  background: rgba(80, 120, 180, 0.18);\n}\n\n.mrrp-chip--overwhelming {\n  color: #ffd0a8;\n  border-color: rgba(220, 140, 80, 0.45);\n  background: rgba(180, 90, 40, 0.20);\n}\n\n.mrrp-chip--intimacy-kind {\n  cursor: pointer;\n  background: var(--mrrp-tint-2);\n  border-color: var(--mrrp-border-strong);\n  color: var(--mrrp-text);\n  font-weight: 600;\n  letter-spacing: 0.04em;\n}\n\n.mrrp-chip--intimacy-kind-tie {\n  color: var(--mrrp-accent);\n  border-color: var(--mrrp-accent-dim);\n}\n\n.mrrp-chip--intimacy-kind-principle {\n  color: var(--mrrp-success);\n  border-color: rgba(110, 231, 183, 0.45);\n  background: rgba(110, 231, 183, 0.10);\n}\n\n/*  ─────  Intimacies flyout panel  ────────────────────────────────────────\n    Shares the .mrrp-spellbook structural classes so position, header,\n    body scroll, and category collapse all \"just work.\" Only the layout\n    of an individual intimacy row is custom: a two-line grid with the\n    kind chip + degree dropdown + delete on the first line and the text\n    input on the second so the field is wide enough to read. */\n.mrrp-intimacies { /* inherits .mrrp-spellbook positioning + open class */ }\n\n.mrrp-intimacy-group {\n  /* inherits .mrrp-spellbook-cat */\n}\n\n.mrrp-intimacy-group--defining .mrrp-spellbook-cat__head {\n  color: var(--mrrp-accent);\n}\n\n.mrrp-intimacy-row {\n  display: grid;\n  grid-template-columns: auto 1fr auto auto;\n  align-items: center;\n  gap: 4px;\n  padding: 4px;\n  background: var(--mrrp-bg-elev);\n  border-radius: var(--mrrp-radius-sm);\n  border: 1px solid var(--mrrp-border);\n}\n\n.mrrp-intimacy-row__text {\n  grid-column: 1 / -1;\n  width: 100%;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 4px 6px;\n  font-family: inherit;\n  font-size: 12px;\n  order: 2;\n}\n\n.mrrp-intimacy-row > .mrrp-chip--intimacy-kind { order: 1; }\n\n.mrrp-intimacy-row__degree {\n  order: 3;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 2px 4px;\n  font-family: inherit;\n  font-size: 11px;\n}\n\n.mrrp-intimacy-row__target {\n  order: 4;\n  grid-column: 1 / -1;\n  width: 100%;\n  background: var(--mrrp-bg);\n  color: var(--mrrp-text);\n  border: 1px solid var(--mrrp-border);\n  border-radius: var(--mrrp-radius-sm);\n  padding: 3px 6px;\n  font-family: inherit;\n  font-size: 11px;\n  font-style: italic;\n}\n\n.mrrp-intimacy-row > .mrrp-char-btn--danger { order: 5; }\n\n.mrrp-intimacies__top-add {\n  width: 100%;\n  margin-bottom: 4px;\n}\n";
 /* EMBEDDED_CSS_END */
 
 var BUNDLE_SCHEMA  = "mrrp-character-bundle";
@@ -1359,6 +1360,11 @@ function blankSheet(rs) {
     backgrounds: [],
     abilities: {},
     abilityCollapse: {},
+    /* Intimacies — Exalted's narrative-driven tie/principle list. Stored as
+       array of { id, kind: "tie"|"principle", text, degree: "minor"|"major"|"defining", target }.
+       Collapse map mirrors abilityCollapse: per-degree boolean, default true (collapsed). */
+    intimacies: [],
+    intimacyCollapse: {},
     identity: { race: "", "class": "" },
     customSkills: [],
     /* User-entered max for derived bar stats whose ruleset declares no
@@ -1410,6 +1416,19 @@ function applyItemAttrs(it, attrs) {
   if (attrs.consumable === "true" || attrs.consumable === true) it.consumable = true;
   if (typeof attrs.notes === "string" && attrs.notes) it.notes = attrs.notes;
   if (attrs.category === "equipment" || attrs.category === "item") it.category = attrs.category;
+  /* Hardness / Overwhelming (Exalted-driven, ruleset-agnostic data shape).
+     Hardness gates Overwhelming: when an attack's post-soak raw damage is
+     less than the defender's Hardness, the damage is reduced to the
+     attacker's Overwhelming value. Both are non-negative integers; a 0
+     value means "no special handling" and is hidden in the UI. */
+  if (attrs.hardness != null) {
+    var h = parseInt(attrs.hardness, 10);
+    if (!isNaN(h) && h >= 0) it.hardness = h;
+  }
+  if (attrs.overwhelming != null) {
+    var o = parseInt(attrs.overwhelming, 10);
+    if (!isNaN(o) && o >= 0) it.overwhelming = o;
+  }
   return it;
 }
 
@@ -1435,6 +1454,48 @@ function normalizeInventoryItem(it, idx) {
   if (typeof it.useEffect !== "string") it.useEffect = "";
   if (typeof it.consumable !== "boolean") it.consumable = false;
   if (typeof it.notes !== "string") it.notes = "";
+  /* Hardness / Overwhelming default to 0 (= "not applicable / hidden in UI").
+     Coerce numeric strings ("3") to numbers; reject NaN, infinity, and
+     negative values. Both are integers — fractional Hardness/Overwhelming
+     has no canon meaning. */
+  if (typeof it.hardness === "string" && it.hardness) {
+    var ph = parseInt(it.hardness, 10);
+    it.hardness = (!isNaN(ph) && ph >= 0) ? ph : 0;
+  }
+  if (typeof it.hardness !== "number" || it.hardness < 0 || !isFinite(it.hardness) || isNaN(it.hardness)) {
+    it.hardness = 0;
+  } else {
+    it.hardness = Math.floor(it.hardness);
+  }
+  if (typeof it.overwhelming === "string" && it.overwhelming) {
+    var po = parseInt(it.overwhelming, 10);
+    it.overwhelming = (!isNaN(po) && po >= 0) ? po : 0;
+  }
+  if (typeof it.overwhelming !== "number" || it.overwhelming < 0 || !isFinite(it.overwhelming) || isNaN(it.overwhelming)) {
+    it.overwhelming = 0;
+  } else {
+    it.overwhelming = Math.floor(it.overwhelming);
+  }
+  return it;
+}
+
+/* Normalize an intimacy entry to the standard shape. Used by mergeSheet
+   (load-time heal of legacy / state-mutator-added entries) and by the
+   intimacy add helper so a freshly created intimacy is safe to render
+   immediately. Idempotent — re-running on an already-normalized entry
+   is a no-op except for filling in a missing id. */
+function normalizeIntimacy(it, idx) {
+  if (!it || typeof it !== "object") return it;
+  if (typeof it.text !== "string") it.text = "";
+  if (it.kind !== "tie" && it.kind !== "principle") it.kind = "tie";
+  if (it.degree !== "minor" && it.degree !== "major" && it.degree !== "defining") it.degree = "minor";
+  if (typeof it.target !== "string") it.target = "";
+  if (typeof it.id !== "string" || !it.id) {
+    /* Deterministic id matching the inventory pattern so re-merging the
+       same payload yields stable ids across reloads. */
+    var slug = (it.text || "unnamed").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    it.id = "intimacy-heal-" + (slug || "x") + "-" + (typeof idx === "number" ? idx : 0);
+  }
   return it;
 }
 
@@ -1540,6 +1601,23 @@ function mergeSheet(base, override) {
     Object.keys(override.abilityCollapse).forEach(function (catId) {
       var v = override.abilityCollapse[catId];
       if (typeof v === "boolean") base.abilityCollapse[catId] = v;
+    });
+  }
+  /* Intimacies — Exalted-system list of ties/principles at minor/major/
+     defining intensity. Heal legacy / agent-added entries through the
+     normalizer so id, kind, text, degree, and target all have safe
+     defaults. Drop entries that aren't plain objects. Old saves
+     predating this field default to []. */
+  if (Array.isArray(override.intimacies)) {
+    base.intimacies = override.intimacies
+      .filter(function (it) { return it && typeof it === "object"; })
+      .map(function (it, idx) { return normalizeIntimacy(it, idx); });
+  }
+  if (override.intimacyCollapse && typeof override.intimacyCollapse === "object" && !Array.isArray(override.intimacyCollapse)) {
+    base.intimacyCollapse = {};
+    Object.keys(override.intimacyCollapse).forEach(function (degree) {
+      var v = override.intimacyCollapse[degree];
+      if (typeof v === "boolean") base.intimacyCollapse[degree] = v;
     });
   }
   /* Identity (race/species/ancestry/exalt-type + class/caste) — free text.
@@ -1767,6 +1845,282 @@ function removeBackground(idx) {
   arr.splice(idx, 1);
   saveSheet(state.chatId, state.sheet);
   renderSheet();
+}
+
+/* ─────  intimacies (Exalted ties + principles)  ─────────────────────────
+   Mirrors the spellbook (charms) flyout pattern: a compact button on the
+   sheet that opens its own floating panel, which groups entries into
+   collapsible Minor / Major / Defining sections. Each entry edits in
+   place with debounce-save so typing doesn't lose focus. The panel is
+   distinct from the spellbook so both can be open simultaneously. */
+
+var INTIMACY_DEGREES = [
+  { id: "minor",    label: "Minor"    },
+  { id: "major",    label: "Major"    },
+  { id: "defining", label: "Defining" }
+];
+
+function generateIntimacyId() {
+  return "intimacy-" + Date.now() + "-" + Math.random().toString(36).slice(2, 11);
+}
+
+function totalIntimacyCount() {
+  if (!state.sheet || !Array.isArray(state.sheet.intimacies)) return 0;
+  return state.sheet.intimacies.length;
+}
+
+function intimaciesByDegree(degreeId) {
+  if (!state.sheet || !Array.isArray(state.sheet.intimacies)) return [];
+  return state.sheet.intimacies.filter(function (it) { return it && it.degree === degreeId; });
+}
+
+function addIntimacy(degreeId, kindId, focusAfterRender) {
+  if (!state.sheet) return null;
+  if (!Array.isArray(state.sheet.intimacies)) state.sheet.intimacies = [];
+  var degree = (degreeId === "minor" || degreeId === "major" || degreeId === "defining")
+    ? degreeId : "minor";
+  var kind = (kindId === "tie" || kindId === "principle") ? kindId : "tie";
+  var entry = normalizeIntimacy({
+    id: generateIntimacyId(),
+    kind: kind,
+    text: "",
+    degree: degree,
+    target: ""
+  }, state.sheet.intimacies.length);
+  state.sheet.intimacies.push(entry);
+  saveSheet(state.chatId, state.sheet);
+  /* Re-render panel + main sheet (the latter to bump the count badge). */
+  renderIntimaciesPanelContents();
+  renderSheet();
+  if (state.intimaciesOpen) showIntimacies(true); /* re-add open class after sheet rerender swap */
+  if (focusAfterRender) {
+    /* Focus the text input on the newly-created row, end-of-frame so the
+       DOM is committed. Identifier match keyed on entry.id so a re-render
+       still finds the right input. */
+    setTimeout(function () {
+      if (!state.intimaciesEl) return;
+      var input = state.intimaciesEl.querySelector('input[data-intimacy-id="' + entry.id + '"]');
+      if (input && typeof input.focus === "function") input.focus();
+    }, 0);
+  }
+  return entry;
+}
+
+function removeIntimacy(id) {
+  if (!state.sheet || !Array.isArray(state.sheet.intimacies)) return;
+  var idx = -1;
+  for (var i = 0; i < state.sheet.intimacies.length; i++) {
+    if (state.sheet.intimacies[i] && state.sheet.intimacies[i].id === id) { idx = i; break; }
+  }
+  if (idx === -1) return;
+  state.sheet.intimacies.splice(idx, 1);
+  saveSheet(state.chatId, state.sheet);
+  renderIntimaciesPanelContents();
+  renderSheet();
+  if (state.intimaciesOpen) showIntimacies(true);
+}
+
+/* Sheet section row: a single button that opens / toggles the flyout. */
+function renderIntimaciesSection(parent) {
+  var sec = marinara.addElement(parent, "div", { "class": "mrrp-section mrrp-spellbook-row" });
+  if (!sec) return;
+  var btn = marinara.addElement(sec, "button", {
+    "class": "mrrp-char-btn mrrp-char-btn--dashed mrrp-spellbook-row__btn",
+    type: "button",
+    textContent: "Intimacies (" + totalIntimacyCount() + ")"
+  });
+  if (btn) marinara.on(btn, "click", function () { showIntimacies(!state.intimaciesOpen); });
+}
+
+function buildIntimaciesPanel() {
+  if (state.intimaciesEl) return state.intimaciesEl;
+  state.intimaciesEl = marinara.addElement(document.body, "div", { "class": "mrrp-spellbook mrrp-intimacies" });
+  if (!state.intimaciesEl) return null;
+
+  var header = marinara.addElement(state.intimaciesEl, "div", { "class": "mrrp-spellbook__header" });
+  if (header) {
+    marinara.addElement(header, "span", { "class": "mrrp-spellbook__title", textContent: "Intimacies — " + state.ruleset.name });
+    var close = marinara.addElement(header, "button", { "class": "mrrp-dice__close", innerHTML: "&times;" });
+    if (close) marinara.on(close, "click", function () { showIntimacies(false); });
+    makeDraggable(state.intimaciesEl, header, LS_INTIMACIES_POS);
+  }
+
+  marinara.addElement(state.intimaciesEl, "div", { "class": "mrrp-spellbook__body" });
+  return state.intimaciesEl;
+}
+
+function showIntimacies(open) {
+  if (open) {
+    if (!state.intimaciesEl) buildIntimaciesPanel();
+    if (state.intimaciesEl) {
+      state.intimaciesEl.classList.add("mrrp-spellbook--open");
+      state.intimaciesOpen = true;
+      renderIntimaciesPanelContents();
+    }
+  } else {
+    if (state.intimaciesEl) state.intimaciesEl.classList.remove("mrrp-spellbook--open");
+    state.intimaciesOpen = false;
+  }
+}
+
+function renderIntimaciesPanelContents() {
+  if (!state.intimaciesEl) return;
+  var body = state.intimaciesEl.querySelector(".mrrp-spellbook__body");
+  if (!body) return;
+  body.textContent = "";
+
+  if (!state.sheet) return;
+  if (!Array.isArray(state.sheet.intimacies)) state.sheet.intimacies = [];
+  if (!state.sheet.intimacyCollapse || typeof state.sheet.intimacyCollapse !== "object") {
+    state.sheet.intimacyCollapse = {};
+  }
+
+  /* Top "+ Add Intimacy" creates a Minor tie by default — same shape the
+     state-mutator add path produces when `degree` and `kind` are omitted,
+     so on-screen and agent-driven adds match. */
+  var topAdd = marinara.addElement(body, "button", {
+    "class": "mrrp-char-btn mrrp-char-btn--dashed mrrp-intimacies__top-add",
+    type: "button",
+    textContent: "+ Add Intimacy"
+  });
+  if (topAdd) marinara.on(topAdd, "click", function () { addIntimacy("minor", "tie", true); });
+
+  INTIMACY_DEGREES.forEach(function (deg) {
+    renderIntimacyDegreeGroup(body, deg);
+  });
+}
+
+function renderIntimacyDegreeGroup(body, degree) {
+  var sec = marinara.addElement(body, "div", { "class": "mrrp-spellbook-cat mrrp-intimacy-group mrrp-intimacy-group--" + degree.id });
+  if (!sec) return;
+
+  var entries = intimaciesByDegree(degree.id);
+  var collapsed = (degree.id in state.sheet.intimacyCollapse)
+    ? !!state.sheet.intimacyCollapse[degree.id]
+    : true;
+  if (collapsed) sec.classList.add("mrrp-spellbook-cat--collapsed");
+
+  var head = marinara.addElement(sec, "button", {
+    "class": "mrrp-spellbook-cat__head",
+    type: "button",
+    textContent: degree.label + " " + entries.length
+  });
+  if (head) marinara.on(head, "click", function () {
+    var nowCollapsed = sec.classList.toggle("mrrp-spellbook-cat--collapsed");
+    state.sheet.intimacyCollapse[degree.id] = nowCollapsed;
+    saveSheet(state.chatId, state.sheet);
+  });
+
+  var list = marinara.addElement(sec, "div", { "class": "mrrp-spellbook-cat__list" });
+  if (!list) return;
+  entries.forEach(function (it) { renderIntimacyRow(list, it); });
+
+  var addBtn = marinara.addElement(sec, "button", {
+    "class": "mrrp-char-btn mrrp-char-btn--dashed mrrp-spellbook-cat__add",
+    type: "button",
+    textContent: "+ Add " + degree.label
+  });
+  if (addBtn) marinara.on(addBtn, "click", function () { addIntimacy(degree.id, "tie", true); });
+}
+
+function renderIntimacyRow(list, entry) {
+  var row = marinara.addElement(list, "div", { "class": "mrrp-intimacy-row" });
+  if (!row) return;
+
+  /* Kind chip — click to toggle tie <-> principle. Visual styling
+     differs by kind (handled in CSS) so a glance distinguishes them. */
+  var kindBtn = marinara.addElement(row, "button", {
+    "class": "mrrp-chip mrrp-chip--intimacy-kind mrrp-chip--intimacy-kind-" + (entry.kind || "tie"),
+    type: "button",
+    textContent: entry.kind === "principle" ? "Principle" : "Tie",
+    title: "Click to toggle Tie / Principle"
+  });
+  if (kindBtn) marinara.on(kindBtn, "click", function () {
+    entry.kind = (entry.kind === "tie") ? "principle" : "tie";
+    saveSheet(state.chatId, state.sheet);
+    renderIntimaciesPanelContents();
+  });
+
+  /* Text input — full width on its own line within the row. Debounce-save
+     250ms identical to renderBackgroundRow so typing stays focused. */
+  var textInput = marinara.addElement(row, "input", {
+    "class": "mrrp-intimacy-row__text",
+    type: "text",
+    placeholder: entry.kind === "principle"
+      ? "principle (e.g. 'Justice protects the powerless')"
+      : "tie (e.g. 'Loyalty to the Sword Lord')",
+    value: entry.text || ""
+  });
+  if (textInput) {
+    textInput.setAttribute("data-intimacy-id", entry.id);
+    var saveTimer = null;
+    marinara.on(textInput, "input", function () {
+      entry.text = textInput.value;
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(function () { saveSheet(state.chatId, state.sheet); }, 250);
+    });
+    marinara.on(textInput, "blur", function () {
+      if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+      saveSheet(state.chatId, state.sheet);
+    });
+    marinara.on(textInput, "click", function (e) {
+      if (e && typeof e.stopPropagation === "function") e.stopPropagation();
+    });
+  }
+
+  /* Degree dropdown — moving an entry between degrees re-renders the
+     panel so it lands in the right group visually. */
+  var degSel = marinara.addElement(row, "select", { "class": "mrrp-intimacy-row__degree" });
+  if (degSel) {
+    INTIMACY_DEGREES.forEach(function (d) {
+      var opt = document.createElement("option");
+      opt.value = d.id; opt.textContent = d.label;
+      if (d.id === (entry.degree || "minor")) opt.selected = true;
+      degSel.appendChild(opt);
+    });
+    marinara.on(degSel, "change", function () {
+      var v = degSel.value;
+      if (v !== "minor" && v !== "major" && v !== "defining") return;
+      entry.degree = v;
+      saveSheet(state.chatId, state.sheet);
+      renderIntimaciesPanelContents();
+    });
+  }
+
+  /* Target — only meaningful for ties (a principle has no external
+     subject). Hidden for principles to avoid implying it should be
+     filled. Debounce-save 250ms like the text input. */
+  if (entry.kind === "tie") {
+    var targetInput = marinara.addElement(row, "input", {
+      "class": "mrrp-intimacy-row__target",
+      type: "text",
+      placeholder: "target name",
+      value: entry.target || ""
+    });
+    if (targetInput) {
+      var tSaveTimer = null;
+      marinara.on(targetInput, "input", function () {
+        entry.target = targetInput.value;
+        if (tSaveTimer) clearTimeout(tSaveTimer);
+        tSaveTimer = setTimeout(function () { saveSheet(state.chatId, state.sheet); }, 250);
+      });
+      marinara.on(targetInput, "blur", function () {
+        if (tSaveTimer) { clearTimeout(tSaveTimer); tSaveTimer = null; }
+        saveSheet(state.chatId, state.sheet);
+      });
+      marinara.on(targetInput, "click", function (e) {
+        if (e && typeof e.stopPropagation === "function") e.stopPropagation();
+      });
+    }
+  }
+
+  var delBtn = marinara.addElement(row, "button", {
+    "class": "mrrp-char-btn mrrp-char-btn--danger",
+    type: "button",
+    textContent: "x",
+    title: "Remove this intimacy"
+  });
+  if (delBtn) marinara.on(delBtn, "click", function () { removeIntimacy(entry.id); });
 }
 
 /* CSP-safe arithmetic evaluator. Recursive-descent parser for + - * / ( ),
@@ -2145,6 +2499,7 @@ function renderSheet() {
     else if (sec === "derived") renderDerived(state.mountEl);
     else if (sec === "states") renderStates(state.mountEl);
     else if (sec === "conditions") renderConditions(state.mountEl);
+    else if (sec === "intimacies") renderIntimaciesSection(state.mountEl);
     else if (sec === "backgrounds") renderBackgrounds(state.mountEl);
     else if (sec === "inventory") renderInventory(state.mountEl);
     else if (sec === "abilities") renderAbilitiesSection(state.mountEl);
@@ -3820,6 +4175,25 @@ function renderInventory(parent) {
         });
       }
 
+      /* Hardness / Overwhelming chips. Hidden when 0 (the "no special
+         handling" sentinel) so they only appear on items where the
+         numbers actually matter — typically armor (Hardness) and
+         high-tier weapons / Charms (Overwhelming) in Exalted. */
+      if (typeof item.hardness === "number" && item.hardness > 0) {
+        marinara.addElement(row, "span", {
+          "class": "mrrp-chip mrrp-chip--hardness",
+          textContent: "Hardness " + item.hardness,
+          title: "Hardness " + item.hardness + " — incoming damage below this floor reduces to the attacker's Overwhelming"
+        });
+      }
+      if (typeof item.overwhelming === "number" && item.overwhelming > 0) {
+        marinara.addElement(row, "span", {
+          "class": "mrrp-chip mrrp-chip--overwhelming",
+          textContent: "Overwhelming " + item.overwhelming,
+          title: "Overwhelming " + item.overwhelming + " — minimum damage this weapon always lands, even against soak/Hardness"
+        });
+      }
+
       var summarySpan = marinara.addElement(row, "span", { "class": "mrrp-inv-item__bonus-summary", textContent: formatBonuses(item.bonuses, false) });
       if (summarySpan) summarySpan.title = formatBonuses(item.bonuses, true);
 
@@ -4194,6 +4568,44 @@ function openItemDialog(itemId, onSaved, defaultCategory) {
   var profInput = marinara.addElement(profRow, "input", { type: "checkbox" });
   if (profInput && draft.attackProficient) profInput.checked = true;
 
+  /* Hardness / Overwhelming. Equipment-only — the fields stay hidden on
+     plain (non-equipment) items because they have no meaning there.
+     Hardness is the "armor / Charm shield" floor that gates incoming
+     damage; Overwhelming is the floor a weapon always lands. Both are
+     non-negative integers; 0 means "no special handling" and the chip
+     is hidden on the inventory card. The category dropdown's change
+     handler toggles visibility live so the user sees the right inputs
+     as they switch the type. */
+  var hardRow = marinara.addElement(dialog, "div", { "class": "mrrp-item-form__row mrrp-item-form__row--equipment-only" });
+  marinara.addElement(hardRow, "label", { textContent: "Hardness" });
+  var hardInput = marinara.addElement(hardRow, "input", {
+    "class": "mrrp-item-form__input",
+    type: "number",
+    min: "0",
+    step: "1",
+    value: String(typeof draft.hardness === "number" ? draft.hardness : 0),
+    placeholder: "0"
+  });
+
+  var overRow = marinara.addElement(dialog, "div", { "class": "mrrp-item-form__row mrrp-item-form__row--equipment-only" });
+  marinara.addElement(overRow, "label", { textContent: "Overwhelming" });
+  var overInput = marinara.addElement(overRow, "input", {
+    "class": "mrrp-item-form__input",
+    type: "number",
+    min: "0",
+    step: "1",
+    value: String(typeof draft.overwhelming === "number" ? draft.overwhelming : 0),
+    placeholder: "0"
+  });
+
+  function applyEquipmentVisibility() {
+    var isEquipment = (catSel && catSel.value === "equipment");
+    if (hardRow) hardRow.style.display = isEquipment ? "" : "none";
+    if (overRow) overRow.style.display = isEquipment ? "" : "none";
+  }
+  applyEquipmentVisibility();
+  if (catSel) marinara.on(catSel, "change", applyEquipmentVisibility);
+
   marinara.addElement(dialog, "div", { "class": "mrrp-bonus-list__title", textContent: "Bonuses" });
   var bonusList = marinara.addElement(dialog, "div", { "class": "mrrp-bonus-list" });
   if (!bonusList) return;
@@ -4303,6 +4715,20 @@ function openItemDialog(itemId, onSaved, defaultCategory) {
       draft.category = (catSel && catSel.value === "item") ? "item" : "equipment";
       draft.useEffect = (useInput && useInput.value || "").trim();
       draft.consumable = !!(consInput && consInput.checked);
+      /* Hardness / Overwhelming persist only on equipment. On a non-
+         equipment item the fields are hidden in the dialog; we still
+         clear them to 0 here so toggling category later doesn't leave
+         stale numbers around. parseInt with || 0 covers blank, NaN,
+         and negative-by-typo. */
+      if (draft.category === "equipment") {
+        var ph = parseInt(hardInput && hardInput.value, 10);
+        draft.hardness = (!isNaN(ph) && ph >= 0) ? ph : 0;
+        var po = parseInt(overInput && overInput.value, 10);
+        draft.overwhelming = (!isNaN(po) && po >= 0) ? po : 0;
+      } else {
+        draft.hardness = 0;
+        draft.overwhelming = 0;
+      }
       /* Drop any in-progress bonus rows that the user never picked a
          target for. Saves the user from typo-by-omission. */
       draft.bonuses = (draft.bonuses || []).filter(function (b) { return b && b.target; });
@@ -6295,6 +6721,34 @@ function formatMutationLabel(attrs) {
     var q = parseInt(attrs.qty, 10); if (!q || q < 1) q = 1;
     prefix = "Inventory";
     change = attrs.add ? "+ " + q + "× " + attrs.add : (attrs.remove ? "− " + q + "× " + attrs.remove : "?");
+  } else if (attrs.field === "backgrounds") {
+    prefix = "Background";
+    if (attrs.add) {
+      var addRating = parseInt(attrs.rating, 10);
+      change = "+ " + attrs.add + (isNaN(addRating) ? "" : " (" + addRating + ")");
+    } else if (attrs.remove) {
+      change = "− " + attrs.remove;
+    } else if (attrs.name && attrs.delta != null) {
+      var dBg = parseInt(attrs.delta, 10);
+      if (isNaN(dBg)) dBg = 0;
+      change = attrs.name + " " + (dBg >= 0 ? "+" : "") + dBg;
+    } else {
+      change = "?";
+    }
+  } else if (attrs.field === "intimacies") {
+    prefix = "Intimacy";
+    if (attrs.add) {
+      change = "+ " + attrs.add + (attrs.degree ? " [" + attrs.degree + "]" : "");
+    } else if (attrs.remove) {
+      change = "− " + attrs.remove;
+    } else if (attrs.text) {
+      var bits = [];
+      if (attrs.degree) bits.push(attrs.degree);
+      if (attrs.kind) bits.push(attrs.kind);
+      change = attrs.text + (bits.length ? " → " + bits.join(", ") : "");
+    } else {
+      change = "?";
+    }
   } else {
     prefix = (attrs.field || "stat").toUpperCase();
     var d = parseInt(attrs.delta, 10);
@@ -6541,6 +6995,123 @@ function applyStateMutation(attrs) {
           if (sheet.inventory[j].quantity <= 0) sheet.inventory.splice(j, 1);
           break;
         }
+      }
+    } else { return false; }
+    return finalizeMutation(attrs);
+  }
+
+  /* Backgrounds / merits / feats — same data shape as the on-sheet section.
+     Three modes: add (or upsert when name already exists with rating),
+     remove (first match by lowercased name), and delta-by-name (apply
+     a signed integer to an existing entry's value, clamped to the
+     ruleset's declared backgrounds.min / .max). Symmetric with how
+     conditions and inventory work — agent never has to know whether an
+     entry exists; tag attempts the right thing for both. */
+  if (field === "backgrounds") {
+    if (!Array.isArray(sheet.backgrounds)) sheet.backgrounds = [];
+    if (attrs.add) {
+      var existingBg = null;
+      for (var bgix = 0; bgix < sheet.backgrounds.length; bgix++) {
+        var bgEntry = sheet.backgrounds[bgix];
+        if (bgEntry && typeof bgEntry.name === "string" && bgEntry.name.toLowerCase() === String(attrs.add).toLowerCase()) {
+          existingBg = bgEntry; break;
+        }
+      }
+      if (existingBg) {
+        var ratingNum = parseInt(attrs.rating, 10);
+        if (!isNaN(ratingNum)) existingBg.value = ratingNum;
+      } else {
+        var newRating = parseInt(attrs.rating, 10);
+        sheet.backgrounds.push({ name: String(attrs.add), value: isNaN(newRating) ? 0 : newRating });
+      }
+    } else if (attrs.remove) {
+      var rem = String(attrs.remove).toLowerCase();
+      var idxBg = -1;
+      for (var bgi = 0; bgi < sheet.backgrounds.length; bgi++) {
+        var bg = sheet.backgrounds[bgi];
+        if (bg && typeof bg.name === "string" && bg.name.toLowerCase() === rem) { idxBg = bgi; break; }
+      }
+      if (idxBg === -1) {
+        warn("state-mutator backgrounds: no match for '" + attrs.remove + "'");
+        return false;
+      }
+      sheet.backgrounds.splice(idxBg, 1);
+    } else if (attrs.name && attrs.delta != null) {
+      var deltaBg = parseInt(attrs.delta, 10);
+      if (isNaN(deltaBg)) return false;
+      var matchBg = null;
+      for (var bgj = 0; bgj < sheet.backgrounds.length; bgj++) {
+        var bgm = sheet.backgrounds[bgj];
+        if (bgm && typeof bgm.name === "string" && bgm.name.toLowerCase() === String(attrs.name).toLowerCase()) {
+          matchBg = bgm; break;
+        }
+      }
+      if (!matchBg) {
+        warn("state-mutator backgrounds delta: no match for '" + attrs.name + "'");
+        return false;
+      }
+      var bgMin = (state.ruleset.backgrounds && typeof state.ruleset.backgrounds.min === "number") ? state.ruleset.backgrounds.min : 0;
+      var bgMax = (state.ruleset.backgrounds && typeof state.ruleset.backgrounds.max === "number") ? state.ruleset.backgrounds.max : 99;
+      matchBg.value = Math.max(bgMin, Math.min(bgMax, (matchBg.value || 0) + deltaBg));
+    } else { return false; }
+    return finalizeMutation(attrs);
+  }
+
+  /* Intimacies — Exalted's narrative tie/principle list. Five modes:
+     add (push new entry), remove (first text-match, lowercased), update
+     degree by text (find then set), update kind by text (find then
+     toggle/set). Defaults match the on-screen + Add path: kind="tie",
+     degree="minor". Optional target landed when kind === "tie". */
+  if (field === "intimacies") {
+    if (!Array.isArray(sheet.intimacies)) sheet.intimacies = [];
+
+    function findIntimacyByText(t) {
+      if (typeof t !== "string" || !t) return null;
+      var lc = t.toLowerCase();
+      for (var ii = 0; ii < sheet.intimacies.length; ii++) {
+        var ie = sheet.intimacies[ii];
+        if (ie && typeof ie.text === "string" && ie.text.toLowerCase() === lc) return ie;
+      }
+      return null;
+    }
+
+    if (attrs.add) {
+      var addText = String(attrs.add);
+      var inKind = (attrs.kind === "principle") ? "principle" : "tie";
+      var inDeg = (attrs.degree === "major" || attrs.degree === "defining") ? attrs.degree : "minor";
+      var inTarget = (inKind === "tie" && typeof attrs.target === "string") ? attrs.target : "";
+      var newEntry = normalizeIntimacy({
+        id: generateIntimacyId(),
+        kind: inKind,
+        text: addText,
+        degree: inDeg,
+        target: inTarget
+      }, sheet.intimacies.length);
+      sheet.intimacies.push(newEntry);
+    } else if (attrs.remove) {
+      var removeMatch = findIntimacyByText(String(attrs.remove));
+      if (!removeMatch) {
+        warn("state-mutator intimacies: no match for '" + attrs.remove + "'");
+        return false;
+      }
+      var rmIdx = sheet.intimacies.indexOf(removeMatch);
+      if (rmIdx === -1) return false;
+      sheet.intimacies.splice(rmIdx, 1);
+    } else if (attrs.text && (attrs.degree || attrs.kind)) {
+      var hit = findIntimacyByText(String(attrs.text));
+      if (!hit) {
+        warn("state-mutator intimacies update: no match for text '" + attrs.text + "'");
+        return false;
+      }
+      if (attrs.degree === "minor" || attrs.degree === "major" || attrs.degree === "defining") {
+        hit.degree = attrs.degree;
+      }
+      if (attrs.kind === "tie" || attrs.kind === "principle") {
+        hit.kind = attrs.kind;
+        if (hit.kind !== "tie") hit.target = "";
+      }
+      if (typeof attrs.target === "string" && hit.kind === "tie") {
+        hit.target = attrs.target;
       }
     } else { return false; }
     return finalizeMutation(attrs);
