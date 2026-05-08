@@ -1439,3 +1439,137 @@
   width: 100%;
   margin-bottom: 4px;
 }
+
+/*  ─────  XP card  ─────────────────────────────────────────────────────────
+    Sits between identity row and the section list in the main sheet. Two
+    layouts driven by ruleset.resolution.mode:
+      "single-roll" (D&D, PF2e) — level + current/next + 4px progress bar
+                                  fed by ruleset.xpTable
+      "dice-pool"   (Exalted)   — current + total earned + +1 XP button
+                                  (a pure int accumulator)
+    Hidden entirely for rulesets whose mode isn't one of the two above
+    (Fate Core uses Fate Points, not XP). */
+
+.mrrp-xp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  margin-top: 4px;
+}
+
+.mrrp-xp-card__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-xp-card__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mrrp-xp-card__group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.mrrp-xp-card__sub {
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-xp-card__input {
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: var(--mrrp-mono);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  width: 80px;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.mrrp-xp-card__input:focus {
+  outline: none;
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-bg-elev);
+}
+
+.mrrp-xp-card__input::-webkit-outer-spin-button,
+.mrrp-xp-card__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.mrrp-xp-card__input--lvl {
+  width: 50px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.mrrp-xp-card__sep {
+  font-family: var(--mrrp-mono);
+  font-size: 16px;
+  color: var(--mrrp-text-dim);
+  align-self: flex-end;
+  padding-bottom: 2px;
+}
+
+.mrrp-xp-card__next {
+  font-family: var(--mrrp-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+  padding: 2px 6px;
+  font-variant-numeric: tabular-nums;
+  align-self: flex-end;
+}
+
+.mrrp-xp-card__bar {
+  height: 4px;
+  background: var(--mrrp-tint-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mrrp-xp-card__bar-fill {
+  height: 100%;
+  background: var(--mrrp-accent);
+  width: 0;
+  transition: width 0.18s ease-out;
+}
+
+.mrrp-xp-card__add {
+  align-self: flex-start;
+  background: var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-accent);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.mrrp-xp-card__add:hover {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
