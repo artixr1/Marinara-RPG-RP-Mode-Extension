@@ -13,13 +13,19 @@ v0.2.1/
 ├── examples/                       Two complete reference rulesets
 │   ├── exalted3e/                    Storyteller dice-pool, typed damage, multi-turn sorcery
 │   └── dnd5e/                        Single-roll d20, SRD-compatible
-└── install-files/                  Drop-in ready
-    ├── RPG-Extension-RP-Mode.js      The framework JS (paste into Extensions panel)
-    ├── exalted3e-bundle.json         Paste into Ruleset dialog
-    ├── exalted3e-agents.json         Import via Import Agents dialog
-    ├── dnd5e-bundle.json
-    └── dnd5e-agents.json
+├── install-files/                  Drop-in ready
+│   ├── RPG-Extension-RP-Mode.js      The framework JS (paste into Extensions panel)
+│   ├── exalted3e-bundle.json         Paste into Ruleset dialog
+│   ├── exalted3e-agents.json         Import via Import Agents dialog
+│   ├── dnd5e-bundle.json
+│   └── dnd5e-agents.json
+└── characters/                     Optional: setting-agnostic GM character card
+    ├── README.md                     What the card does + how to import
+    ├── Universal-RPG-GM.json         V2 character card (JSON)
+    └── Universal-RPG-GM.png          Same card embedded in a PNG (Marinara import)
 ```
+
+> The **characters/** folder is optional but highly recommended. The Universal-RPG-GM card is a setting-agnostic Game Master persona that bootstraps a roleplay-mode chat by asking three opening questions (setting, your character, opening situation), then narrates as the GM in cooperation with the agents. Import the `.png` via Marinara's character editor — the card data ships in the PNG's `chara` tEXt chunk per the SillyTavern V2 spec. It's not required for the framework to work; it just gets you from zero to a playable scene faster.
 
 ## Three things you can do with this
 
