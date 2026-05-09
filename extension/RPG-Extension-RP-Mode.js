@@ -1742,8 +1742,7 @@ function mergeSheet(base, override) {
       return typeof c === "string" && c;
     });
   }
-  /* Phase 4 — per-cell damage track persistence. Phase-3 wrapper uses
-     this for in-place cell escalation. */
+  /* Phase 4 — per-cell damage track persistence. */
   if (override.trackCells && typeof override.trackCells === "object" && !Array.isArray(override.trackCells)) {
     base.trackCells = {};
     Object.keys(override.trackCells).forEach(function (name) {
@@ -1752,6 +1751,24 @@ function mergeSheet(base, override) {
       base.trackCells[name] = arr.map(function (v) {
         return (typeof v === "string" && v) ? v : null;
       });
+    });
+  }
+  /* Phase 5 — V20 disciplines plumbing: per-category score + custom cats. */
+  if (override.abilityCategoryScores && typeof override.abilityCategoryScores === "object"
+      && !Array.isArray(override.abilityCategoryScores)) {
+    base.abilityCategoryScores = {};
+    Object.keys(override.abilityCategoryScores).forEach(function (catId) {
+      var v = override.abilityCategoryScores[catId];
+      if (typeof v === "number" && isFinite(v)) {
+        base.abilityCategoryScores[catId] = Math.max(0, Math.min(10, Math.floor(v)));
+      }
+    });
+  }
+  if (Array.isArray(override.customAbilityCategories)) {
+    base.customAbilityCategories = override.customAbilityCategories.filter(function (c) {
+      return c && typeof c === "object" && typeof c.id === "string" && typeof c.label === "string";
+    }).map(function (c) {
+      return { id: c.id, label: c.label };
     });
   }
   return base;
@@ -7398,6 +7415,15 @@ function renderSpellbookContents() {
     renderSpellbookCategory(body, cat);
   });
 
+  /* Phase 5 — custom user-added categories. */
+  if (Array.isArray(state.sheet.customAbilityCategories)) {
+    state.sheet.customAbilityCategories.forEach(function (cat) {
+      if (!cat || !cat.id) return;
+      declaredIds[cat.id] = true;
+      renderSpellbookCategory(body, cat, null, true);
+    });
+  }
+
   var orphans = Object.keys(state.sheet.abilities).filter(function (k) {
     return !declaredIds[k] && Array.isArray(state.sheet.abilities[k]) && state.sheet.abilities[k].length > 0;
   });
@@ -7409,9 +7435,27 @@ function renderSpellbookContents() {
     });
     renderSpellbookCategory(body, pseudoCat, orphans);
   }
+
+  /* Phase 5 — "+ Add custom" button. */
+  var addCustomBtn = marinara.addElement(body, "button", {
+    "class": "mrrp-char-btn mrrp-char-btn--dashed",
+    type: "button",
+    textContent: "+ Add " + (cfg.label || "Category")
+  });
+  if (addCustomBtn) marinara.on(addCustomBtn, "click", function () {
+    var name = window.prompt("Name for the new " + (cfg.label || "category").toLowerCase() + ":");
+    if (!name || !name.trim()) return;
+    var nameTrim = name.trim();
+    var slug = nameTrim.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    var newId = "custom-" + (slug || "unnamed") + "-" + Date.now().toString(36);
+    if (!Array.isArray(state.sheet.customAbilityCategories)) state.sheet.customAbilityCategories = [];
+    state.sheet.customAbilityCategories.push({ id: newId, label: nameTrim });
+    saveSheet(state.chatId, state.sheet);
+    renderSpellbookContents();
+  });
 }
 
-function renderSpellbookCategory(body, cat, orphanCategoryIds) {
+function renderSpellbookCategory(body, cat, orphanCategoryIds, isCustom) {
   var sec = marinara.addElement(body, "div", { "class": "mrrp-spellbook-cat" });
   if (!sec) return;
 
@@ -7424,7 +7468,11 @@ function renderSpellbookCategory(body, cat, orphanCategoryIds) {
     : true;
   if (collapsed) sec.classList.add("mrrp-spellbook-cat--collapsed");
 
-  var head = marinara.addElement(sec, "button", {
+  /* Phase 5 — head row with category title button + per-category score
+     input + custom-category delete. */
+  var headRow = marinara.addElement(sec, "div", { "class": "mrrp-spellbook-cat__head-row" });
+  if (!headRow) return;
+  var head = marinara.addElement(headRow, "button", {
     "class": "mrrp-spellbook-cat__head",
     type: "button",
     textContent: cat.label + " " + count
@@ -7434,6 +7482,60 @@ function renderSpellbookCategory(body, cat, orphanCategoryIds) {
     state.sheet.abilityCollapse[cat.id] = nowCollapsed;
     saveSheet(state.chatId, state.sheet);
   });
+
+  var isPoolMode = state.ruleset && state.ruleset.resolution
+      && state.ruleset.resolution.mode === "dice-pool";
+  if (isPoolMode && !orphanCategoryIds) {
+    if (!state.sheet.abilityCategoryScores || typeof state.sheet.abilityCategoryScores !== "object") {
+      state.sheet.abilityCategoryScores = {};
+    }
+    var curScore = state.sheet.abilityCategoryScores[cat.id];
+    if (typeof curScore !== "number") curScore = 0;
+    var scoreInput = marinara.addElement(headRow, "input", {
+      "class": "mrrp-spellbook-cat__score",
+      type: "number",
+      min: "0",
+      max: "10",
+      step: "1",
+      title: "Rating (0-10)"
+    });
+    if (scoreInput) {
+      scoreInput.value = String(curScore);
+      marinara.on(scoreInput, "click", function (e) {
+        if (e && typeof e.stopPropagation === "function") e.stopPropagation();
+      });
+      marinara.on(scoreInput, "change", function () {
+        var n = parseInt(scoreInput.value, 10);
+        if (isNaN(n) || n < 0) n = 0;
+        if (n > 10) n = 10;
+        state.sheet.abilityCategoryScores[cat.id] = n;
+        saveSheet(state.chatId, state.sheet);
+      });
+    }
+  }
+
+  if (isCustom) {
+    var delCatBtn = marinara.addElement(headRow, "button", {
+      "class": "mrrp-char-btn mrrp-char-btn--danger",
+      type: "button",
+      textContent: "×",
+      title: "Remove this custom " + (cat.label || "category")
+    });
+    if (delCatBtn) marinara.on(delCatBtn, "click", function (e) {
+      if (e && typeof e.stopPropagation === "function") e.stopPropagation();
+      if (!window.confirm("Remove " + (cat.label || "category") + " and all its abilities?")) return;
+      if (Array.isArray(state.sheet.customAbilityCategories)) {
+        state.sheet.customAbilityCategories = state.sheet.customAbilityCategories.filter(function (c) {
+          return c && c.id !== cat.id;
+        });
+      }
+      if (state.sheet.abilities) delete state.sheet.abilities[cat.id];
+      if (state.sheet.abilityCategoryScores) delete state.sheet.abilityCategoryScores[cat.id];
+      if (state.sheet.abilityCollapse) delete state.sheet.abilityCollapse[cat.id];
+      saveSheet(state.chatId, state.sheet);
+      renderSpellbookContents();
+    });
+  }
 
   var list = marinara.addElement(sec, "div", { "class": "mrrp-spellbook-cat__list" });
   if (!list) return;
@@ -7465,21 +7567,25 @@ function renderAbilityRow(list, ab, catId) {
   marinara.addElement(row, "span", { "class": "mrrp-spellbook-ab__name", textContent: ab.name || "(unnamed)" });
   marinara.addElement(row, "span", { "class": "mrrp-spellbook-ab__cost", textContent: ab.costText || "" });
 
-  /* Cast button — appears only on abilities with cast-time data
-     (damageDice OR a save target OR a spellcasting attribute). Computes
-     DC, rolls damage, posts a [mrrp-cast: ...] tag plus a [damage: ...]
-     tag to the dice widget result so the player ships them to chat in
-     one click. The narrator reads both; the GM agent resolves saves. */
+  /* Cast button — single-roll: with cast-time data; dice-pool: always
+     so V20 disciplines / Exalted charms can announce activation. */
   var hasCastData = !!(ab.damageDice || ab.saveAttribute || ab.spellcastingAttribute);
-  if (hasCastData && state.ruleset && state.ruleset.resolution
-      && state.ruleset.resolution.mode === MODES.SINGLE) {
+  var isPoolModeRow = state.ruleset && state.ruleset.resolution
+      && state.ruleset.resolution.mode === "dice-pool";
+  if (state.ruleset && state.ruleset.resolution &&
+      ((state.ruleset.resolution.mode === MODES.SINGLE && hasCastData) || isPoolModeRow)) {
     var castBtn = marinara.addElement(row, "button", {
       "class": "mrrp-char-btn mrrp-char-btn--accent",
       type: "button",
       textContent: "Cast",
-      title: "Compute DC, roll damage, post chat tag for the GM to resolve"
+      title: isPoolModeRow
+        ? "Announce activation in chat with name + cost"
+        : "Compute DC, roll damage, post chat tag for the GM to resolve"
     });
-    if (castBtn) marinara.on(castBtn, "click", function () { castSpell(ab); });
+    if (castBtn) marinara.on(castBtn, "click", function () {
+      if (isPoolModeRow) castAbilityPool(ab, catId);
+      else castSpell(ab);
+    });
   }
 
   var editBtn = marinara.addElement(row, "button", { "class": "mrrp-char-btn", type: "button", textContent: "Edit" });
@@ -7500,6 +7606,52 @@ function renderAbilityRow(list, ab, catId) {
    nothing is declared. {spellcastingAttribute_mod} is a magic token
    substituted with the spell's specific caster-attribute modifier
    before the formula is evaluated. */
+/* Phase 5 — dice-pool cast (V20 disciplines + Exalted charms). Posts
+   a chat tag with name + discipline + rating + cost so the GM sees
+   the player invoked it. No DC, no damage roll. */
+function castAbilityPool(ability, catId) {
+  if (!ability || !state.ruleset) return;
+  var name = String(ability.name || "ability");
+  var cost = String(ability.costText || "");
+  var catLabel = "";
+  if (catId) {
+    var cfg = (typeof getAbilitiesConfig === "function") ? getAbilitiesConfig() : null;
+    if (cfg && Array.isArray(cfg.categories)) {
+      for (var i = 0; i < cfg.categories.length; i++) {
+        if (cfg.categories[i].id === catId) { catLabel = cfg.categories[i].label; break; }
+      }
+    }
+    if (!catLabel && Array.isArray(state.sheet.customAbilityCategories)) {
+      for (var j = 0; j < state.sheet.customAbilityCategories.length; j++) {
+        if (state.sheet.customAbilityCategories[j].id === catId) {
+          catLabel = state.sheet.customAbilityCategories[j].label; break;
+        }
+      }
+    }
+  }
+  var rating = "";
+  if (catId && state.sheet.abilityCategoryScores
+      && typeof state.sheet.abilityCategoryScores[catId] === "number") {
+    rating = String(state.sheet.abilityCategoryScores[catId]);
+  }
+  var parts = ['[mrrp-cast: name="' + name.replace(/"/g, '\\"') + '"'];
+  if (catLabel) parts.push('discipline="' + catLabel.replace(/"/g, '\\"') + '"');
+  if (rating)   parts.push('rating="' + rating + '"');
+  if (cost)     parts.push('cost="' + cost.replace(/"/g, '\\"') + '"');
+  parts[parts.length - 1] += ']';
+  var tag = parts.join(" ");
+  if (typeof finalizeRoll === "function") {
+    finalizeRoll(tag, "narrate", []);
+  } else if (typeof injectIntoChat === "function") {
+    injectIntoChat(tag);
+  } else {
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tag);
+    }
+    log("castAbilityPool: no chat-injection helper found; tag in console: " + tag);
+  }
+}
+
 function castSpell(ability) {
   if (!ability || !state.ruleset) return;
   var ctx = statContext();
