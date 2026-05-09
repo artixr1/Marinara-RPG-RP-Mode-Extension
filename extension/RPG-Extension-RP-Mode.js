@@ -1742,6 +1742,18 @@ function mergeSheet(base, override) {
       return typeof c === "string" && c;
     });
   }
+  /* Phase 4 — per-cell damage track persistence. Phase-3 wrapper uses
+     this for in-place cell escalation. */
+  if (override.trackCells && typeof override.trackCells === "object" && !Array.isArray(override.trackCells)) {
+    base.trackCells = {};
+    Object.keys(override.trackCells).forEach(function (name) {
+      var arr = override.trackCells[name];
+      if (!Array.isArray(arr)) return;
+      base.trackCells[name] = arr.map(function (v) {
+        return (typeof v === "string" && v) ? v : null;
+      });
+    });
+  }
   return base;
 }
 
@@ -3901,9 +3913,7 @@ function mrrpP3ComputeBarMax(d) {
    Take-B/L/A) NOT migrated — primitive doesn't expose them, this is a
    JSX-prototype UX choice not a regression. */
 function mrrpP3RenderDerivedTrack(parent, d) {
-  /* Phase 4 — health-track ordering fix. Sort cells by penalty descending
-     (best first, Incapacitated last) so extra Ox-Body cells slot in by
-     penalty rather than tacking on at the end. Mirrors classic. */
+  /* Phase 4 — health-track ordering fix. */
   var ruleEntries = (d.track || []).map(function (c) { return { cell: c, extra: false }; });
   var extraEntries = (state.sheet.extraTrack && state.sheet.extraTrack[d.name])
     ? state.sheet.extraTrack[d.name].map(function (c) { return { cell: c, extra: true }; })
@@ -3911,58 +3921,41 @@ function mrrpP3RenderDerivedTrack(parent, d) {
   var tagged = ruleEntries.concat(extraEntries);
   tagged.sort(function (a, b) { return (b.cell.penalty || 0) - (a.cell.penalty || 0); });
   var allCells = tagged.map(function (e) { return e.cell; });
-  var levels = allCells.map(function (c) { return c.label; });
+  /* Phase 4 — Incapacitated label overflow fix. */
+  var levels = allCells.map(function (c) {
+    var lbl = String(c.label || "");
+    return lbl.length > 4 ? lbl.slice(0, 3) : lbl;
+  });
   var types = damageTypesFor(d);
-  var damage = types ? ensureTypedTrack(d.name, types) : null;
 
-  /* Phase 4 — type-label fix. Primitive expects f.type as the SHORT
-     letter ("B"/"L"/"A") to drive .mrrp-p3-cell--<type> CSS and the
-     summary counts. Ruleset's damageType objects have id="bashing"
-     (long form) and label="B" (short form). Use label here and map
-     back to id when mutating typed counters. */
-  var typeByLabel = {};
-  if (types) {
-    for (var ti = 0; ti < types.length; ti++) typeByLabel[types[ti].label] = types[ti];
-  }
-
-  var filled = [];
-  if (types && damage) {
-    for (var i = 0; i < types.length; i++) {
-      var t = types[i];
-      var n = damage[t.id] || 0;
-      for (var k = 0; k < n; k++) filled.push({ type: t.label });
-    }
-  }
-  while (filled.length < allCells.length) filled.push(null);
-  if (filled.length > allCells.length) filled = filled.slice(0, allCells.length);
+  /* Phase 4 — per-cell state. Each cell escalates in place. */
+  var cells = ensureTrackCells(d, allCells.length);
+  var filled = cells.map(function (typeLabel) {
+    return typeLabel ? { type: typeLabel } : null;
+  });
 
   mrrpP3RenderDamageTrack(parent, {
     track: { name: d.name, levels: levels, filled: filled },
     onCellClick: function (idx) {
-      /* Phase 4 — click ESCALATES damage. Empty→B, B→L, L→A. No
-         heal-on-click — Heal-worst / Heal-all buttons are the only
-         heal path. At max severity (A), click clears. */
-      if (!types) return;
-      var dmg = ensureTypedTrack(d.name, types);
-      var f = filled[idx];
-      if (!f || !f.type) {
+      if (!types || !cells || idx < 0 || idx >= cells.length) return;
+      var current = cells[idx];
+      var nextLabel;
+      if (!current) {
         var lightest = types[types.length - 1];
-        if (lightest) dmg[lightest.id] = (dmg[lightest.id] || 0) + 1;
+        nextLabel = lightest ? lightest.label : null;
       } else {
-        var hitType = typeByLabel[f.type];
-        if (!hitType) return;
         var curIdx = -1;
-        for (var ci = 0; ci < types.length; ci++) {
-          if (types[ci].id === hitType.id) { curIdx = ci; break; }
+        for (var i = 0; i < types.length; i++) {
+          if (types[i].label === current) { curIdx = i; break; }
         }
-        if (curIdx === -1) return;
-        if (curIdx === 0) {
-          dmg[hitType.id] = Math.max(0, (dmg[hitType.id] || 0) - 1);
+        if (curIdx <= 0) {
+          nextLabel = null;
         } else {
-          var nextType = types[curIdx - 1];
-          if (nextType) dmg[nextType.id] = (dmg[nextType.id] || 0) + 1;
+          nextLabel = types[curIdx - 1].label;
         }
       }
+      cells[idx] = nextLabel;
+      syncTrackCellsToTyped(d);
       saveSheet(state.chatId, state.sheet);
       renderSheet();
     },
@@ -3983,18 +3976,25 @@ function mrrpP3RenderDerivedTrack(parent, d) {
       renderSheet();
     },
     onHeal: function (mode) {
-      if (!types) return;
-      var dmg = ensureTypedTrack(d.name, types);
+      if (!types || !cells) return;
       if (mode === "all") {
-        for (var i = 0; i < types.length; i++) dmg[types[i].id] = 0;
+        for (var i = 0; i < cells.length; i++) cells[i] = null;
       } else {
-        for (var j = 0; j < types.length; j++) {
-          if ((dmg[types[j].id] || 0) > 0) {
-            dmg[types[j].id] -= 1;
-            break;
+        for (var ti = 0; ti < types.length; ti++) {
+          var targetLabel = types[ti].label;
+          for (var ci = 0; ci < cells.length; ci++) {
+            if (cells[ci] === targetLabel) {
+              cells[ci] = null;
+              syncTrackCellsToTyped(d);
+              saveSheet(state.chatId, state.sheet);
+              renderSheet();
+              return;
+            }
           }
         }
+        return;
       }
+      syncTrackCellsToTyped(d);
       saveSheet(state.chatId, state.sheet);
       renderSheet();
     }
@@ -5772,6 +5772,57 @@ function damageTypesFor(derived) {
   return derived.damageTypes.slice().sort(function (a, b) {
     return (b.severity || 0) - (a.severity || 0);
   });
+}
+
+/* Phase 4 — per-cell damage state. Each cell independently typed. */
+function ensureTrackCells(d, totalLen) {
+  if (!state.sheet.trackCells || typeof state.sheet.trackCells !== "object") {
+    state.sheet.trackCells = {};
+  }
+  if (!d || !d.name) return [];
+  var name = d.name;
+  var cells = state.sheet.trackCells[name];
+  if (!Array.isArray(cells)) {
+    cells = [];
+    var types = damageTypesFor(d);
+    var classic = state.sheet.track && state.sheet.track[name];
+    if (types && classic && typeof classic === "object" && !Array.isArray(classic)) {
+      for (var i = 0; i < types.length; i++) {
+        var t = types[i];
+        var n = classic[t.id] || 0;
+        for (var k = 0; k < n; k++) cells.push(t.label);
+      }
+    } else if (types && typeof classic === "number" && classic > 0) {
+      var lightest = types[types.length - 1];
+      for (var lc = 0; lc < classic; lc++) cells.push(lightest ? lightest.label : null);
+    }
+    state.sheet.trackCells[name] = cells;
+  }
+  while (cells.length < totalLen) cells.push(null);
+  if (cells.length > totalLen) {
+    cells = cells.slice(0, totalLen);
+    state.sheet.trackCells[name] = cells;
+  }
+  return cells;
+}
+
+function syncTrackCellsToTyped(d) {
+  if (!d || !d.name) return;
+  var name = d.name;
+  var cells = state.sheet.trackCells && state.sheet.trackCells[name];
+  if (!Array.isArray(cells)) return;
+  var types = damageTypesFor(d);
+  if (!types) return;
+  if (!state.sheet.track) state.sheet.track = {};
+  var typedObj = {};
+  for (var i = 0; i < types.length; i++) typedObj[types[i].id] = 0;
+  cells.forEach(function (label) {
+    if (!label) return;
+    for (var j = 0; j < types.length; j++) {
+      if (types[j].label === label) { typedObj[types[j].id] += 1; return; }
+    }
+  });
+  state.sheet.track[name] = typedObj;
 }
 
 /* Get-or-create the typed damage object for a track. Migrates a legacy
