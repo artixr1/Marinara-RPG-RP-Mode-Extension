@@ -1988,6 +1988,25 @@ function renderIntimaciesSection(parent) {
   if (btn) marinara.on(btn, "click", function () { showIntimacies(!state.intimaciesOpen); });
 }
 
+/* Phase 3.7 — Phase-3 intimacies flyout via mrrpP3CreatePanel. */
+function mrrpP3BuildIntimaciesPanel() {
+  if (state.intimaciesEl) return state.intimaciesEl;
+  if (typeof mrrpP3CreatePanel !== "function") return null;
+  var p = mrrpP3CreatePanel(document.body, {
+    storageKey: "mrrp-p3-intimacies-pos",
+    title: "Intimacies — " + state.ruleset.name,
+    defaultPos: { x: 360, y: 80 },
+    defaultSize: { w: 460, h: 600 },
+    className: "mrrp-intimacies",
+    onClose: function () { showIntimacies(false); }
+  });
+  if (!p || !p.panel || !p.body) return null;
+  if (p.body.classList) p.body.classList.add("mrrp-spellbook__body");
+  p.panel.style.display = "none";
+  state.intimaciesEl = p.panel;
+  return state.intimaciesEl;
+}
+
 function buildIntimaciesPanel() {
   if (state.intimaciesEl) return state.intimaciesEl;
   state.intimaciesEl = marinara.addElement(document.body, "div", { "class": "mrrp-spellbook mrrp-intimacies" });
@@ -2006,15 +2025,23 @@ function buildIntimaciesPanel() {
 }
 
 function showIntimacies(open) {
+  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
-    if (!state.intimaciesEl) buildIntimaciesPanel();
+    if (!state.intimaciesEl) {
+      if (useNew && typeof mrrpP3BuildIntimaciesPanel === "function") mrrpP3BuildIntimaciesPanel();
+      else buildIntimaciesPanel();
+    }
     if (state.intimaciesEl) {
       state.intimaciesEl.classList.add("mrrp-spellbook--open");
+      state.intimaciesEl.style.display = "flex";
       state.intimaciesOpen = true;
       renderIntimaciesPanelContents();
     }
   } else {
-    if (state.intimaciesEl) state.intimaciesEl.classList.remove("mrrp-spellbook--open");
+    if (state.intimaciesEl) {
+      state.intimaciesEl.classList.remove("mrrp-spellbook--open");
+      state.intimaciesEl.style.display = "none";
+    }
     state.intimaciesOpen = false;
   }
 }
@@ -6274,6 +6301,24 @@ function renderInventoryList(parent) {
    [damage: ...] roll to the dice widget so the agent / state-mutator
    resolves the actual mechanical effect (HP delta, condition, etc.). */
 
+/* Phase 3.7 — Phase-3 itembag flyout via mrrpP3CreatePanel. */
+function mrrpP3BuildItemBag() {
+  if (state.itemBagEl) return state.itemBagEl;
+  if (typeof mrrpP3CreatePanel !== "function") return null;
+  var p = mrrpP3CreatePanel(document.body, {
+    storageKey: "mrrp-p3-itembag-pos",
+    title: "Items — " + state.ruleset.name,
+    defaultPos: { x: 360, y: 80 },
+    defaultSize: { w: 420, h: 600 },
+    onClose: function () { showItemBag(false); }
+  });
+  if (!p || !p.panel || !p.body) return null;
+  if (p.body.classList) p.body.classList.add("mrrp-spellbook__body");
+  p.panel.style.display = "none";
+  state.itemBagEl = p.panel;
+  return state.itemBagEl;
+}
+
 function buildItemBag() {
   if (state.itemBagEl) return state.itemBagEl;
   state.itemBagEl = marinara.addElement(document.body, "div", { "class": "mrrp-spellbook" });
@@ -6292,15 +6337,23 @@ function buildItemBag() {
 }
 
 function showItemBag(open) {
+  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
-    if (!state.itemBagEl) buildItemBag();
+    if (!state.itemBagEl) {
+      if (useNew && typeof mrrpP3BuildItemBag === "function") mrrpP3BuildItemBag();
+      else buildItemBag();
+    }
     if (state.itemBagEl) {
       state.itemBagEl.classList.add("mrrp-spellbook--open");
+      state.itemBagEl.style.display = "flex";
       state.itemBagOpen = true;
       renderItemBagContents();
     }
   } else {
-    if (state.itemBagEl) state.itemBagEl.classList.remove("mrrp-spellbook--open");
+    if (state.itemBagEl) {
+      state.itemBagEl.classList.remove("mrrp-spellbook--open");
+      state.itemBagEl.style.display = "none";
+    }
     state.itemBagOpen = false;
   }
 }
@@ -7066,17 +7119,48 @@ function showSpellbook(open) {
     state.spellbookOpen = false;
     return;
   }
+  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
-    if (!state.spellbookEl) buildSpellbook();
+    if (!state.spellbookEl) {
+      if (useNew && typeof mrrpP3BuildSpellbook === "function") mrrpP3BuildSpellbook();
+      else buildSpellbook();
+    }
     if (state.spellbookEl) {
       state.spellbookEl.classList.add("mrrp-spellbook--open");
+      state.spellbookEl.style.display = "flex";
       state.spellbookOpen = true;
       renderSpellbookContents();
     }
   } else {
-    if (state.spellbookEl) state.spellbookEl.classList.remove("mrrp-spellbook--open");
+    if (state.spellbookEl) {
+      state.spellbookEl.classList.remove("mrrp-spellbook--open");
+      state.spellbookEl.style.display = "none";
+    }
     state.spellbookOpen = false;
   }
+}
+
+/* Phase 3.7 — Phase-3 spellbook flyout via mrrpP3CreatePanel.
+   Parallel to classic buildSpellbook; chosen by showSpellbook based
+   on useNewRenderer. Reuses renderSpellbookContents by adding the
+   .mrrp-spellbook__body class to the factory's body. */
+function mrrpP3BuildSpellbook() {
+  if (state.spellbookEl) return state.spellbookEl;
+  if (typeof mrrpP3CreatePanel !== "function") return null;
+  var cfg = (typeof getAbilitiesConfig === "function") ? getAbilitiesConfig() : null;
+  var titleText = (cfg && cfg.label ? cfg.label : "Spellbook") + " — " + state.ruleset.name;
+  var p = mrrpP3CreatePanel(document.body, {
+    storageKey: "mrrp-p3-spellbook-pos",
+    title: titleText,
+    defaultPos: { x: 360, y: 80 },
+    defaultSize: { w: 420, h: 640 },
+    onClose: function () { showSpellbook(false); }
+  });
+  if (!p || !p.panel || !p.body) return null;
+  if (p.body.classList) p.body.classList.add("mrrp-spellbook__body");
+  p.panel.style.display = "none";
+  state.spellbookEl = p.panel;
+  return state.spellbookEl;
 }
 
 function buildSpellbook() {
