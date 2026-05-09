@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Pending the next published release.
 
+### Added — Phase 3.5 UI port: skills + states + conditions + backgrounds + intimacies migrated behind feature flag (2026-05-08)
+
+Marathon slice. With `state.sheet.useNewRenderer === true`, the Phase-3 sheet now renders **eight** sections via Phase-3 wrappers — Attributes (3.3), Derived (3.4), Saves (3.4), Skills, States, Conditions, Backgrounds, and Intimacies. Only Inventory (item-editor flyout) and Abilities/Charms (charm tree) remain on classic helpers.
+
+- **`mrrpP3RenderSkillsSection(parent)`** — iterates `state.ruleset.skills` and calls `mrrpP3RenderSkillRow` per skill with the full opt set. Autocalc-vs-manual gate on `state.ruleset.resolution.skillBonusFormula`. Tier-cycle persists via `state.sheet.skillProficiency[skill.name]`. Specialties round-trip through `state.sheet.skillSpecialties[skill.name]`. Section title resolves to "ABILITIES" for Exalted, "SKILLS" elsewhere.
+
+- **`mrrpP3RenderCustomSkillRow(parent, sk, idx)`** — inline Phase-3 row for custom skills with debounced editable name + linked-attribute select + value input + remove. Reuses classic `addCustomSkill` / `removeCustomSkill`.
+
+- **`mrrpP3RenderStatesSection(parent)`** — name + select per state; persists to `state.sheet.states[name]`. Inline Phase-3 row.
+
+- **`mrrpP3RenderConditionsSection(parent)`** — active list with effect chips (disadv/adv from ruleset definitions) + × remove. Add-condition select with "(other — type a name)" custom option. Reuses classic `addCondition` / `removeCondition`.
+
+- **`mrrpP3RenderBackgroundsSection(parent)`** — debounced editable name + value input (clamped to `cfg.min/max`) + × remove. Respects `cfg.textOnly` (D&D feats). "+ Add Background/Feat" footer button.
+
+- **`mrrpP3RenderIntimaciesSection(parent)`** — Phase-3 section frame with single "Intimacies (N)" button that opens the existing classic flyout. Full flyout migration deferred to Phase 3.6+.
+
+- **Section dispatch swap** — five lines in `mrrpP3RenderSheet`. Classic `renderSheet` body untouched.
+
+- **Engine + classic helpers untouched** — `statContext`, `equippedBonuses`, `tierForSkill`, `resolveTierBonus` and the seven classic renderers all unchanged.
+
+- **No new CSS this slice** — Phase-3 wrappers reuse Phase 3.1 row primitives + classic row chrome inside Phase-3 section bodies. CSS file unchanged.
+
+- **v1 retreats** — per-specialty value editing not migrated (primitive shows static dice); custom skill name uses inline row not primitive; Intimacies flyout still classic.
+
 ### Added — Phase 3.4 UI port: derived (bars + damage track) + saves migrated behind feature flag (2026-05-08)
 
 Third slice of the multi-session renderSheet rewrite. With `state.sheet.useNewRenderer === true`, the Phase-3 sheet now renders three full sections via the Phase 3.1 primitives — Attributes (shipped in 3.3), Derived (bars + damage track, this slice), and Saves (this slice). Every other section still routes through classic helpers; the flag-OFF default is unchanged.
