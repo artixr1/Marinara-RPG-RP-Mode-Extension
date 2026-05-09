@@ -9317,8 +9317,27 @@ function buildSheetForPrompt() {
   pushFieldRef("derived",    state.ruleset.derivedStats);
   pushFieldRef("attributes", state.ruleset.attributes);
   pushFieldRef("skills",     state.ruleset.skills);
+  /* Phase 5 — Special canonical field names that the parser recognizes
+     but aren't backed by ruleset arrays. Without these the agent guesses
+     field names from the snapshot's display labels (e.g. "XP available
+     to spend") and the parser stashes the write on sheet root with no
+     visible effect. The Phase 2 + Phase 5 work added these branches to
+     applyStateMutation; documenting them here is the corresponding
+     read-side contract. */
+  refLines.push("- xp (use field=\"xp\" with delta=\"+50\" or absolute current/level/next/total — NOT the display label \"XP available to spend\")");
+  if (Array.isArray(state.sheet.intimacies) || (state.ruleset.id === "exalted3e")) {
+    refLines.push("- intimacies (use field=\"intimacies\" with add=\"text\" kind=\"tie|principle\" degree=\"minor|major|defining\" target=\"name\"; remove=\"text\"; or update via text=... + degree/kind)");
+  }
+  var commitMod = state.ruleset.commitmentModel;
+  if (commitMod === "attuned") {
+    refLines.push("- attunement (use field=\"attunement\" item=\"<item name>\" attuned=\"true|false\" — D&D cap 3)");
+  } else if (commitMod === "invested") {
+    refLines.push("- investiture (use field=\"investiture\" item=\"<item name>\" invested=\"true|false\" — PF2e cap 10)");
+  } else if (commitMod === "mote") {
+    refLines.push("- commitment (use field=\"commitment\" item=\"<item name>\" motes=\"N\" pool=\"Personal|Peripheral\" — Exalted mote commit)");
+  }
   if (refLines.length) {
-    lines.push("State-mutator field reference (use these names in [mrrp-state: field=\"...\"] tags):");
+    lines.push("State-mutator field reference (use these EXACT names — not display labels — in [mrrp-state: field=\"...\"] tags):");
     Array.prototype.push.apply(lines, refLines);
     lines.push("");
   }
@@ -9819,6 +9838,57 @@ function finalizeMutation(attrs) {
 function applyStateMutation(attrs) {
   if (!state.sheet || !state.ruleset) return false;
   var sheet = state.sheet;
+  /* Phase 5 — alias-resolve common display labels back to canonical
+     field names. Agents that read the snapshot may emit field= values
+     using the display label they saw (e.g. "XP available to spend",
+     "Total XP earned (lifetime)") instead of the canonical "xp".
+     Normalize before dispatch so the write actually lands. */
+  var rawField = attrs.field;
+  var lcField = (typeof rawField === "string") ? rawField.trim().toLowerCase() : "";
+  var fieldAliases = {
+    "xp available to spend": "xp",
+    "xp available": "xp",
+    "xp": "xp",
+    "experience": "xp",
+    "experience points": "xp",
+    "total xp earned (lifetime)": "xp",
+    "total xp earned": "xp",
+    "total xp": "xp",
+    "intimacy": "intimacies",
+    "intimacies": "intimacies",
+    "attune": "attunement",
+    "attunement": "attunement",
+    "attuned": "attunement",
+    "invest": "investiture",
+    "invested": "investiture",
+    "investiture": "investiture",
+    "commit": "commitment",
+    "commitment": "commitment",
+    "mote commitment": "commitment",
+    "mote commit": "commitment"
+  };
+  if (lcField && fieldAliases[lcField] && fieldAliases[lcField] !== rawField) {
+    log("state-mutator: alias-resolved field '" + rawField + "' to canonical '" + fieldAliases[lcField] + "'");
+    attrs.field = fieldAliases[lcField];
+  }
+  /* Special XP-write recovery: agents emitted current/total as separate
+     fields ("XP available to spend" + "Total XP earned (lifetime)") with
+     bare value=N. Translate value=N to current=N when field="xp" and the
+     original lookup was an XP-display alias. Otherwise the absolute
+     branch in the xp handler rejects (it requires current/level/next/total
+     keys). */
+  if (attrs.field === "xp" && attrs.value != null
+      && attrs.current == null && attrs.level == null
+      && attrs.next == null && attrs.total == null
+      && attrs.delta == null) {
+    if (lcField && lcField.indexOf("total") !== -1) {
+      attrs.total = attrs.value;
+    } else {
+      attrs.current = attrs.value;
+    }
+    log("state-mutator: xp value=" + attrs.value + " mapped to " +
+        (lcField.indexOf("total") !== -1 ? "total" : "current"));
+  }
   var field = attrs.field;
 
   if (field === "conditions") {
