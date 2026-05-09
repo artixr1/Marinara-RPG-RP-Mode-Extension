@@ -3939,15 +3939,29 @@ function mrrpP3RenderDerivedTrack(parent, d) {
   mrrpP3RenderDamageTrack(parent, {
     track: { name: d.name, levels: levels, filled: filled },
     onCellClick: function (idx) {
+      /* Phase 4 — cell click CYCLES through severity per the primitive's
+         documented title text "click cycles B→L→A→clear". types is sorted
+         severity-DESC (A first, B last). Cycle: empty → lightest (B) →
+         next-up (L) → next-up (A) → clear. */
       if (!types) return;
       var dmg = ensureTypedTrack(d.name, types);
       var f = filled[idx];
-      if (f && f.type) {
-        var hitType = typeByLabel[f.type];
-        if (hitType) dmg[hitType.id] = Math.max(0, (dmg[hitType.id] || 0) - 1);
-      } else {
+      if (!f || !f.type) {
         var lightest = types[types.length - 1];
         if (lightest) dmg[lightest.id] = (dmg[lightest.id] || 0) + 1;
+      } else {
+        var hitType = typeByLabel[f.type];
+        if (!hitType) return;
+        var curIdx = -1;
+        for (var ci = 0; ci < types.length; ci++) {
+          if (types[ci].id === hitType.id) { curIdx = ci; break; }
+        }
+        if (curIdx === -1) return;
+        dmg[hitType.id] = Math.max(0, (dmg[hitType.id] || 0) - 1);
+        if (curIdx > 0) {
+          var nextType = types[curIdx - 1];
+          if (nextType) dmg[nextType.id] = (dmg[nextType.id] || 0) + 1;
+        }
       }
       saveSheet(state.chatId, state.sheet);
       renderSheet();
@@ -4438,13 +4452,27 @@ function mrrpP3RenderBackgroundsSection(parent) {
 
 /* Phase 3.5 — IntimaciesSection wrapper. Button-only; classic flyout. */
 function mrrpP3RenderIntimaciesSection(parent) {
-  if (!parent || !state.ruleset) return;
-  if (typeof totalIntimacyCount !== "function" || typeof showIntimacies !== "function") return;
+  /* Phase 4 — diagnostic logging to surface why the section may not be
+     rendering for the user. Dump entry-state + per-guard outcomes so a
+     console paste tells us exactly which branch is silently returning. */
+  log("mrrpP3RenderIntimaciesSection ENTRY: parent=" + (!!parent) +
+      " ruleset=" + (!!state.ruleset) +
+      " totalIntimacyCount=" + (typeof totalIntimacyCount) +
+      " showIntimacies=" + (typeof showIntimacies));
+  if (!parent || !state.ruleset) {
+    warn("mrrpP3RenderIntimaciesSection: early-return on parent/ruleset guard");
+    return;
+  }
+  if (typeof totalIntimacyCount !== "function" || typeof showIntimacies !== "function") {
+    warn("mrrpP3RenderIntimaciesSection: early-return on helper-function guard");
+    return;
+  }
   mrrpP3RenderSection(parent, {
     id: "intimacies-p3",
     title: "INTIMACIES",
     defaultOpen: true
   }, function (body) {
+    log("mrrpP3RenderIntimaciesSection BODY: rendering button, count=" + totalIntimacyCount());
     var btn = marinara.addElement(body, "button", {
       type: "button",
       "class": "mrrp-char-btn mrrp-char-btn--dashed",
