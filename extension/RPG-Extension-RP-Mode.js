@@ -9741,7 +9741,7 @@ function resolveDamageType(field) {
     for (var j = 0; j < types.length; j++) {
       var dt = types[j];
       if (normalizeFieldKey(dt.id) === target || normalizeFieldKey(dt.label) === target) {
-        return { trackName: d.name, typeId: dt.id, types: types };
+        return { trackName: d.name, typeId: dt.id, types: types, derived: d };
       }
     }
   }
@@ -10346,13 +10346,51 @@ function applyStateMutation(attrs) {
     if (isNaN(absoluteValue)) return false;
   }
 
-  /* Typed-damage path. */
+  /* Typed-damage path — writes to per-cell state so the Phase-4 renderer
+     picks up agent damage. New entries fill empty cells from left;
+     removals clear rightmost cells of that type first. */
   var dmg = resolveDamageType(field);
   if (dmg) {
-    var damage = ensureTypedTrack(dmg.trackName, dmg.types);
-    var dCurrent = (typeof damage[dmg.typeId] === "number") ? damage[dmg.typeId] : 0;
-    var dNext = hasAbsolute ? absoluteValue : (dCurrent + delta);
-    damage[dmg.typeId] = Math.max(0, dNext);
+    var derivedObj = dmg.derived;
+    var rulesetCellCount = Array.isArray(derivedObj.track) ? derivedObj.track.length : 0;
+    var extraCellCount = (sheet.extraTrack && Array.isArray(sheet.extraTrack[dmg.trackName]))
+      ? sheet.extraTrack[dmg.trackName].length : 0;
+    var totalLen = rulesetCellCount + extraCellCount;
+    if (totalLen <= 0) {
+      log("state-mutator typed-damage: derived '" + dmg.trackName + "' has no cells declared");
+      return false;
+    }
+    var cells = ensureTrackCells(derivedObj, totalLen);
+    var typeForLabel = null;
+    for (var ti = 0; ti < dmg.types.length; ti++) {
+      if (dmg.types[ti].id === dmg.typeId) { typeForLabel = dmg.types[ti]; break; }
+    }
+    if (!typeForLabel) return false;
+    var label = typeForLabel.label;
+    var currentCount = 0;
+    for (var cci = 0; cci < cells.length; cci++) {
+      if (cells[cci] === label) currentCount += 1;
+    }
+    var targetCount = hasAbsolute ? absoluteValue : (currentCount + delta);
+    if (targetCount < 0) targetCount = 0;
+    var diff = targetCount - currentCount;
+    if (diff > 0) {
+      for (var ai = 0; ai < cells.length && diff > 0; ai++) {
+        if (cells[ai] == null) {
+          cells[ai] = label;
+          diff -= 1;
+        }
+      }
+    } else if (diff < 0) {
+      var toRemove = -diff;
+      for (var ri = cells.length - 1; ri >= 0 && toRemove > 0; ri--) {
+        if (cells[ri] === label) {
+          cells[ri] = null;
+          toRemove -= 1;
+        }
+      }
+    }
+    syncTrackCellsToTyped(derivedObj);
     return finalizeMutation(attrs);
   }
 
