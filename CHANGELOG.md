@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Pending the next published release.
 
+### Added — Phase 3.2 + 3.3 UI port: panel-frame factory + renderer cutover behind feature flag (2026-05-08)
+
+Second slice of the multi-session renderSheet rewrite. Panel-frame chrome translated from `~/projects/claude-design-updates/panel-frame.jsx`, and a parallel `mrrpP3RenderSheet` lands behind a `state.sheet.useNewRenderer` flag so users can opt into the new path while the classic renderer remains the default. Initial cutover migrates only the Attributes section to the Phase 3.1 primitives; every other section still routes through the classic helpers.
+
+- **`mrrpP3CreatePanel(parent, opts)`** — vanilla-JS port of the JSX prototype's `DraggablePanel` (`panel-frame.jsx`). Floating panel with drag-from-head + 8 resize handles (4 edges + 4 corners) + `localStorage` position/size persistence + viewport re-clamp on `window.resize`. Returns `{ panel, head, body, dispose }` so callers populate the body and clean up event listeners on close. Drag from head ignores button / input / select / textarea targets via `e.target.closest`. The SE corner gets a small SVG glyph for affordance. Currently unused by the running renderer — held in reserve for future Session 3.4+ flyouts.
+
+- **`mrrpP3RenderSheet()` parallel renderer** — alternative entry point that REUSES the existing `.mrrp-sheet` shell + `makeDraggable` / `makeResizable` so toggling renderers preserves the user's saved sheet position. Section dispatch identical to classic except the Attributes section, which routes to the new primitives via `mrrpP3RenderAttributesSection`. Every other section (Skills, Saves, Derived, States, Conditions, Intimacies, Backgrounds, Inventory, Abilities) still calls the classic `renderXxx` helpers.
+
+- **`mrrpP3RenderAttributesSection(parent)`** — wires the Phase 3.1 `mrrpP3RenderSection` + `mrrpP3RenderAttrRow` primitives to `state.sheet.attributes` + `saveSheet`. Modifier slot populates from `statContext()[<attr>_mod]` for D&D-family rulesets that declare `modifierFormula`; pool systems pass `undefined` and the modifier slot collapses.
+
+- **Feature flag — `state.sheet.useNewRenderer`** — defaults to `false` in `blankSheet`. The classic `renderSheet()` entry now dispatches to `mrrpP3RenderSheet()` when the flag is `true`. The flag persists across sessions: `mergeSheet` adds `if (override.useNewRenderer === true) base.useNewRenderer = true` so the user's preference survives reload.
+
+- **UI toggles** — the classic actions row gains a `🧪 Try Phase 3 renderer` button. The new actions row gains a `↩ Use classic renderer` button. Both states reachable from the UI.
+
+- **Section open/closed persistence** — `mergeSheet` preserves `state.sheet.sectionCollapse`.
+
+- **Panel-frame CSS (`mrrp-p3-panel*` namespace)** — ~110 lines covering panel root, head/title/title-meta/close, body slot, and 8 resize handles. Re-embedded via `tools/embed-css.mjs`.
+
+- **Engine functions still untouched.** Sacred this phase too.
+
+- **Deferred** (continuing the multi-session port): `panel-frame` factory has no caller yet — foundation for Session 3.4+ flyouts. Sections beyond Attributes migrate one at a time across Sessions 3.4–3.N. Token migration still deferred.
+
 ### Added — Phase 3.1 UI port: row primitives extracted from sheet.jsx (2026-05-08)
 
 First slice of the multi-session renderSheet rewrite. Seven foundational row primitives translated from the Claude-Design prototype's `~/projects/claude-design-updates/sheet.jsx` into vanilla-JS DOM-builder functions, sitting alongside the existing 7K-line `renderSheet` so a future-session cutover can compose them mechanically. No behavioral change this commit — primitives are uncalled by the running renderer.

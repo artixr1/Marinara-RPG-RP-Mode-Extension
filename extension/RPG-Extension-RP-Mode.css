@@ -2101,3 +2101,103 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+ * Phase 3.2 — panel-frame chrome (port of panel-frame.jsx)
+ * ═══════════════════════════════════════════════════════════════
+ * Standalone floating panel: drag head + 8 resize handles + body.
+ * Used by future Session 3.4+ flyouts. Phase 3.3 sheet body REUSES
+ * the existing .mrrp-sheet shell so toggling renderers doesn't
+ * disturb the saved sheet position.
+ * ═══════════════════════════════════════════════════════════════ */
+
+.mrrp-p3-panel {
+  position: fixed;
+  background: var(--mrrp-bg);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius);
+  box-shadow: var(--mrrp-shadow);
+  color: var(--mrrp-text);
+  z-index: var(--mrrp-z-sheet);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.mrrp-p3-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: move;
+  user-select: none;
+  border-bottom: 1px solid var(--mrrp-border);
+  background: var(--mrrp-bg-elev);
+}
+.mrrp-p3-panel__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+}
+.mrrp-p3-panel__title-meta {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mrrp-text-dim);
+  letter-spacing: 0;
+  text-transform: none;
+  margin-left: 4px;
+}
+.mrrp-p3-panel__close {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text-dim);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: var(--mrrp-radius-sm);
+}
+.mrrp-p3-panel__close:hover {
+  background: var(--mrrp-tint-1);
+  color: var(--mrrp-text);
+}
+.mrrp-p3-panel__body {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+}
+
+.mrrp-p3-panel__resize {
+  position: absolute;
+  background: transparent;
+  z-index: 1;
+}
+.mrrp-p3-panel__resize--n  { top: 0;     left: 8px;   right: 8px;   height: 6px; cursor: ns-resize; }
+.mrrp-p3-panel__resize--s  { bottom: 0;  left: 8px;   right: 8px;   height: 6px; cursor: ns-resize; }
+.mrrp-p3-panel__resize--e  { top: 8px;   right: 0;    bottom: 8px;  width: 6px;  cursor: ew-resize; }
+.mrrp-p3-panel__resize--w  { top: 8px;   left: 0;     bottom: 8px;  width: 6px;  cursor: ew-resize; }
+.mrrp-p3-panel__resize--ne { top: 0;     right: 0;                              width: 12px; height: 12px; cursor: nesw-resize; }
+.mrrp-p3-panel__resize--nw { top: 0;     left: 0;                               width: 12px; height: 12px; cursor: nwse-resize; }
+.mrrp-p3-panel__resize--se {
+  bottom: 0; right: 0;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-p3-panel__resize--se:hover { color: var(--mrrp-accent); }
+.mrrp-p3-panel__resize--sw { bottom: 0;  left: 0;                               width: 12px; height: 12px; cursor: nesw-resize; }
+
+.mrrp-p3-section__subgroup-label {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrrp-text-dim);
+  margin: 8px 0 4px;
+  padding-left: 4px;
+}
