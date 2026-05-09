@@ -2776,9 +2776,16 @@ function mrrpP3RenderSection(parent, opts, bodyFn) {
   });
   var body = marinara.addElement(card, "div", { "class": "mrrp-p3-section__body" });
   if (!body) return null;
-  if (typeof bodyFn === "function") {
-    try { bodyFn(body); } catch (e) { warn("renderSection bodyFn failed:", e); }
-  }
+  /* Defensive inline display: belt + suspenders against the embedded
+     CSS string and the live host stylesheet ever disagreeing during a
+     hot-reload. The class-based rule still applies; this just
+     guarantees the body shows when `open` is true regardless of which
+     stylesheet wins specificity. */
+  body.style.display = open ? "flex" : "none";
+  body.style.flexDirection = "column";
+  body.style.gap = "8px";
+  /* Click handler attached BEFORE bodyFn so a bodyFn exception
+     doesn't strand the user on a section they can't toggle. */
   head.addEventListener("click", function () {
     if (!id) return;
     if (!state.sheet.sectionCollapse) state.sheet.sectionCollapse = {};
@@ -2786,6 +2793,25 @@ function mrrpP3RenderSection(parent, opts, bodyFn) {
     saveSheet(state.chatId, state.sheet);
     renderSheet();
   });
+  if (typeof bodyFn === "function") {
+    try {
+      bodyFn(body);
+    } catch (e) {
+      var errMsg = (e && e.message) ? e.message : String(e);
+      warn("mrrpP3 renderSection bodyFn failed for id='" + id + "':", errMsg, e && e.stack);
+      /* Surface the error visibly so a silent body becomes a visible
+         "render error" rather than a missing section. Phase 3 is
+         experimental — make failures observable. */
+      var errEl = marinara.addElement(body, "div", { "class": "mrrp-p3-section__error" });
+      if (errEl) {
+        errEl.textContent = "⚠ " + errMsg;
+        errEl.style.color = "var(--mrrp-warning)";
+        errEl.style.fontFamily = "var(--mrrp-mono)";
+        errEl.style.fontSize = "11px";
+        errEl.style.padding = "8px 12px";
+      }
+    }
+  }
   return { card: card, head: head, body: body };
 }
 
