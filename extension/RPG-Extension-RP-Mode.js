@@ -3939,10 +3939,9 @@ function mrrpP3RenderDerivedTrack(parent, d) {
   mrrpP3RenderDamageTrack(parent, {
     track: { name: d.name, levels: levels, filled: filled },
     onCellClick: function (idx) {
-      /* Phase 4 — cell click CYCLES through severity per the primitive's
-         documented title text "click cycles B→L→A→clear". types is sorted
-         severity-DESC (A first, B last). Cycle: empty → lightest (B) →
-         next-up (L) → next-up (A) → clear. */
+      /* Phase 4 — click ESCALATES damage. Empty→B, B→L, L→A. No
+         heal-on-click — Heal-worst / Heal-all buttons are the only
+         heal path. At max severity (A), click clears. */
       if (!types) return;
       var dmg = ensureTypedTrack(d.name, types);
       var f = filled[idx];
@@ -3957,8 +3956,9 @@ function mrrpP3RenderDerivedTrack(parent, d) {
           if (types[ci].id === hitType.id) { curIdx = ci; break; }
         }
         if (curIdx === -1) return;
-        dmg[hitType.id] = Math.max(0, (dmg[hitType.id] || 0) - 1);
-        if (curIdx > 0) {
+        if (curIdx === 0) {
+          dmg[hitType.id] = Math.max(0, (dmg[hitType.id] || 0) - 1);
+        } else {
           var nextType = types[curIdx - 1];
           if (nextType) dmg[nextType.id] = (dmg[nextType.id] || 0) + 1;
         }
