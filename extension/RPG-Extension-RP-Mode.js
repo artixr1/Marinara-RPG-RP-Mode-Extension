@@ -4134,6 +4134,7 @@ function mrrpP3RenderStatesSection(parent) {
     title: "STATES",
     defaultOpen: true
   }, function (body) {
+    var stateValues = state.sheet.states || {};
     state.ruleset.states.forEach(function (st) {
       var row = marinara.addElement(body, "div", { "class": "mrrp-p3-row mrrp-p3-row--state" });
       if (!row) return;
@@ -4144,10 +4145,11 @@ function mrrpP3RenderStatesSection(parent) {
         var opt = document.createElement("option");
         opt.value = v.label;
         opt.textContent = v.label;
-        if (v.label === state.sheet.states[st.name]) opt.selected = true;
+        if (v.label === stateValues[st.name]) opt.selected = true;
         sel.appendChild(opt);
       });
       marinara.on(sel, "change", function () {
+        if (!state.sheet.states) state.sheet.states = {};
         state.sheet.states[st.name] = sel.value;
         saveSheet(state.chatId, state.sheet);
       });
@@ -4223,13 +4225,15 @@ function mrrpP3RenderConditionsSection(parent) {
         marinara.on(sel, "change", function () {
           var v = sel.value;
           if (!v) return;
+          /* Reset before addCondition; addCondition triggers renderSheet which
+             detaches `sel`, so any post-addCondition assignment lands on a
+             dead node. */
+          sel.value = "";
           if (v === "__custom__") {
             var typed = window.prompt("Condition name:");
-            sel.value = "";
             if (typed && typed.trim()) addCondition(typed.trim());
           } else {
             addCondition(v);
-            sel.value = "";
           }
         });
       }
