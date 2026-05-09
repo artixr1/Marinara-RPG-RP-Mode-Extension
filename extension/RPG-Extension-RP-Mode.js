@@ -1518,6 +1518,16 @@ function normalizeInventoryItem(it, idx) {
     it.moteCommitment = Math.floor(it.moteCommitment);
   }
   if (it.motePool !== "Personal" && it.motePool !== "Peripheral") it.motePool = "Personal";
+  /* Phase 4 — quantity (item stacking). Defaults to 1 for legacy items. */
+  if (typeof it.quantity === "string" && it.quantity) {
+    var pq = parseInt(it.quantity, 10);
+    it.quantity = (!isNaN(pq) && pq >= 0) ? pq : 1;
+  }
+  if (typeof it.quantity !== "number" || it.quantity < 0 || !isFinite(it.quantity) || isNaN(it.quantity)) {
+    it.quantity = 1;
+  } else {
+    it.quantity = Math.floor(it.quantity);
+  }
   return it;
 }
 
@@ -1707,6 +1717,29 @@ function mergeSheet(base, override) {
     base.sectionCollapse = {};
     Object.keys(override.sectionCollapse).forEach(function (k) {
       base.sectionCollapse[k] = !!override.sectionCollapse[k];
+    });
+  }
+  /* Phase 4 — XP persistence. Critical precondition for the leveling /
+     XP-spending system. Without this, XP earned across sessions resets
+     on reload. */
+  if (override.xp && typeof override.xp === "object" && !Array.isArray(override.xp)) {
+    if (!base.xp) base.xp = { current: 0, level: 1, next: 0, total: 0 };
+    if (typeof override.xp.current === "number" && isFinite(override.xp.current)) base.xp.current = override.xp.current;
+    if (typeof override.xp.level   === "number" && isFinite(override.xp.level))   base.xp.level   = override.xp.level;
+    if (typeof override.xp.next    === "number" && isFinite(override.xp.next))    base.xp.next    = override.xp.next;
+    if (typeof override.xp.total   === "number" && isFinite(override.xp.total))   base.xp.total   = override.xp.total;
+  }
+  /* Phase 4 — commitment counter persistence. */
+  if (typeof override.attunedCount === "number" && isFinite(override.attunedCount)) {
+    base.attunedCount = Math.max(0, Math.floor(override.attunedCount));
+  }
+  if (typeof override.investedCount === "number" && isFinite(override.investedCount)) {
+    base.investedCount = Math.max(0, Math.floor(override.investedCount));
+  }
+  /* Phase 4 — conditions persistence. */
+  if (Array.isArray(override.conditions)) {
+    base.conditions = override.conditions.filter(function (c) {
+      return typeof c === "string" && c;
     });
   }
   return base;
@@ -6226,6 +6259,14 @@ function renderInventoryList(parent) {
       if (equippedHere) row.classList.add("mrrp-inv-item--equipped");
 
       marinara.addElement(row, "span", { "class": "mrrp-inv-item__name", textContent: item.name || "(unnamed)" });
+      /* Phase 4 — quantity badge. Hidden for quantity 1 (default). */
+      if (typeof item.quantity === "number" && item.quantity !== 1) {
+        marinara.addElement(row, "span", {
+          "class": "mrrp-chip mrrp-chip--quantity",
+          textContent: "× " + item.quantity,
+          title: item.quantity + " in stack — edit via the item dialog"
+        });
+      }
       marinara.addElement(row, "span", { "class": "mrrp-inv-item__slot", textContent: item.slot ? "[" + item.slot + "]" : "" });
 
       /* Damage cell: weapons declare e.g. "1d8 slashing"; non-weapons leave
@@ -6952,6 +6993,18 @@ function openItemDialog(itemId, onSaved, defaultCategory) {
   var consInput = marinara.addElement(consRow, "input", { type: "checkbox" });
   if (consInput && draft.consumable) consInput.checked = true;
 
+  /* Phase 4 — Quantity (item stacking). One entry can represent N copies.
+     Default 1. */
+  var qtyRow = marinara.addElement(dialog, "div", { "class": "mrrp-item-form__row" });
+  marinara.addElement(qtyRow, "label", { textContent: "Quantity" });
+  var qtyInput = marinara.addElement(qtyRow, "input", {
+    type: "number",
+    "class": "mrrp-item-form__field",
+    min: "0",
+    step: "1"
+  });
+  if (qtyInput) qtyInput.value = String(typeof draft.quantity === "number" ? draft.quantity : 1);
+
   var notesRow = marinara.addElement(dialog, "div", { "class": "mrrp-item-form__row" });
   marinara.addElement(notesRow, "label", { textContent: "Notes" });
   var notesInput = marinara.addElement(notesRow, "textarea", { "class": "mrrp-item-form__textarea" });
@@ -6977,6 +7030,9 @@ function openItemDialog(itemId, onSaved, defaultCategory) {
       draft.category = (catSel && catSel.value === "item") ? "item" : "equipment";
       draft.useEffect = (useInput && useInput.value || "").trim();
       draft.consumable = !!(consInput && consInput.checked);
+      /* Phase 4 — quantity. */
+      var qn = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+      draft.quantity = (!isNaN(qn) && qn >= 0) ? Math.floor(qn) : 1;
       /* Hardness / Overwhelming persist only on equipment. On a non-
          equipment item the fields are hidden in the dialog; we still
          clear them to 0 here so toggling category later doesn't leave
