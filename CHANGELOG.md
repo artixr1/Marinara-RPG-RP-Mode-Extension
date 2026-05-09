@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Pending the next published release.
 
+### Added — Phase 3.6 UI port: inventory (equipment) + abilities (charms/spells) migrated behind feature flag (2026-05-08)
+
+Final body slice. With `state.sheet.useNewRenderer === true`, **all ten** sheet sections now render through Phase-3 wrappers. Item-editor dialog, Spellbook flyout, Intimacies flyout, and Items flyout panels remain classic — each is a separate flyout subsystem deferred to fine-tuning sessions.
+
+- **`mrrpP3RenderInventorySection(parent)`** — Phase-3 section frame around the equipment list, using newly-extracted `renderInventoryList(parent)` helper. Helper lifted from classic `renderInventory` so the equipment list renders identically inside either a classic `.mrrp-section` parent (flag-OFF) or Phase-3 `.mrrp-p3-section__body` parent (flag-ON). Avoids double-section-header. All inventory functionality preserved.
+
+- **`renderInventoryList(parent)`** — refactored from classic `renderInventory`'s inline body. DOM byte-identical to before.
+
+- **`mrrpP3RenderAbilitiesSection(parent)`** — same pattern as Intimacies wrapper: Phase-3 section frame + button → `showSpellbook(true)`. Section omitted when ruleset declares no abilities.
+
+- **Section dispatch swap** — two lines in `mrrpP3RenderSheet`.
+
+- **Engine + classic helpers untouched** — except classic `renderInventory` body refactored to delegate (DOM identical).
+
+- **No new CSS this slice.**
+
+- **All 10 sections now Phase-3 framed under flag.**
+
 ### Added — Phase 3.5 UI port: skills + states + conditions + backgrounds + intimacies migrated behind feature flag (2026-05-08)
 
 Marathon slice. With `state.sheet.useNewRenderer === true`, the Phase-3 sheet now renders **eight** sections via Phase-3 wrappers — Attributes (3.3), Derived (3.4), Saves (3.4), Skills, States, Conditions, Backgrounds, and Intimacies. Only Inventory (item-editor flyout) and Abilities/Charms (charm tree) remain on classic helpers.
