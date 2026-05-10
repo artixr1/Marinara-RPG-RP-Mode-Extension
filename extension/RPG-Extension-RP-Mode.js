@@ -1385,12 +1385,7 @@ function blankSheet(rs) {
        attuned ≤ 3, PF2e invested ≤ 10) and surfaced in the snapshot
        so GM agents can see the budget at a glance. */
     attunedCount: 0,
-    investedCount: 0,
-    /* Phase 3.3 feature flag — when true, renderSheet dispatches to
-       mrrpP3RenderSheet which uses the new primitives for migrated
-       sections. Default off so existing characters keep the classic
-       renderer until the user opts in. */
-    useNewRenderer: false
+    investedCount: 0
   };
   rs.attributes.forEach(function (a) { s.attributes[a.name] = (a["default"] != null ? a["default"] : a.min); });
   rs.skills.forEach(function (k) { s.skills[k.name] = (k["default"] != null ? k["default"] : (k.min != null ? k.min : 0)); });
@@ -1705,11 +1700,6 @@ function mergeSheet(base, override) {
       if (typeof v === "number" && isFinite(v)) base.derivedMax[n] = v;
     });
   }
-  /* Phase 3.3 feature flag — preserve the user's renderer preference
-     across sessions. The classic renderer stays the default; the flag
-     only flips when the user explicitly clicks the "Try Phase 3
-     renderer" toggle, so accidental opt-in isn't possible. */
-  if (override.useNewRenderer === true) base.useNewRenderer = true;
   /* Phase 3.1 section open/closed map — persists across sessions so
      the Attributes section (and any future Phase-3 sections) remember
      their collapsed state. */
@@ -2087,10 +2077,9 @@ function buildIntimaciesPanel() {
 }
 
 function showIntimacies(open) {
-  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
     if (!state.intimaciesEl) {
-      if (useNew && typeof mrrpP3BuildIntimaciesPanel === "function") mrrpP3BuildIntimaciesPanel();
+      if (typeof mrrpP3BuildIntimaciesPanel === "function") mrrpP3BuildIntimaciesPanel();
       else buildIntimaciesPanel();
     }
     if (state.intimaciesEl) {
@@ -3750,18 +3739,8 @@ function mrrpP3RenderSheet() {
   if (actions) {
     var btnRoll = marinara.addElement(actions, "button", { "class": "mrrp-dice__btn", textContent: "Open dice widget" });
     var btnSync = marinara.addElement(actions, "button", { "class": "mrrp-dice__btn mrrp-dice__btn--secondary mrrp-dice__btn--row-spaced", textContent: "Sync sheet to chat fields" });
-    var btnToggle = marinara.addElement(actions, "button", {
-      "class": "mrrp-dice__btn mrrp-dice__btn--secondary mrrp-dice__btn--row-spaced",
-      textContent: "↩ Use classic renderer",
-      title: "Switch back to the classic renderSheet (Phase 1+2 path)"
-    });
     if (btnRoll) marinara.on(btnRoll, "click", function () { showDice(true); });
     if (btnSync) marinara.on(btnSync, "click", syncSheetToChat);
-    if (btnToggle) marinara.on(btnToggle, "click", function () {
-      state.sheet.useNewRenderer = false;
-      saveSheet(state.chatId, state.sheet);
-      renderSheet();
-    });
   }
 
   applyCollapsed(state.collapsed);
@@ -4572,102 +4551,8 @@ function renderSheet() {
     restoreScroll();
     return;
   }
-
-  /* Reset refresh registries; render passes repopulate during this call. */
-  barRefreshers.length = 0;
-  derivedBonusRefreshers.length = 0;
-
-  if (state.sheetResizeObserver) {
-    try { state.sheetResizeObserver.disconnect(); } catch (e) {}
-    state.sheetResizeObserver = null;
-  }
-  if (state.mountEl && state.mountEl.parentNode) state.mountEl.parentNode.removeChild(state.mountEl);
-
-  var host = findSheetContainer();
-  var floating = false;
-  if (!host) {
-    state.mountEl = marinara.addElement(document.body, "div", { "class": "mrrp-sheet mrrp-sheet--floating" });
-    floating = true;
-  } else {
-    hideBuiltInAttributesPanel(host);
-    state.mountEl = marinara.addElement(host, "div", { "class": "mrrp-sheet" });
-  }
-  if (!state.mountEl) return;
-
-  renderSheetHeader(state.mountEl);
-
-  if (floating) {
-    var sheetHeader = state.mountEl.querySelector(".mrrp-sheet__header");
-    if (sheetHeader) makeDraggable(state.mountEl, sheetHeader, "mrrp-sheet-pos");
-    state.sheetResizeObserver = makeResizable(state.mountEl, LS_SHEET_SIZE);
-  }
-
-  /* XP card — sits between the identity row (rendered inside the
-     header) and the main section list. Skipped silently for rulesets
-     whose resolution.mode isn't one of single-roll / dice-pool, so
-     Fate Core and any future XP-less ruleset stays clean. */
-  renderXpCard(state.mountEl);
-
-  var sections = (state.ruleset.sheetSections && state.ruleset.sheetSections.length)
-    ? state.ruleset.sheetSections
-    : ["attributes", "skills", "derived", "states"];
-
-  sections.forEach(function (sec) {
-    if (sec === "attributes") renderAttributes(state.mountEl);
-    else if (sec === "skills") renderSkills(state.mountEl);
-    else if (sec === "saves") renderSaves(state.mountEl);
-    else if (sec === "derived") renderDerived(state.mountEl);
-    else if (sec === "states") renderStates(state.mountEl);
-    else if (sec === "conditions") renderConditions(state.mountEl);
-    else if (sec === "intimacies") renderIntimaciesSection(state.mountEl);
-    else if (sec === "backgrounds") renderBackgrounds(state.mountEl);
-    else if (sec === "inventory") renderInventory(state.mountEl);
-    else if (sec === "abilities") renderAbilitiesSection(state.mountEl);
-  });
-
-  if (state.ruleset.abilities && Array.isArray(state.ruleset.abilities.categories) && sections.indexOf("abilities") === -1) {
-    renderAbilitiesSection(state.mountEl);
-  }
-  /* Auto-render conditions when the ruleset declares any but didn't list
-     "conditions" in sheetSections. Same pattern as the abilities auto-
-     append above. Without this, an author who just adds the conditions
-     array to a bundle never sees the section unless they also remember
-     to update sheetSections. */
-  if (Array.isArray(state.ruleset.conditions) && state.ruleset.conditions.length
-      && sections.indexOf("conditions") === -1) {
-    renderConditions(state.mountEl);
-  }
-
-  var actions = marinara.addElement(state.mountEl, "div", { "class": "mrrp-section" });
-  if (actions) {
-    var btnRoll = marinara.addElement(actions, "button", { "class": "mrrp-dice__btn", textContent: "Open dice widget" });
-    var btnSync = marinara.addElement(actions, "button", { "class": "mrrp-dice__btn mrrp-dice__btn--secondary mrrp-dice__btn--row-spaced", textContent: "Sync sheet to chat fields" });
-    /* Phase 3.3 toggle — opt into the experimental renderer. The new
-       path uses Phase 3.1 primitives for migrated sections (currently:
-       Attributes); everything else still routes through the classic
-       helpers below this point. */
-    var btnTryP3 = marinara.addElement(actions, "button", {
-      "class": "mrrp-dice__btn mrrp-dice__btn--secondary mrrp-dice__btn--row-spaced",
-      textContent: "🧪 Try Phase 3 renderer",
-      title: "Switch to the experimental Phase 3 renderer (Attributes section uses new primitives)"
-    });
-    if (btnRoll) marinara.on(btnRoll, "click", function () { showDice(true); });
-    if (btnSync) marinara.on(btnSync, "click", syncSheetToChat);
-    if (btnTryP3) marinara.on(btnTryP3, "click", function () {
-      state.sheet.useNewRenderer = true;
-      saveSheet(state.chatId, state.sheet);
-      renderSheet();
-    });
-  }
-
-  /* renderSheet rebuilds state.mountEl from scratch every call; the new
-     element has no mrrp-hidden class regardless of the user's collapsed
-     preference. Re-apply so character-switch / rename / bundle-import
-     paths don't accidentally pop the sheet open. */
-  applyCollapsed(state.collapsed);
-
-  /* Phase 4 — restore scroll position after the rebuild settles. */
-  restoreScroll();
+  /* Defensive only — mrrpP3RenderSheet is defined unconditionally in
+     this file; this function should always early-return above. */
 }
 
 function renderSheetHeader(parent) {
@@ -6533,10 +6418,9 @@ function buildItemBag() {
 }
 
 function showItemBag(open) {
-  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
     if (!state.itemBagEl) {
-      if (useNew && typeof mrrpP3BuildItemBag === "function") mrrpP3BuildItemBag();
+      if (typeof mrrpP3BuildItemBag === "function") mrrpP3BuildItemBag();
       else buildItemBag();
     }
     if (state.itemBagEl) {
@@ -7342,10 +7226,9 @@ function showSpellbook(open) {
     state.spellbookOpen = false;
     return;
   }
-  var useNew = state.sheet && state.sheet.useNewRenderer === true;
   if (open) {
     if (!state.spellbookEl) {
-      if (useNew && typeof mrrpP3BuildSpellbook === "function") mrrpP3BuildSpellbook();
+      if (typeof mrrpP3BuildSpellbook === "function") mrrpP3BuildSpellbook();
       else buildSpellbook();
     }
     if (state.spellbookEl) {
