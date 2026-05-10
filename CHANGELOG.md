@@ -9,6 +9,196 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Pending the next published release.
 
+### Added — Phase 5 step 5.3: Resources cluster ("charbar") (2026-05-10)
+
+The biggest Phase 5 piece — a horizontal resource readout cluster above Attributes, driven by `ruleset.resources[]` (Plan B step 1 schema add). Five sub-renderers dispatch by `type`: bar / dice / counter / pool / custom. Includes a custom-component registry that Round 5's V20 visual treatment will populate.
+
+- **`extension/RPG-Extension-RP-Mode.css` end-of-file** — new `/* ── Phase 5 step 5.3: Resources cluster ── */` section (lines 2552-2794, +243 lines) with sub-renderer styles for `.mrrp-resources` cluster, `.mrrp-resource__bar` (auto-color fill: <30% bad, 30-65% warn, >65% ok), `.mrrp-resource__dice` (clickable die-glyph pool), `.mrrp-resource__counter` (numeric stepper), `.mrrp-resource__pool` (current/max + quickButtons), `.mrrp-resource__placeholder` (custom-component fallback), `.mrrp-resources__group-label` (subheader for grouped resources), and `flex-wrap` with `min-width: 120px` per resource for narrow-panel responsiveness (≥320px collapses to single column).
+- **`extension/RPG-Extension-RP-Mode.js`** — registry `mrrp_resourceRenderers = {}` (open-object for runtime registration); helpers `mrrpResolveResourceMax`, `mrrpResolveResourceDefaultCurrent`, `mrrpGetResourceCurrent`, `mrrpSetResourceCurrent`, `mrrpResourceClamp`, `mrrpResourceAutoColor`, `mrrpResourceContext` (wraps `statContext()` to add `{Level}` and `{tierBonus}` token resolution that the existing context omits); five sub-renderers (`mrrpRenderResourceBar/Dice/Counter/Pool/Custom`); custom dispatcher `mrrpRenderResourceCustom` that looks up `rendererConfig.component` in the registry and falls back to `mrrpRenderResourcePlaceholder` on miss; section function `mrrpP3RenderResourcesSection`. Section dispatch wired with a new `sections.order[]` fallback chain (`sheetSections[]` → `sections.order[]` → hardcoded default) and a `"resources"` case that calls the new section function. Lines 3723-3759 (dispatch wiring) + lines 3818-4209 (registry, sub-renderers, dispatcher).
+- **State persistence** at `state.sheet.resources[<id>].current`. quickButtons handle integer deltas and the `"max"` magic string. `change` event (not `input`) on numeric editors prevents bar-fill stutter while typing multi-digit numbers.
+- **Group clustering** works for D&D Spell Slots case: adjacent resources sharing the same `group` value cluster under one subheader (`.mrrp-resources__group-label` with `flex-basis: 100%` to force wrap break).
+- **Mirror discipline**: same in `Marinara-RPG-Extension` with `mrr-` namespace (CSS at line 2567-2809, JS dispatch at line 3533-3576, JS renderers at line 3637-4035).
+- **Embedded CSS regenerated** — `node tools/embed-css.mjs` re-ran in both repos after Round 4 (Intern A additions + Intern B deletions): RP grew to 73594 chars / GM to 72786 chars.
+- **Hand-off — V20 health-track registration (Round 5):**
+  ```js
+  // RP file:
+  mrrp_resourceRenderers["v20-health-track"] = function (resource, parent, ctx) { /* ... */ };
+  // GM file: same code, swap mrrp_ → mrr_
+  ```
+  The renderer owns its own state shape under its resource id (typed `[{type:"B"|"L"|"A"|null}, ...]` array per V20's per-level damage typing) — the registry-default `{current: number}` shape doesn't fit V20 health.
+- **Cross-track note**: this CSS change combined with Intern B's dead-code deletion in the same Round 4 was made parallel-safe via targeted `Edit` calls operating on disjoint regions. Both edits coexisted; embed-css.mjs ran ONCE post-agents to sync both into `EMBEDDED_CSS`.
+
+### Removed — Phase 5 step 5.1 dead code: legacy `renderIdentityField` + `.mrr(p)-sheet__id-*` CSS rules (2026-05-10)
+
+Cleanup follow-up to Phase 5 step 5.1 (Round 1) — removes the legacy identity rendering code that was left in place during the original cycle and is now confirmed unused.
+
+- **`extension/RPG-Extension-RP-Mode.css`** — deleted lines 157-184 (baseline numbering): `.mrrp-sheet__identity-row`, `.mrrp-sheet__id-label`, `.mrrp-sheet__id-input`, `.mrrp-sheet__id-input:focus`. Net −28 lines.
+- **`extension/RPG-Extension-RP-Mode.js`** — deleted lines 4816-4847 (baseline numbering): `renderIdentityField` function + 5-line preceding doc comment. Net −32 lines.
+- **Pre-deletion verification** confirmed zero callers of `renderIdentityField` outside its own definition; zero references to deleted CSS classes from active JS code (only EMBEDDED_CSS string literal at line 49, which is regenerated automatically by `embed-css.mjs`).
+- **Active code preserved**: 10 `.mrr(p)-identity*` rules in each CSS file remain in place; `mrr(p)RenderIdentitySubField` helper untouched. Verified via post-deletion grep.
+- **Mirror discipline**: same deletions in `Marinara-RPG-Extension` with `mrr-` namespace.
+- **Embedded CSS regenerated** in the same Round 4 post-agents pass; the `EMBEDDED_CSS` literal in both `.js` files no longer carries the deleted rules.
+- **Tidy-up follow-up flagged**: an orphaned comment block at line 153 of each CSS file (now describing nothing, since it pointed to the deleted legacy identity-row rules) remains. Drop in a small follow-up cycle.
+
+### Added — Plan B step B.4: fate-core schema-conforming stubs (2026-05-10)
+
+Light JSON-only population of fate-core's new Plan B step 1 schema fields without inventing Fate Core mechanics that don't exist.
+
+- **`rulesets/fate-core/ruleset.json`** — added a 38-line `sections` + `resources` block:
+  - `sections.order[]` (9 entries): `identity, resources, attributes, skills, derived, abilities, states, inventory, notes`. Mirrors the existing legacy `sheetSections` order with the wider Plan B section vocabulary, inserts `resources` near top (matching the dnd5e/exalted3e pattern), and adds `identity`/`inventory`/`notes` defaults that were missing. The legacy `sheetSections` is preserved untouched for backward compatibility.
+  - `sections.hidden[]`: explicit empty array — no fate-core sections need hiding.
+  - `resources[]` (1 entry): `fate-points` with `type: "counter"`, max/current bound to `{Refresh}` (the Refresh attribute, default 3, max 5), `color: "accent"`, and `quickButtons: [-1, +1, Refresh]`.
+- **Stress tracks intentionally NOT added to `resources[]`** — Physical Stress and Mental Stress are already represented as `derivedStats[]` entries with `renderAs: "track"`, which is the canonical Plan B representation for box-track stress. Promoting them to `resources[]` would duplicate the data and lose per-box penalty semantics (`track[].penalty`).
+- **Fate Points exists in BOTH `derivedStats` AND `resources[]`** — the derivedStats version has `renderAs: "value"` (a single integer); the resources version has `type: "counter"` with quickButtons. The resources version is the better player-facing UX (top-of-sheet, click-to-spend) per Phase 5 step 5.3 intent. Coexistence is acceptable; deprecate the derivedStats version in a future cycle once resources rendering ships and migration is clear (renderer should prefer resources[] when both are present).
+- **`derivedStats[].tooltipFormula`**: zero additions. Fate Core's derived stats are narrative formulas in plain English ("3 boxes baseline; Physique 1-2 grants box 3 already") that can't be expressed under the schema's whitelist of `digits, + - * / ( ) and {StatName}` because the rules use stepwise conditionals.
+- **`abilities.groups[]`**: omitted entirely. Fate Core uses the player-chosen skill pyramid, not canonical groups like V20 Talents/Skills/Knowledges. Existing `abilities.categories: [{id:"stunts"}]` block untouched.
+- **`morality`**: confirmed not added (N/A for Fate Core).
+- **Mirror discipline**: byte-identical changes in `Marinara-RPG-Extension`.
+- **Validation gates**: `node tools/validate-ruleset.mjs --all` PASS for fate-core in both repos (`fate-core v1.0.0`); mirror diff empty.
+- **Forward-compatibility note**: if a `fate-accelerated` sibling ruleset is later added, its skill list becomes Approaches (Careful/Clever/Flashy/Forceful/Quick/Sneaky), Stress collapses to a single 3-box track, and most of these Plan B schema additions translate directly.
+
+### Added — Phase 5 step 5.6 (Exalted-only): Initiative-Crashed badge + Anima Banner 6-value layout (2026-05-10)
+
+Visual treatment for the Exalted content that Plan B step B.2 landed earlier today. Initiative state now has a visible distress treatment when active value is `Crashed`; Anima Banner accommodates the new `Suppressed` option with a muted styling.
+
+- **`extension/RPG-Extension-RP-Mode.css` end-of-file** — new section `/* ── Phase 5 step 5.6: state badges + anima banner ── */` (~lines 2503-2578). Three new tokens scoped inside the section's local `:root` block: `--mrrp-state-crashed-color: oklch(0.62 0.18 28)`, `--mrrp-state-crashed-soft` (18% alpha), `--mrrp-state-crashed-line` (42% alpha). Selectors: `.mrrp-state--initiative-crashed` (BEM modifier on the existing `.mrrp-state` row) repaints `.__name`, `.__name::after` (appends `(!)` glyph), and `.__select` with red + soft red bg + red border. 2.4s ease-in-out opacity pulse 1→0.72→1, gated behind `prefers-reduced-motion`. `.mrrp-state--anima-suppressed` paints `var(--mrrp-text-faint)` + italic. Defensive `flex-wrap: wrap; min-width: 0;` on `.mrrp-state` and `max-width: 100%; min-width: 0;` on `.mrrp-state__select` to keep narrow-panel rows clean.
+- **`extension/RPG-Extension-RP-Mode.js`** — new helper `mrrpStateRowApplyMods(row, name, value)` (~lines 4302-4326) idempotently strips any prior `mrrp-state--*` modifier and adds the right one for the active value: `--initiative-crashed` for Initiative=Crashed, `--anima-suppressed` for Anima Banner=Suppressed. Called once at row creation and re-called inside the select `change` handler so the visual updates live without rebuilding the section. Sets `data-active-value` on every state row for future CSS extension without growing the JS branch list.
+- **Mirror discipline**: same in `Marinara-RPG-Extension` with `mrr-` namespace (CSS at line 2518-2593, JS helper at line 4146-4170, inline calls at 4197-4203).
+- **Embedded CSS regenerated** — `node tools/embed-css.mjs` re-ran in both repos after Round 3's three agents (5.2 + 5.6 Exalted + Plan B B.3) all landed; both `EMBEDDED_CSS` strings now contain section markers for steps 5.1, 5.2, 5.4, 5.5, and 5.6.
+- **Class-shape deviation from spec**: Used `.mrrp-state--initiative-crashed` (BEM modifier on existing `.mrrp-state` block) rather than `.mrrp-state-badge--initiative-crashed`, because the in-repo convention has no `.mrrp-state-badge` block — modifiers hang off the existing `.mrrp-state` row class. Functionally identical.
+- **Anima Banner is select-based, not a pill strip.** Existing render uses native `<select>` so the option count never affects row width. Phase 5 step 5.6 ensures the new Suppressed option (Plan B B.2) renders correctly with muted treatment when active. If a horizontal pill-strip rebuild was the actual intent, that's a separate render-flow change for a follow-up cycle.
+
+### Added — Phase 5 step 5.2: XP card visual restructure to prototype parity (2026-05-10)
+
+Numeric input type-scale tightened to prototype spec (16px/600 for current/total/next, 18px/600/56px-wide for level), and the `+1 XP` button moved inline at the right end of the pool-mode row (prototype anatomy: `align-self: flex-end; margin-left: auto;`). Both formula-mode and pool-mode confirmed working.
+
+- **`extension/RPG-Extension-RP-Mode.css` end-of-file** — new section `/* ── Phase 5 step 5.2: XP card ── */` (~lines 2460-2502) with five selector rules overriding type-scale and button position on the pre-existing `.mrrp-xp-card*` baseline. The baseline rules (lines 1615-1737, structural flex/padding/border/gap/group/bar geometry) were left untouched; the appended section overrides only the rules that diverged from the prototype. CSS source-order win resolves the cascade.
+- **`extension/RPG-Extension-RP-Mode.js`** — single semantic change in `renderXpCard`'s pool branch (~lines 2746-2755): `+1 XP` button's parent argument changed from `card` → `poolRow` so it sits inline with the inputs instead of below them. Click handler still atomically increments both `state.sheet.xp.current` and `state.sheet.xp.total`. No state shape change, no schema change.
+- **Pool-mode (Exalted, `resolution.mode: "dice-pool"`)**: renders `[CURRENT] / [TOTAL EARNED] [+1 XP]` all in one row.
+- **Formula-mode (D&D 5e, `resolution.mode: "single-roll"`)**: renders `Level [N] · Current XP · / · Next-level threshold` row + 4px progress bar, reading thresholds from `ruleset.xpTable[]` (D&D 5e ships a 20-entry table; bar fill computes against current-level threshold).
+- **Mirror discipline**: same in `Marinara-RPG-Extension` (CSS at line 2475-2517, JS at line 2461-2470).
+- **Type scale matches prototype** per UI-build.md §3.4: 10-11px uppercase letter-spaced labels, 16px/600 numeric values, 18px/600 level input.
+- **Card-label color preserved**: `var(--mrrp-accent)` retained rather than reverted to `var(--mrrp-text-faint)` as the prototype uses — keeps the in-extension stylistic convention where every section-label tints accent.
+
+### Added — Plan B step B.3: V:TM V20 lorebook path-lookup entries (2026-05-10)
+
+Plan B step 1 already populated the V20 morality block (paths, virtues with paired-choice options) and abilities.groups (Talents/Skills/Knowledges with verbatim 30-ability membership) more thoroughly than the original Plan B step B.3 brief expected. This step adds the missing piece: clean lookup-style lorebook entries that bind cleanly to the `loreRef` tokens declared on each path.
+
+- **`rulesets/vtmv20/lorebook.json`** (untracked-but-modified file) — appended 5 new entries (~lines 425-466) named `Path Lookup: <loreRef>` to bind to the morality.paths[].loreRef tokens:
+  - `Path Lookup: humanity` (binds Humanity)
+  - `Path Lookup: path-honorable-accord` (binds Sabbat Lasombra/Tzimisce path)
+  - `Path Lookup: path-caine` (binds Noddist scholars path)
+  - `Path Lookup: path-beast` (binds frenzy-embracing predators path)
+  - `Path Lookup: path-night` (binds Sabbat dark mystics path)
+- Each new entry's `keys[0]` exactly matches the loreRef token from `morality.paths[N].loreRef`, enabling the future Phase 5 step 5.6 V20 path picker to resolve descriptions by direct lorebook lookup.
+- **`rulesets/vtmv20/ruleset.json`** — no changes this cycle. Plan B step 1 already populated `morality.paths[]`, `morality.virtues[]` (with Conscience/Conviction and Self-Control/Instinct paired-choice options), `abilities.groups[]` (full 30-ability membership), `resources[]`, and `sections.hidden[]` for Disciplines.
+- **Clan-specific Discipline trios verified** in lorebook clan entries (Brujah: Celerity/Potence/Presence; Toreador: Auspex/Celerity/Presence; etc.) — no gaps, no edits needed.
+- **Mirror discipline**: byte-identical lorebook additions in both repos. Pre-existing line-420 `mrrp-state` vs `mrr-state` namespace difference inside content remains intact.
+- **Hand-off — Round 4 V20 visual treatment** consumes these loreRef bindings: when the path picker selects a path, look up the lorebook entry whose `keys[0]` exactly matches `morality.paths[N].loreRef`. The path-pool dropdown should preserve `morality.virtues[N].options[]` two-state toggling for Conscience/Conviction and Self-Control/Instinct (active option conventionally driven by selected path — see the new lookup entries for canonical Virtue pairings, including Path of Night's "Cold variant").
+
+### Added — Phase 5 step 5.5: 3-way density toggle (compact / cozy / roomy) (2026-05-10)
+
+User-facing density preference shipped end-to-end: a 3-way pill toggle in the actions row, with `state.sheet.density` per-character persistence and `data-density` attribute branching on the sheet root. Default `cozy` matches the JSX prototype.
+
+- **`extension/RPG-Extension-RP-Mode.css` `:root`** — appended 5 density variables (`--mrrp-density-pad-x`, `-pad-y`, `-gap`, `-row-h`, `-fs`) with cozy defaults, after the existing Phase 4 token block. No existing token modified.
+- **`extension/RPG-Extension-RP-Mode.css` end-of-file** — new section `/* ── Phase 5 step 5.5: density toggle ── */` with three `.mrrp-sheet[data-density="compact|cozy|roomy"]` selector blocks branching the four density values, plus `.mrrp-density-toggle` pill-group classes (`__label`, `__btn`, `__btn[aria-pressed="true"]`, `:hover`, `:focus-visible`).
+- **`extension/RPG-Extension-RP-Mode.js`** — added `density: "cozy"` to `blankSheet` defaults (~line 1389); set `data-density` attribute on `state.mountEl` immediately after creation in `mrrpP3RenderSheet` (~line 3702); appended density toggle UI in the actions-row block (~line 3756) iterating `["compact","cozy","roomy"]` to render three buttons with `aria-pressed` selection. Click handler writes `state.sheet.density`, sets `data-density`, calls `saveSheet(state.chatId, state.sheet)`, then `renderSheet()` — same save-then-re-render pattern as other actions-row controls.
+- **Mirror discipline**: same restructure in `Marinara-RPG-Extension` with `mrr-` namespace (sheet at line 3509, actions row at line 3574, blankSheet at line 1086).
+- **Embedded CSS regenerated** — `node tools/embed-css.mjs` re-ran in both repos as the orchestrated final step after Phase 5 step 5.4 also landed; both `EMBEDDED_CSS` strings contain Phase 5 step 5.5 + Phase 5 step 5.4 markers verbatim.
+- **Follow-up — density-aware components not yet wired.** This step ships the toggle infrastructure and root-level variable swap. Existing components still use literal `--mrr(p)-pad`/`--mrr(p)-gap`/`13px` references — they won't visually respond to the toggle until a separate cycle threads `var(--mrr(p)-density-*)` through them. Recommend that follow-up land as its own slice.
+
+### Added — Phase 5 step 5.4: derived tooltip math via `derivedStats[].tooltipFormula` (2026-05-10)
+
+Hover any derived stat that declares a `tooltipFormula` (Plan B step 1 schema add) and see the breakdown: `Soak (Bashing): 7 = 4 + 3` with each contributor's source on its own line. Closes the gap where existing valueFormula tokens of the form `{bonuses:Bashing Soak}` silently evaluated to 0.
+
+- **`extension/RPG-Extension-RP-Mode.js`** — added `mrrpSubstituteTokens(formula, ctx)` and `mrrpComputeTooltipBreakdown(derived, ctx)` helpers (lines 5583-5654). Token vocabulary: `{StatName}` (flat ctx lookup), `{StatName_mod}` (D&D-style modifier), `{bonuses:Key}` (NEW — resolves `equippedBonuses(Key).value`, summed across equipped items), `{Level}` and `{tierBonus}` (forward-compatible — currently 0 in derived contexts).
+- **`extension/RPG-Extension-RP-Mode.js`** — extended `renderValue` (lines 5656-5720) inside `mrrpP3RenderDerivedSection`: when `tooltipFormula` is present, computes the substituted breakdown and emits it as `title=` on the value cell after `calc.textContent` is set in `refreshAutocalc`. Coexistence: when `valueFormula` is also present, `valueFormula` continues to drive the displayed number; `tooltipFormula` only drives the tooltip text. When only `tooltipFormula` is present, it computes BOTH the displayed value AND the tooltip.
+- **`extension/RPG-Extension-RP-Mode.css` end-of-file** — new section `/* ── Phase 5 step 5.4: derived tooltip math ── */` (lines 2441-2459) with `.mrrp-row__value--autocalc[title]:not([title=""])` selectors: `cursor: help`, dotted underline via `--mrrp-text-faint`, hover state shifts underline to `--mrrp-accent-line`.
+- **Mirror discipline**: same in `Marinara-RPG-Extension` with `mrr-` namespace (helpers at line 5454, renderValue edits at line 5527, CSS at line 2456).
+- **Active formulas verified to render**: Exalted Soak (Bashing) `{Stamina} + {bonuses:Bashing Soak}`, Soak (Lethal) `{Stamina} + {bonuses:Lethal Soak}`; D&D Armor Class `10 + {Dexterity_mod} + {bonuses:Armor Class}`, Initiative `{Dexterity_mod} + {bonuses:Initiative}`. All compute correctly via in-session smoke test.
+- **BEHAVIOR CHANGE — D&D Armor Class** is now autocalc-driven (no manual stepper) because its `tooltipFormula` is present without a `valueFormula`. Players who previously typed AC numbers directly will now need an inventory item with `bonuses: [{target: "Armor Class", value: N}]` equipped. This matches the long-term Soak-style architecture but is a UX shift worth noting. If unwanted, gate the promotion behind a `derived.computeFromTooltipFormula: true` opt-in flag.
+
+### Added — Plan B step B.2: Exalted content cleanup (2026-05-10)
+
+Five Exalted content updates following the new schema fields from Plan B step 1.
+
+- **`rulesets/exalted3e/ruleset.json`** —
+  - Removed `Sorcerous Motes` from `derivedStats[]` (now lives authoritatively in `resources[]` per Plan B step 1).
+  - Added `"derived:Sorcery Circle"` and `"derived:Sorcerous Motes"` to `sections.hidden[]` (the latter as belt-and-suspenders against any cached state still referencing the deleted entry).
+  - Added new state category `Initiative` with values `Active` and `Crashed` to model the canonical Exalted 3e initiative-crashed condition.
+  - Prepended `Suppressed` option to the anima banner state values (covers no-motes-spent / Charm-damped / non-Exalt cases).
+- **`rulesets/exalted3e/lorebook.json`** — no changes; the pre-existing `ex3-rules-sorcery-circles` entry (`Rule: Sorcery — The Three Circles`, covering Terrestrial / Celestial / Solar progression) already satisfies the spec's intent. The duplicate-id collision was caught and rolled back during implementation.
+- **Mirror discipline**: byte-identical changes in `Marinara-RPG-Extension`.
+- **Validation gates**: `node tools/validate-ruleset.mjs --all` PASS for exalted3e (v1.1.0) in both repos; mirror `diff` empty for ruleset.json.
+- **Hand-off — Anima Banner now has 6 values** (Suppressed / Dim / Glowing / Burning / Bonfire / Iconic) — up from 5. Phase 5 step 5.6 visual treatment will need to accommodate the extra option (likely flex-wrap rather than fixed 5-column grid).
+- **Out of scope this cycle (queued for follow-ups)**: Plan B step B.3 V20 morality detail fills, Plan B step B.4 fate-core / pathfinder2e content, ruleset version bump 1.1.0 → 1.2.0.
+
+### Added — Phase 5 step 5.1: identity card visual restructure (2026-05-10)
+
+Replaces the legacy `mrrp-sheet__identity-row` with a prototype-shaped compact identity card at the bottom of the sheet header. Pure-visual port from `~/projects/claude-design-updates/sheet.jsx` §3.4 — no functional, schema, or state-shape changes.
+
+- **`extension/RPG-Extension-RP-Mode.css`** — added `.mrrp-identity` parent + 7 child classes (`__avatar`, `__main`, `__name`, `__sub`, `__sub-item`, `__sub-label`, `__sub-input`, plus `:focus` states). Type scale: 16px/600 borderless name input (`var(--mrrp-text)`), 9px uppercase letter-spacing 0.1em sub-labels (`var(--mrrp-text-faint)`), 12px borderless sub-inputs (`var(--mrrp-text-dim)`). Avatar slot uses 10px-mono dashed border placeholder text "PORTRAIT" matching prototype.
+- **`extension/RPG-Extension-RP-Mode.js`** — restructured the tail of `renderSheetHeader` to emit the new card markup wrapping the existing identity inputs; added `mrrpRenderIdentitySubField` helper. Renderer branches on `Array.isArray(state.ruleset.identityFields)`: when present, iterates the schema-declared list; when absent, falls back to the legacy `header.raceLabel`/`classLabel` two-field pattern so all current rulesets (Exalted Type/Caste, D&D Class/Race, V20 Clan/Sect) keep working unchanged.
+- **Save/load semantics preserved** — sub-inputs retain the 250ms debounced `saveSheet()` pattern + immediate-save-on-blur + click-stopPropagation. Name input edits `activeChar.name` with the same debounced pattern, calling `saveCharacters() + renderSheet()` so the character switcher dropdown updates live.
+- **Embedded CSS regenerated** — `node tools/embed-css.mjs` re-ran; the `EMBEDDED_CSS` string in `extension/RPG-Extension-RP-Mode.js` is in sync.
+- **Mirror discipline**: same restructure landed same-day in `Marinara-RPG-Extension` with the `mrr-` namespace.
+- **Forward-compatible with Plan B's `identityFields[]` schema** — when rulesets begin declaring `identityFields[]` (Plan B step 1 also landed today), this renderer iterates them automatically.
+- **Dead-code note (out of scope this cycle)**: the legacy `renderIdentityField` function and `mrrp-sheet__identity-*` CSS rules are now unused; left in place as harmless dead code, prune in a follow-up commit.
+
+### Added — Plan B step 1: ruleset schema additions for resources, derived tooltips, ability grouping, and morality (2026-05-10)
+
+Backwards-compatible JSON-only schema additions to `schema/ruleset.schema.json` plus per-ruleset population. Unblocks Phase 5 steps 5.3 (Resources cluster), 5.4 (Derived tooltip math), and 5.6 (per-ruleset visual tweaks).
+
+- **`schema/ruleset.schema.json`** — added five top-level structural areas:
+  - **`sections`** with `order[]` (enum-typed string[] declaring section render order) and `hidden[]` (string[] hiding sections or `derived:<name>` individual derived stats).
+  - **`resources[]`** — array of Resource objects: `{id, label, type: bar|dice|counter|pool|custom, max?, current?, die?, group?, color?, quickButtons?, rendererConfig?}`. State tag format: `[mrrp-state: resource:<id>=N]`.
+  - **`derivedStats[].tooltipFormula`** — token-substituted formula string, drives the Phase 5 step 5.4 tooltip math. Coexists with the existing `formula` (GM prose hint) and `valueFormula` (autocalc) fields. Note: Plan B doc literally specified `derived[].formula` but `derivedStats[].formula` already exists with different semantics — `tooltipFormula` is the minimum-disruption naming that delivers Plan B's intent without a breaking rename.
+  - **`abilities.groups[]`** — array of `{id, label, members[]}` for V20 Talents/Skills/Knowledges grouping; optional and ignored by rulesets that don't group abilities.
+  - **`morality`** — section type with `rating {label, min, max, default}`, `paths[]`, and `virtues[]` (each virtue supports `options[]` for paired-choice virtues like Conscience/Conviction).
+- **`rulesets/exalted3e/ruleset.json`** — populated `sections.order[]` (12 sections), `resources[]` (HP, Motes Personal, Motes Peripheral, Willpower, Sorcerous Motes), `derivedStats[].tooltipFormula` on Soak (Bashing) `{Stamina} + {bonuses:Bashing Soak}` and Soak (Lethal).
+- **`rulesets/vtmv20/ruleset.json`** — populated `sections.order[]` (13 sections including new `morality` and `disciplines` slots), `sections.hidden[]` (12 entries hiding each Discipline from Derived per Phase 5 step 5.6 spec), `resources[]` (Blood Pool / Willpower / Health-as-`custom` with `rendererConfig.component: "v20-health-track"`), `abilities.groups[]` (Talents/Skills/Knowledges with verbatim V20 member lists), `morality` section (Path Rating + 5 paths + 3 virtues with Conscience/Conviction and Self-Control/Instinct as paired-choice).
+- **`rulesets/dnd5e/ruleset.json`** — populated `sections.order[]` (13 sections), `resources[]` (HP, Hit Dice, Spell Slots 1st-3rd grouped under "Spell Slots"), `derivedStats[].tooltipFormula` on Armor Class `10 + {Dexterity_mod} + {bonuses:Armor Class}` and Initiative `{Dexterity_mod} + {bonuses:Initiative}`.
+- **`rulesets/fate-core/ruleset.json`** — no edits; new fields are optional and the file already validates against the new schema.
+- **`rulesets/pathfinder2e/ruleset.json`** — file remains absent (pre-existing condition flagged for separate triage); not created by this work.
+- **Validation gates**: `node tools/validate-ruleset.mjs --all` PASS for every existing ruleset.json in both repos; mirror diff between RP and GM ruleset.json files returns empty (byte-identical content; only intentional namespace differences in schema files preserved).
+- **Out of scope this cycle (queued for follow-ups)**: removing the now-redundant Sorcerous Motes from Exalted `derivedStats[]` (Plan B step B.2 content cycle), the Sorcery Circle hiding + lorebook ingestion (Plan B step B.2), the Initiative-crashed Exalted state and anima "none" option (Plan B step B.2), V20 morality data fills beyond schema-conforming defaults (Plan B step B.3).
+
+### Added — Phase 4 design-token migration: oklch palette + Geist font stack (2026-05-10)
+
+Visual layer of the UI rebuild ported from the JSX prototype at `~/projects/claude-design-updates/`. No functional or structural change — this is the appearance-only counterpart to the structural Phase 3 cutover that landed earlier this week.
+
+- **`extension/RPG-Extension-RP-Mode.css` `:root`** — every color token migrated from hand-picked rgba/hex to perceptually-uniform oklch values matching the prototype's purple/dark mood (background `oklch(0.21 0.025 285 / 0.96)`, accent derived from new tweakable `--mrrp-accent-h: 280` / `-c: 0.12` / `-l: 0.78`). Token NAMES preserved across the migration so every existing CSS rule resolves unchanged. New tokens added per prototype: `--mrrp-bg-app`, `--mrrp-bg-input`, `--mrrp-hairline`, `--mrrp-hairline-strong`, `--mrrp-accent-soft`, `--mrrp-accent-line`, `--mrrp-text-faint`, `--mrrp-sans`.
+- **Geist font stack** — `--mrrp-sans` introduced (`"Geist", "Inter", system-ui, ...`); `--mrrp-mono` updated to lead with `"Geist Mono"`. Applied via `font-family: var(--mrrp-sans)` on the `.mrrp-sheet` root so all descendant text picks it up. Geist falls back gracefully through the stack if not installed locally — no WOFF2 bundling this cycle (deferred until requested).
+- **Shadow** — replaced single 8px-offset drop with the prototype's two-layer 24px + 6px composite for richer panel elevation.
+- **`tools/token-migration-map.json`** — full mapping between every old token value, the new oklch value, and the prototype source variable. Includes an `added` section listing the new tokens and a `deferred_to_followups` section calling out density toggle, motion tokens, and light/dark mode (each is its own future cycle, intentionally not mixed in).
+- **Embedded CSS regenerated** — `node tools/embed-css.mjs` re-ran; the `EMBEDDED_CSS` string in `extension/RPG-Extension-RP-Mode.js` is in sync with the standalone `.css` file (grep proof: oklch literal + `Geist Mono` both present).
+- **Validation gates passed**: `node --check extension/RPG-Extension-RP-Mode.js` (clean) · `npm run validate-bundles` (5/5 PASS) · cross-namespace grep for `\bmrr-` in `extension/ schema/ tools/` (zero hits — namespace integrity preserved).
+- **Mirror discipline**: same migration landed same-day in `Marinara-RPG-Extension` (GM-mode) with the `--mrr-*` namespace.
+- **Out of scope this cycle (queued for follow-ups)**: density toggle (step 4.4 — touches state schema), motion tokens (step 4.5 — prototype defines none to port), light-mode adaptation (prototype is single-mode dark too).
+- **Visual verification gate**: re-import `RPG-Extension-RP-Mode.js` + `RPG-Extension-RP-Mode.css` from Marinara → Settings → Extensions, hard-refresh, then open an Exalted or D&D character sheet to confirm the deeper purple surface + Geist body type land correctly.
+
+### Added — V:TM V20 ruleset bundle (`mrrp-vtmv20`) — first-pass draft from training + internet research (2026-05-09)
+
+New ruleset bundle for **Vampire: The Masquerade 20th Anniversary Edition** (V20, 2011 Onyx Path). Phase 1 of a multi-phase build — drafted from model training plus multi-source web research (Onyx Path corebook references, Anarch State wiki for the canonical generation chart, Saligia / White Wolf wiki cross-checks for clan/Discipline/sect content, Onyx Path forums for V20-specific botch/Willpower/specialty rules, and the live Dark Pack Agreement text from worldofdarkness.com for IP boundaries). Phase 2 (V20 corebook ingestion to fill gaps) is held in reserve; see EVALUATION.md in the per-session work dir for the post-Phase-1 gap report and the corebook-ingestion verdict.
+
+- **`rulesets/vtmv20/ruleset.json`** — full V20 character sheet template: 9 Attributes (Physical/Social/Mental), 30 Abilities (Talents/Skills/Knowledges, category in tooltip), 9 common + 3 clan-unique Discipline ratings as derived stats, 3 Virtues, Generation, Blood Pool bar, Willpower bar, Humanity bar, Path Rating, Initiative auto-calc, V20 7-level Health Track with B/L/A damage types (Aggravated soak = Fortitude only), Backgrounds & Merits, Morality Track selector, Frenzy State, Hunger Tier. Header labels: Clan / Sect.
+
+- **`rulesets/vtmv20/lorebook.json`** — 52 keyword-triggered reference entries: mechanics rules (resolution, botch, Willpower, generation table, Beast/Frenzy, hunger/feeding, Blood Bond, torpor/Final Death, Six Traditions); 13 V20 clans + 4 V20 bloodlines (Caitiff, Daughters of Cacophony, Salubri, Samedi); 9 common Disciplines with all 5 named power levels each + 3 clan-unique Disciplines (Necromancy, Thaumaturgy, Vicissitude); 4 sects; Humanity hierarchy + 4 Path hierarchies of sins (Honorable Accord, Caine, Beast, Night); sub-agent doc. Every entry under the 2500-char lorebook budget.
+
+- **`rulesets/vtmv20/gm-agent.md` + `agents.json`** — main Storyteller agent prompt framed for **roleplay mode**, working alongside Marinara's default world-state / prose-guardian / continuity / expression agents. Targets the main narration model (not a single GM model). Drops the 50-character reputation tag cap workaround that GM-mode requires (RP-mode lifts the cap). Otherwise V20-canonical mechanics: variable difficulty 6-9, botch on any 1 with zero successes, Willpower auto-success (one per turn cap), Potence auto-successes, Celerity end-of-turn extra physical actions, generation-keyed Blood Pool & per-turn spend caps, V20 health track with Aggravated soak rule, state-mutation tag schema (`[mrrp-state: ...]`), Discipline activation tag.
+
+- **`rulesets/vtmv20/agents/*.md`** — five optional sub-agents installed DISABLED (toggle in Marinara → Settings → Agents): `state-mutator` (emit `[mrrp-state: ...]` tags inline), `state-reminder` (bullet PC state every turn), `combat-adjudicator` (V20 combat math; sleeps in social scenes), `lore-query` (answer rules questions from lorebook + RAW; sleeps otherwise), `npc-bookkeeper` (track Kindred NPCs across turns). All five framed for RP-mode (working with default narration model and engine sub-agents).
+
+- **`rulesets/vtmv20/INSTALL.md`** — file-import instructions, Dark Pack compliance notes, sub-agent enablement guide, cross-OS install commands, companion-install pointer to the GM-Mode repo. Notes the lifted reputation cap and the RP-mode multi-agent collaboration model.
+
+- **`rulesets/vtmv20/bundle.json`** — assembled single-file install (52 lorebook entries + 6 agents + full ruleset). Validates clean. `mrrp-bundle` envelope; `mrrp-vtmv20` ruleset id; idempotent re-install supported.
+
+- **Validation gates passed**: `npm run validate-rulesets` (vtmv20 PASS) · `npm run validate-bundles` (vtmv20 PASS) · `node --check extension/RPG-Extension-RP-Mode.js` (clean) · namespace audit — zero standalone `mrr-` hits inside `rulesets/vtmv20/` (only `mrrp-` tokens, as required).
+
+- **Dark Pack compliance**: license string in `ruleset.json` carries the Paradox copyright notice + "NOT official World of Darkness material" disclaimer per the [Dark Pack Agreement](https://www.worldofdarkness.com/dark-pack). All flavor text is original-prose paraphrase; mechanical references only; no contiguous V20 corebook quotation longer than ~30 words. Display the Dark Pack logo on the project README and any release page.
+
+- **Companion bundle**: same-day landing in `Marinara-RPG-Extension` repo as `rulesets/vtmv20/` with the `mrr-vtmv20` namespace and GM-mode-framed Storyteller (includes 50-char cap workaround). Both bundles can coexist on a single Marinara install.
+
 ### Added — Phase 3.6 UI port: inventory (equipment) + abilities (charms/spells) migrated behind feature flag (2026-05-08)
 
 Final body slice. With `state.sheet.useNewRenderer === true`, **all ten** sheet sections now render through Phase-3 wrappers. Item-editor dialog, Spellbook flyout, Intimacies flyout, and Items flyout panels remain classic — each is a separate flyout subsystem deferred to fine-tuning sessions.

@@ -103,6 +103,21 @@ To enable: open the gear icon in Marinara, go to **Settings → Agents**,
 find the agent (named `MRRP: <System> — <Role>`), toggle on. The agent
 persists across chats; toggle off any time.
 
+### Compatibility with Marinara's built-in agents
+
+If you want to also turn on some of Marinara's 25+ built-in agents
+(`director`, `quest`, `cyoa`, `chat-summary`, `illustrator`, etc.) in
+the same chat, see [`docs/AGENT-COMPATIBILITY.md`](docs/AGENT-COMPATIBILITY.md)
+for the full matrix. Short version:
+
+- **Don't enable** `combat`, `knowledge-retrieval`, `knowledge-router`,
+  `character-tracker`, or `persona-stats` — each one directly conflicts
+  with one of our five sub-agents.
+- **Caution** on `editor` (may strip our `[mrrp-state:]` tags) and
+  `lorebook-keeper` (may pollute our managed ruleset lorebook).
+- Everything else is safe to enable freely; the matrix lists "Enable
+  when…" guidance per agent.
+
 ---
 
 Both rulesets ship with `bundle.json` (the install file) plus their
