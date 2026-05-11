@@ -150,11 +150,6 @@
   gap: 4px;
 }
 
-/* Identity row — sits below the character switcher, holds two label+input
-   pairs whose labels are ruleset-driven (Race+Class for D&D, Ancestry+
-   Class for PF2e, Exalt Type+Caste for Exalted, Concept+Trouble for Fate).
-   Inputs flex to share the row evenly; labels stay tight and dim. */
-
 /* Phase 5 step 5.1 — Identity card (port of prototype's `.identity`).
    Sits at the bottom of the sheet header, immediately above the body.
    Wraps the existing renderIdentityField inputs so save/load behavior
@@ -3041,4 +3036,117 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* ── Round 6: roll-under mechanic ── */
+/* Visual states for roll-under outcomes. The dice tray's existing success/fail
+   modifiers (lines ~870) cover plain pass/fail; these two add crit-success and
+   fumble bands the roll-under widget emits. accent ring for crit, warning fill
+   for fumble — same vocabulary as the dice-pool botch state. */
+.mrrp-dice__result--crit {
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-dice__result--fumble {
+  border-color: var(--mrrp-warning);
+  background: rgba(251, 191, 36, 0.10);
+}
+
+/* ── Round 7: stance-modal-pool ── */
+/* Segmented stance toggle for stance-modal-pool resolution mode (Lasers &
+   Feelings). Two pill buttons render in a single row above the pool size
+   input. Active stance is filled with accent; inactive is the standard
+   hairline-button look so the choice reads at a glance. Per-die "exact"
+   highlight class lights the LASER FEELINGS dice in the result row, and
+   outcome tier classes give the dice tray's result strip a per-tier
+   gradient so miss / barely / good / critical are distinguishable without
+   reading text. */
+.mrrp-dice__stance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 4px;
+}
+.mrrp-dice__stance-row > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint, oklch(0.7 0.02 285));
+  min-width: 48px;
+}
+.mrrp-dice__stance-group {
+  display: inline-flex;
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--mrrp-bg-input);
+}
+.mrrp-stance-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--mrrp-text, inherit);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.mrrp-stance-btn + .mrrp-stance-btn {
+  border-left: 1px solid var(--mrrp-hairline);
+}
+.mrrp-stance-btn:hover {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-stance-btn--active {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
+.mrrp-stance-btn--active:hover {
+  background: var(--mrrp-accent);
+}
+
+/* Pool-formula hint label under the pool input. Pure cosmetic — exposes
+   the rules-text formula for pool composition to the player without
+   forcing them into a parser. */
+.mrrp-dice__hint {
+  font-size: 10px;
+  color: var(--mrrp-text-faint, oklch(0.65 0.02 285));
+  padding: 0 8px 4px;
+  font-style: italic;
+}
+
+/* LASER FEELINGS / exact-match die highlight. Stronger accent ring than a
+   plain stance-success so the exact-match dice pop on the result strip. */
+.mrrp-dice__face--exact {
+  outline: 2px solid var(--mrrp-accent);
+  outline-offset: -2px;
+  background: var(--mrrp-accent-soft);
+  position: relative;
+}
+
+/* Stance-modal-pool result strip — per-tier visual states. Outcome tiers
+   are open-ended labels (the spec doesn't enumerate them) so we map by
+   the canonical L&F label set: miss / barely / good / critical. Any other
+   tier label falls through to the default --success / --fail kind chosen
+   by rollStanceModalPool. */
+.mrrp-dice__result--tier-miss {
+  border-color: var(--mrrp-warning);
+  background: rgba(251, 191, 36, 0.08);
+}
+.mrrp-dice__result--tier-barely {
+  border-color: var(--mrrp-hairline-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+.mrrp-dice__result--tier-good {
+  border-color: var(--mrrp-accent-line);
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-dice__result--tier-critical {
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-accent-soft);
+  box-shadow: 0 0 0 1px var(--mrrp-accent-dim) inset;
 }
