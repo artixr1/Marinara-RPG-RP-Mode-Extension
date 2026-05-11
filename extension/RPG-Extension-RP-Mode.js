@@ -1355,6 +1355,12 @@ function blankSheet(rs) {
   var s = {
     attributes: {}, skills: {}, derived: {}, states: {},
     track: {}, extraTrack: {},
+    /* Plan B v1 resources cluster state. Resources that declare a
+       `stateName` (motes, willpower in Exalted) actually persist via
+       state.sheet.derived[stateName] for legacy state-mutator compat;
+       this map is the store for resources without a legacy counterpart
+       (Sorcerous Motes, health-track damage cycling state, etc.). */
+    resources: {},
     inventory: [],
     equipped: {},
     skillProficiency: {},
@@ -1570,6 +1576,21 @@ function mergeSheet(base, override) {
       if (Array.isArray(override.extraTrack[name])) {
         base.extraTrack[name] = override.extraTrack[name];
       }
+    });
+  }
+  /* Plan B v1 resources state. Resources with a `stateName` actually
+     persist via state.sheet.derived[stateName] (handled by the 'derived'
+     merge above). This block preserves resources without a legacy
+     counterpart (e.g. sorcerous-motes' current, the health-track's
+     per-cell type via the legacy `track` map — though Exalted's
+     exalted-health-track uses state.sheet.track["Health Track"] which
+     the 'track' merge above already covers). Per-resource entry shape
+     is open ({current, track?, ...}) — preserve verbatim. */
+  if (override.resources && typeof override.resources === "object") {
+    if (!base.resources) base.resources = {};
+    Object.keys(override.resources).forEach(function (id) {
+      var v = override.resources[id];
+      if (v && typeof v === "object") base.resources[id] = v;
     });
   }
   /* inventory + equipped accept any items / slots the saved sheet carried,
@@ -3900,11 +3921,33 @@ function mrrpGetResourceCurrent(resource, ctx) {
   }
   var id = resource && resource.id;
   if (!id) return 0;
+  /* Legacy-state binding (Plan B v1.x): when a resource declares
+     `stateName`, the canonical store is state.sheet.derived[stateName] —
+     the same key the state-mutator chat-tag parser writes to (e.g.
+     [mrrp-state: field="Personal Motes" delta=-3] writes to
+     state.sheet.derived["Personal Motes"]). Reading from there makes
+     LLM-driven mutations flow into the Resources cluster automatically,
+     and writes via mrrpSetResourceCurrent also persist there so
+     mergeSheet's existing 'derived' whitelist preserves the value across
+     sessions. Resources without stateName fall back to the new
+     state.sheet.resources[id].current store. */
+  if (typeof resource.stateName === "string" && resource.stateName) {
+    if (!state.sheet.derived || typeof state.sheet.derived !== "object") {
+      state.sheet.derived = {};
+    }
+    var dv = state.sheet.derived[resource.stateName];
+    if (typeof dv === "number" && isFinite(dv)) return dv;
+    var maxL = mrrpResolveResourceMax(resource, ctx);
+    var defL = mrrpResolveResourceDefaultCurrent(resource, ctx, maxL);
+    state.sheet.derived[resource.stateName] = defL;
+    return defL;
+  }
   var entry = state.sheet.resources[id];
   if (!entry || typeof entry.current !== "number") {
     var max = mrrpResolveResourceMax(resource, ctx);
     var def = mrrpResolveResourceDefaultCurrent(resource, ctx, max);
-    state.sheet.resources[id] = { current: def };
+    if (!entry) entry = state.sheet.resources[id] = {};
+    entry.current = def;
     return def;
   }
   return entry.current;
@@ -3915,7 +3958,21 @@ function mrrpSetResourceCurrent(resource, value) {
   if (!state.sheet.resources || typeof state.sheet.resources !== "object") {
     state.sheet.resources = {};
   }
-  state.sheet.resources[resource.id] = { current: value };
+  /* Legacy-state binding: see mrrpGetResourceCurrent comment. */
+  if (typeof resource.stateName === "string" && resource.stateName) {
+    if (!state.sheet.derived || typeof state.sheet.derived !== "object") {
+      state.sheet.derived = {};
+    }
+    state.sheet.derived[resource.stateName] = value;
+    saveSheet(state.chatId, state.sheet);
+    return;
+  }
+  /* Preserve any other fields on the entry (e.g. health-track's `track`
+     array is owned by the custom renderer — overwriting the whole entry
+     would wipe it). */
+  var prev = state.sheet.resources[resource.id];
+  if (!prev || typeof prev !== "object") prev = state.sheet.resources[resource.id] = {};
+  prev.current = value;
   saveSheet(state.chatId, state.sheet);
 }
 
