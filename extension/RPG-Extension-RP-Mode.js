@@ -12220,4 +12220,13 @@ mrrp_resourceRenderers["v20-health-track"] = function (resource, parent, ctx) {
   }
 };
 
+/* Exalted 3e health track shares the same shape as V20 (7 levels with
+   labels + penalties, B/L/A damage type cycle, per-box state stored as
+   {type: label|null}). Alias the v20 renderer so Exalted's `health-track`
+   resource (rendererConfig.component === "exalted-health-track") renders
+   identically. If Exalted ever needs different visual treatment (e.g.,
+   distinct color per damage type, Incapacitated row styling), fork this
+   into its own function. */
+mrrp_resourceRenderers["exalted-health-track"] = mrrp_resourceRenderers["v20-health-track"];
+
 init();
