@@ -99,7 +99,7 @@
   margin: var(--mrrp-gap) 0;
   color: var(--mrrp-text);
   font-family: var(--mrrp-sans);
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
 }
 
 .mrrp-sheet--floating {
@@ -119,7 +119,7 @@
 .mrrp-sheet__header {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--mrrp-density-gap);
   border-bottom: 1px solid var(--mrrp-border);
   padding-bottom: 6px;
   margin-bottom: 4px;
@@ -291,10 +291,10 @@
 .mrrp-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--mrrp-density-gap);
   border: 1px solid var(--mrrp-border);
   border-radius: var(--mrrp-radius-sm);
-  padding: 8px;
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
   background: var(--mrrp-bg-elev);
 }
 
@@ -326,7 +326,7 @@
   display: grid;
   grid-template-columns: 1fr auto auto auto;
   align-items: center;
-  gap: 6px;
+  gap: var(--mrrp-density-gap);
   padding: 2px 4px;
   border-radius: var(--mrrp-radius-sm);
 }
@@ -784,7 +784,7 @@
   padding: var(--mrrp-pad);
   box-shadow: var(--mrrp-shadow);
   z-index: var(--mrrp-z-dice);
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
   display: none;
 }
 
@@ -834,7 +834,7 @@
   border-radius: var(--mrrp-radius-sm);
   padding: 4px 6px;
   font-family: var(--mrrp-mono);
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
   width: 100%;
 }
 
@@ -1051,7 +1051,7 @@
 .mrrp-dialog__lib-name {
   flex: 1;
   font-family: var(--mrrp-mono);
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
 }
 
 .mrrp-msg {
@@ -1329,7 +1329,7 @@
   padding: var(--mrrp-pad);
   box-shadow: var(--mrrp-shadow);
   z-index: 9996;
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
   display: none;
   flex-direction: column;
   overflow: hidden;
@@ -1738,7 +1738,7 @@
   margin-bottom: 8px;
 }
 .mrrp-p3-section__head {
-  padding: 12px;
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1775,7 +1775,7 @@
 .mrrp-p3-section--open .mrrp-p3-section__chev { transform: rotate(90deg); }
 .mrrp-p3-section__body {
   display: none;
-  padding: 8px 12px 12px;
+  padding: 8px var(--mrrp-density-pad-x) var(--mrrp-density-pad-y);
   flex-direction: column;
   gap: 8px;
 }
@@ -1812,7 +1812,7 @@
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  height: 30px;
+  height: var(--mrrp-density-row-h);
   border-radius: var(--mrrp-radius-sm);
 }
 .mrrp-p3-row:hover { background: var(--mrrp-tint-1); }
@@ -1821,11 +1821,11 @@
   grid-template-columns: 1fr auto auto auto;
   align-items: start;
   height: auto;
-  min-height: 30px;
+  min-height: var(--mrrp-density-row-h);
 }
 .mrrp-p3-row--save { grid-template-columns: 1fr auto auto auto; }
 .mrrp-p3-row__name {
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
   color: var(--mrrp-text);
   display: inline-flex;
   align-items: center;
@@ -1897,7 +1897,7 @@
 .mrrp-p3-row__val--auto {
   background: transparent;
   border: 0;
-  font-size: 13px;
+  font-size: var(--mrrp-density-fs);
   font-weight: 600;
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
@@ -2243,7 +2243,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 10px var(--mrrp-density-pad-x);
   cursor: move;
   user-select: none;
   border-bottom: 1px solid var(--mrrp-border);
@@ -2282,7 +2282,7 @@
 .mrrp-p3-panel__body {
   flex: 1;
   overflow: auto;
-  padding: 12px;
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
 }
 
 .mrrp-p3-panel__resize {
@@ -2790,5 +2790,255 @@
   .mrrp-resource {
     flex-basis: 100%;
     min-width: 0;
+  }
+}
+
+/* ── Phase 5 step 5.6: V20 morality + paths + virtues + health-track ─────
+ * V20 visual treatment. Owns the .mrrp-morality cluster (Path Rating,
+ * path picker + description, virtue rows with paired-choice toggle) and
+ * the .mrrp-health-track grid (7 boxes cycling through B / L / A damage
+ * types per V20 RAW). All rules namespaced under .mrrp-morality* and
+ * .mrrp-health-track* so they don't collide with the Phase 5 step 5.3
+ * resources cluster above. */
+
+.mrrp-morality {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: 6px;
+}
+.mrrp-morality__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mrrp-morality__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-morality__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mrrp-morality__rating-label {
+  font-size: 11px;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-morality__rating-step {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mrrp-morality__rating-step:hover:not([disabled]) {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-morality__rating-step[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mrrp-morality__rating-value {
+  min-width: 1.5em;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+}
+.mrrp-morality__path-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mrrp-morality__path-select {
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  padding: 4px 6px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.mrrp-morality__path-desc {
+  font-size: 11px;
+  color: var(--mrrp-text-faint);
+  line-height: 1.4;
+  padding: 4px 6px;
+  background: var(--mrrp-bg-app);
+  border-left: 2px solid var(--mrrp-accent-line);
+  border-radius: 2px;
+}
+.mrrp-morality__virtues {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mrrp-morality__virtue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mrrp-morality__virtue-label {
+  flex: 1 1 auto;
+  font-size: 12px;
+  color: var(--mrrp-text);
+}
+.mrrp-morality__virtue-toggle {
+  display: inline-flex;
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.mrrp-morality__virtue-toggle-btn {
+  padding: 2px 8px;
+  background: var(--mrrp-bg-input);
+  border: 0;
+  color: var(--mrrp-text-faint);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 100ms ease-out, color 100ms ease-out;
+}
+.mrrp-morality__virtue-toggle-btn[aria-pressed="true"] {
+  background: var(--mrrp-accent-soft);
+  color: var(--mrrp-text);
+  font-weight: 600;
+}
+.mrrp-morality__virtue-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.mrrp-morality__virtue-step {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 3px;
+  color: var(--mrrp-text);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mrrp-morality__virtue-step:hover:not([disabled]) {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-morality__virtue-step[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mrrp-morality__virtue-value {
+  min-width: 1.25em;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+}
+
+/* v20-health-track — 7-level V20 health grid. Each box cycles
+ * empty → B (bashing) → L (lethal) → A (aggravated) → empty on click.
+ * Color tier matches damage severity (B = faint, L = warn, A = bad). */
+.mrrp-health-track {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.mrrp-health-track__levels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+.mrrp-health-track__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mrrp-health-track__box {
+  width: 100%;
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 3px;
+  color: var(--mrrp-text);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  cursor: pointer;
+  transition: background-color 100ms ease-out, border-color 100ms ease-out;
+}
+.mrrp-health-track__box[data-damage="B"] {
+  background: var(--mrrp-accent-soft);
+  border-color: var(--mrrp-accent-line);
+}
+.mrrp-health-track__box[data-damage="L"] {
+  background: oklch(0.55 0.16 60 / 0.32);
+  border-color: oklch(0.65 0.18 60 / 0.55);
+  color: oklch(0.94 0.04 60);
+}
+.mrrp-health-track__box[data-damage="A"] {
+  background: oklch(0.50 0.20 25 / 0.42);
+  border-color: oklch(0.62 0.22 25 / 0.65);
+  color: oklch(0.96 0.05 25);
+}
+.mrrp-health-track__label {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--mrrp-text-faint);
+  text-align: center;
+  line-height: 1.1;
+}
+.mrrp-health-track__penalty {
+  font-size: 9px;
+  color: var(--mrrp-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.mrrp-health-track__summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-health-track__legend {
+  display: inline-flex;
+  gap: 6px;
+}
+.mrrp-health-track__legend code {
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+}
+
+@media (max-width: 320px) {
+  .mrrp-health-track__levels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .mrrp-morality__virtue {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
