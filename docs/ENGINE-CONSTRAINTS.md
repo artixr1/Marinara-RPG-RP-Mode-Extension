@@ -24,7 +24,7 @@ The extension replaces the engine's built-in attribute panel with a ruleset-awar
 
 ### Floating dice widget
 
-The widget supports the same five resolution modes as the GM-mode sibling: `single-roll` (d20), `dice-pool` (Xd10 with doubles), `d100-percentile`, `2d6-stat with bands`, `fate-ladder` (4dF with style margin). Resolution happens client-side; the formatted result can be sent into the chat input.
+The widget supports the same nine resolution modes as the GM-mode sibling: `single-roll` (d20), `dice-pool` (Xd10 with doubles), `d100-percentile`, `2d6-stat with bands`, `fate-ladder` (4dF with style margin), `roll-under` (3d6 / 1d100 ≤ target), `stance-modal-pool` (L&F / Stewpot / Trophy Dark), `dice-pool-sum` (OpenD6 / WEG Star Wars / Mini Six with optional Wild Die explode), `narrative-handled` (prose-resolved / GM-overrules). Resolution happens client-side; the formatted result can be sent into the chat input.
 
 ### Per-character persistence + cross-chat save/load
 
