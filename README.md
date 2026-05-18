@@ -286,6 +286,8 @@ Run `node tools/validate-bundle.mjs rulesets/your-system/bundle.json` after the 
 
 ### The developer path — assemble from sources
 
+> **For the generator-pipeline reference** (every `tools/*.mjs` script, what each consumes, what each emits, and which `ruleset.json` fields drive each one), see **[`docs/BUILDING.md`](docs/BUILDING.md)**. It's the canonical contract for the spec-driven build pipeline; pair it with `schema/ruleset.schema.json` and you can scaffold a complete bundle from spec alone, no codebase spelunking required.
+
 1. Copy the closest existing bundle directory (`rulesets/dnd5e/`, `exalted3e/`, `fate-core/`, or `pathfinder2e/`) to `rulesets/your-system/`.
 2. Edit `ruleset.json` — your dice, attributes, skills, difficulty ladder, dice-tag format.
 3. Run `node tools/validate-ruleset.mjs rulesets/your-system/ruleset.json` to confirm.
