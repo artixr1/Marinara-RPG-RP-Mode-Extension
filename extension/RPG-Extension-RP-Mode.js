@@ -4476,9 +4476,27 @@ function mrrpRenderResourceBar(parent, resource, current, max) {
   mrrpRenderResourceQuickButtons(parent, resource, current, max);
 }
 
+/* Resolve a dice resource's die size, honoring dieFromClass binding
+   when the ruleset declares classOptions[] and the player has selected
+   a class on the sheet. Static `die` is the fallback. */
+function mrrpResolveResourceDie(resource) {
+  var fallback = (typeof resource.die === "string" && resource.die) ? resource.die : "d6";
+  if (resource.dieFromClass !== true) return fallback;
+  if (!state.ruleset || !Array.isArray(state.ruleset.classOptions)) return fallback;
+  var selectedClass = state.sheet && state.sheet.identity && state.sheet.identity["class"];
+  if (!selectedClass) return fallback;
+  for (var i = 0; i < state.ruleset.classOptions.length; i++) {
+    var co = state.ruleset.classOptions[i];
+    if (co && co.name === selectedClass && typeof co.hitDie === "string" && co.hitDie) {
+      return co.hitDie;
+    }
+  }
+  return fallback;
+}
+
 function mrrpRenderResourceDice(parent, resource, current, max) {
   if (!parent) return;
-  var dieLabel = (typeof resource.die === "string" && resource.die) ? resource.die : "d6";
+  var dieLabel = mrrpResolveResourceDie(resource);
 
   var values = marinara.addElement(parent, "div", { "class": "mrrp-resource__values" });
   if (values) {
@@ -6206,6 +6224,46 @@ function mrrpRenderIdentitySubField(parent, labelText, key, placeholder) {
     "class": "mrrp-identity__sub-label",
     textContent: labelText
   });
+
+  /* Class-dropdown special case: when key === "class" AND the ruleset
+     declares classOptions[], render as <select> driven by that array.
+     Selection persists in state.sheet.identity.class (same storage as
+     the free-text path). On change, re-render so dice resources with
+     dieFromClass:true pick up the new hitDie. */
+  var classOptions = (key === "class" && state.ruleset && Array.isArray(state.ruleset.classOptions))
+    ? state.ruleset.classOptions
+    : null;
+
+  if (classOptions && classOptions.length > 0) {
+    var currentClass = (state.sheet.identity && state.sheet.identity[key]) || "";
+    var select = marinara.addElement(item, "select", { "class": "mrrp-identity__sub-input" });
+    if (!select) return;
+    var placeholderOpt = marinara.addElement(select, "option", {
+      value: "",
+      textContent: "(choose " + (typeof labelText === "string" ? labelText.toLowerCase() : "class") + ")"
+    });
+    if (placeholderOpt && !currentClass) placeholderOpt.selected = true;
+    classOptions.forEach(function (opt) {
+      if (!opt || !opt.name) return;
+      var label = opt.name + (opt.hitDie ? " (" + opt.hitDie + ")" : "");
+      var optionEl = marinara.addElement(select, "option", {
+        value: opt.name,
+        textContent: label
+      });
+      if (optionEl && opt.name === currentClass) optionEl.selected = true;
+    });
+    marinara.on(select, "change", function () {
+      if (!state.sheet.identity) state.sheet.identity = {};
+      state.sheet.identity[key] = select.value;
+      saveSheet(state.chatId, state.sheet);
+      renderSheet();
+    });
+    marinara.on(select, "click", function (e) {
+      if (e && typeof e.stopPropagation === "function") e.stopPropagation();
+    });
+    return;
+  }
+
   var input = marinara.addElement(item, "input", {
     "class": "mrrp-identity__sub-input",
     type: "text",
