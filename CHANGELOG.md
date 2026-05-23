@@ -9,6 +9,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Pending the next published release.
 
+## [0.3.0] - 2026-05-22
+
+Canonical agent pool documented as the recommended path (the legacy five remain available — RP-mode users CAN toggle in Settings → Agents), three new per-system parallel-phase overlays land, two new reference rulesets (Blades in the Dark, Genesys), and the Vector 8 per-chat scenario-default install path closes. Non-breaking — companion to GM-mode v0.5.0 which took the more aggressive path (deleted legacy four, all `enabled:true`) because GM-mode has no per-agent toggle UI.
+
+### Added — per-system parallel-phase overlays (2026-05-22)
+
+- `rulesets/exalted3e/agents/anima-banner-monitor.md` — `parallel`-phase `context_injection` agent tracking each Solar/Lunar/Sidereal/Dragon-Blooded character's anima banner level based on Peripheral mote spend across the scene. Runs alongside the narrator without blocking — zero added per-turn latency.
+- `rulesets/exalted3e/agents/charm-cooldown-tracker.md` — `parallel`-phase agent scanning recent turns for Charm activations and emitting a per-scene cooldown summary.
+- `rulesets/vtmv20/agents/blood-pool-tracker.md` — `parallel`-phase agent tracking each Kindred character's current Blood Pool, per-turn generation cap, and recent significant changes.
+- Per-system parallel overlays cannot be folded into universal agents because the resources they track exist only in their system. They are emitted alongside the universal pool in `agents.json`.
+
+### Added — Phase honoring in the build pipeline (Vector 7 enabler, 2026-05-22)
+
+- `tools/build-agents.mjs` and `tools/build-bundle.mjs` both gain `extractPhase()` which honors a sub-agent's `**Phase:**` declaration verbatim (`pre_generation` | `post_generation` | `parallel`), falling back to `pre_generation` only if no declaration is found. Earlier versions hardcoded `pre_generation`, which silently downgraded the new `parallel`-phase agents and broke the V7 path.
+
+### Added — two new reference rulesets (since v0.2.2)
+
+- **Blades in the Dark** (`blades-in-the-dark`) — narrative-handled resolution mode (Forged in the Dark mechanics).
+- **Genesys** (`genesys`) — narrative-handled resolution mode (Star Wars / Genesys narrative dice).
+- v0.3.0 ships twelve total reference rulesets: blades-in-the-dark, coc7e, dnd5e, exalted3e, fate-core, genesys, gurps-lite, lasers-and-feelings, pathfinder2e, stewpot, trophy-dark, vtmv20.
+
+### Added — Vector 8 per-chat scenario-default install (2026-05-22)
+
+- `tools/build-scenario-default.mjs` already shipped `bundle.scenarioDefault` (introduced in 0.2.2). The Vector 8 close-the-loop install step now lives in `extension/RPG-Extension-RP-Mode.js`: after `installBundle()` resolves, the helper prompts the user once via `window.confirm` and PATCHes `chatMeta.groupScenarioText` on the active chat if approved. The install pipeline never throws from this step.
+- `coc7e`, `dnd5e`, `pathfinder2e`, `vtmv20` ruleset.json files gained `scenarioDefault` blocks alongside the existing `exalted3e` derivation.
+
+### Docs — canonical-vs-legacy paths documented across the build docs (2026-05-22)
+
+- `README.md`: added **"Agent layout (canonical pool + RP-mode toggle policy)"** section that documents the new layout and explicitly contrasts RP-mode's `enabled:false` + Settings → Agents toggle against GM-mode's `enabled:true`. The sub-agent reference table was rewritten to show canonical + legacy + per-system parallel overlays separately with "pick one path" guidance. File-tree comment in the repo-layout section updated.
+- `AUTHORING-PROMPT.md`: optional-sub-agents section rewritten with both paths + parallel overlays + GM-mode alignment-break note.
+- `docs/BUILDING.md`: `build-agents.mjs` purpose updated for both paths; **"Agent consolidation"** section replaced with **"Agent paths (RP-mode toggleable model)"** — three tables (canonical / legacy / parallel) + v0.4.x migration steps + GM-mode alignment-break note.
+- `docs/ENGINE-CONSTRAINTS.md`: optional sub-agents section rewritten with both paths + parallel overlays + "pick one" warning.
+- `docs/AGENT-COMPATIBILITY.md`: file header updated; **"Our 5 sub-agents (recap)"** replaced with three sub-tables (canonical / legacy / parallel) with phase columns.
+- `docs/AUTHORING-PHASE-6.md`: `combat-adjudicator`'s round-ended-signal reference generalized to "active combat agent (combat-overseer on canonical, combat-adjudicator on legacy)".
+- `package.json` description rewritten to describe the two-path agent architecture + parallel overlays.
+- `schema/bundle.schema.json` `additionalAgents.description` rewritten with both paths and parallel overlays.
+- `schema/ruleset.schema.json`: `roundCounters` + `resetOn` descriptions generalized to "active combat agent"; `trackPenaltyKind` description generalized to "active state agent (context-fuser on canonical, state-reminder on legacy)".
+
+### Migration — non-breaking upgrade path
+
+- v0.2.x users can continue to run the legacy five sub-agents (`combat-adjudicator`, `npc-bookkeeper`, `lore-query`, `state-reminder`, plus `state-mutator`) through Marinara Settings → Agents. The build pipeline still emits all of them into `agents.json`.
+- To opt into the canonical path: import the new `agents.json` via Marinara's Import Agents dialog, disable the four legacy pre-gen agents, enable `combat-overseer` + `context-fuser` (keep `state-mutator` enabled). Per-turn cost drops from 4 pre-gen + 1 post-proc → 2 pre-gen + 1 post-proc (~40% reduction).
+- Per-system parallel overlays opt-in independently — Exalted players can enable `anima-banner-monitor` + `charm-cooldown-tracker`; VTM players can enable `blood-pool-tracker`.
+- Release packaged at `releases/v0.3.0/` + matching `releases/Marinara-RPG-RP-Mode-Extension-v0.3.0.zip` (791K).
+
 ## [0.2.2] - 2026-05-14
 
 Trinity grouping, Merits & Flaws section, OpenD6 dogfood remediation, parity fixes, and documentation completeness pass.
