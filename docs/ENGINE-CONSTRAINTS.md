@@ -12,7 +12,13 @@ Your custom `gmAgent` is a `pre_generation` `context_injection` agent that runs 
 
 ### Optional sub-agents (`additionalAgents[]`)
 
-Each bundle can ship up to five focused sub-agents (`state-mutator`, `state-reminder`, `combat-adjudicator`, `lore-query`, `npc-bookkeeper`). Per the post-2026-05-04 install behavior, sub-agents install **disabled by default** — users opt in per agent via Settings → Agents. Bundle authors can mark a specific agent as `"enabled": true` on the additionalAgents item to ship it enabled (use sparingly).
+Each bundle can ship two mutually-exclusive sub-agent paths in `additionalAgents[]`, plus optional per-system parallel-phase overlays:
+
+- **Canonical (recommended):** `combat-overseer`, `context-fuser`, `state-mutator`. Two pre-gen AI calls per turn + one post-proc.
+- **Legacy (v0.4.x compatibility):** `combat-adjudicator`, `npc-bookkeeper`, `lore-query`, `state-reminder`, `state-mutator`. Four pre-gen AI calls per turn + one post-proc.
+- **Per-system parallel overlays:** e.g. `anima-banner-monitor` + `charm-cooldown-tracker` for Exalted, `blood-pool-tracker` for VTM. Run alongside the narrator without blocking it.
+
+Per the post-2026-05-04 install behavior, sub-agents install **disabled by default** in RP mode — users opt into a path via Settings → Agents. Bundle authors can mark a specific agent as `"enabled": true` on the additionalAgents item to ship it enabled (use sparingly). Running both pre-gen paths simultaneously causes double-coverage; pick one.
 
 ### Lorebook content + keyword triggers
 

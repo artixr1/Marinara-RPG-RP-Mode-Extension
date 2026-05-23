@@ -283,9 +283,9 @@ The generated agent recognizes those patterns and annotates each matching turn w
 
 **Input:** ruleset directory (uses `agents/*.md` + optional per-ruleset overrides). **Output:** `agents.json` in the same directory.
 
-**Purpose:** assemble the five overlay agents (`combat-adjudicator`, `lore-query`, `npc-bookkeeper`, `state-mutator`, `state-reminder`) into a single import payload. Bundles can OPTIONALLY embed these via `bundle.additionalAgents`; the preferred v0.4.x+ flow is the standalone `agents.json` + agent-import dialog.
+**Purpose:** assemble every agent the bundle ships into a single import payload Marinara's Import Agents dialog reads. As of 2026-05-22 the shared-baseline pool has two coexisting paths: the **canonical** merged set (`combat-overseer`, `context-fuser`, `state-mutator`) and the **legacy** five (`combat-adjudicator`, `lore-query`, `npc-bookkeeper`, `state-mutator`, `state-reminder`) kept for back-compat. Per-system **parallel-phase overlays** (e.g. `anima-banner-monitor` + `charm-cooldown-tracker` for `exalted3e`, `blood-pool-tracker` for `vtmv20`) live only in their ruleset directory and are emitted alongside the universal pool. The generator honors each agent file's `**Phase:**` declaration verbatim (`pre_generation`, `post_processing`, or `parallel`), falling back to `pre_generation` only if no declaration is found. Bundles can OPTIONALLY embed these via `bundle.additionalAgents`; the preferred RP-mode flow is the standalone `agents.json` + agent-import dialog so users can toggle the path they want through Marinara's Settings → Agents UI.
 
-**Override surface:** drop `agents/<role>.md` into a per-ruleset directory to override the shared baseline for that ruleset. Roles can also be introduced per-ruleset (no shared baseline required).
+**Override surface:** drop `agents/<role>.md` into a per-ruleset directory to override the shared baseline for that ruleset. Roles can also be introduced per-ruleset (no shared baseline required) — this is how parallel-phase overlays ship.
 
 See `docs/AUTHORING.md` Step 5 for the agent-prompt authoring guide.
 
@@ -402,32 +402,55 @@ The `hit-dice` resource's count is wired to `{Level}` — so as the player level
 
 **Default-class behavior:** when the sheet is fresh and no class is selected, dice resources fall back to their static `die` field. D&D 5e ships `die: "d8"` as a sensible mid-tier default — the player picks from the dropdown to switch to d6 (Wizard / Sorcerer), d10 (Fighter / Paladin / Ranger), d12 (Barbarian), etc.
 
-## Agent consolidation (recommended v0.5.0+ defaults)
+## Agent paths (RP-mode toggleable model)
 
-The legacy `agents/` directory shipped five overlay agents — `combat-adjudicator`, `lore-query`, `npc-bookkeeper`, `state-mutator`, `state-reminder` — each enforcing a single responsibility. Enabling all four pre-generation agents (everyone except the post-processing `state-mutator`) costs **four AI calls per turn**.
+RP-mode ships TWO mutually-exclusive sub-agent paths plus optional per-system parallel-phase overlays. Users pick ONE pre-gen path via Marinara Settings → Agents — running both at once causes double-coverage and wastes tokens.
 
-As of 2026-05-22 the repo ships two merged agents that collapse the pre-generation surface to **two AI calls**:
+### Canonical path (recommended, post-2026-05-22 default)
 
-| Merged agent | Replaces | Responsibility |
-|--------------|----------|----------------|
-| `combat-overseer` | `combat-adjudicator` + `npc-bookkeeper` | Combat math framing (initiative / action economy / attack resolution / damage / conditions / range) AND NPC roster (HP / conditions / state / intent) — both surfaces emitted in one output. |
-| `context-fuser` | `lore-query` + `state-reminder` | Rules-query answers (when asked) AND player-state reminder (HP / resources / conditions / equipped gear / duration effects) — both surfaces in one output. |
-| `state-mutator` | (unchanged) | Post-processing — parses AI output for state changes and writes to the sheet. Different phase; cannot merge with pre-generation agents. |
+| Agent | Phase | Responsibility |
+|-------|-------|----------------|
+| `combat-overseer` | `pre_generation` | Combat math framing (initiative / action economy / attack resolution / damage / conditions / range) AND NPC roster (HP / conditions / state / intent) — both surfaces emitted in one output. |
+| `context-fuser` | `pre_generation` | Rules-query answers (when asked) AND player-state reminder (HP / resources / conditions / equipped gear / duration effects) — both surfaces in one output. |
+| `state-mutator` | `post_processing` | Parses AI output for `[mrrp-state: ...]` tags and writes deltas to the sheet. Stays enabled regardless of path. |
 
-**Recommended enable set:** `combat-overseer` + `context-fuser` + `state-mutator` = 2 pre-gen calls + 1 post-proc call per turn. That's a **40% reduction** in per-turn agent calls versus enabling all five legacy agents.
+**Cost:** 2 pre-gen calls + 1 post-proc call per turn.
 
-**Migration path:**
+### Legacy path (v0.4.x compatibility)
+
+| Agent | Phase | Responsibility |
+|-------|-------|----------------|
+| `combat-adjudicator` | `pre_generation` | Combat-math framing only. |
+| `npc-bookkeeper` | `pre_generation` | NPC HP / conditions / state across turns. |
+| `lore-query` | `pre_generation` | Rules-query answers (when asked). |
+| `state-reminder` | `pre_generation` | Player-state reminder. |
+| `state-mutator` | `post_processing` | Same as canonical path. |
+
+**Cost:** 4 pre-gen calls + 1 post-proc call per turn (~40% more than canonical).
+
+### Per-system parallel-phase overlays (universal across paths)
+
+Some systems ship additional `parallel`-phase agents that track resources unique to that system. They run alongside the narrator without blocking it — zero added latency. They are compatible with either path above (and with both, theoretically, though that defeats the purpose of picking one).
+
+| Ruleset | Parallel overlay(s) | Tracks |
+|---------|---------------------|--------|
+| `exalted3e` | `anima-banner-monitor`, `charm-cooldown-tracker` | Anima banner level per character, Charm cooldown state per scene. |
+| `vtmv20` | `blood-pool-tracker` | Per-Kindred blood pool current value, per-turn generation cap. |
+
+### Migration
+
+**v0.4.x → canonical:**
 
 1. Open Marinara Settings → Agents.
 2. **Disable** `combat-adjudicator`, `npc-bookkeeper`, `lore-query`, and `state-reminder` (the four legacy pre-gen agents). They stay installed but stop firing.
-3. **Enable** `combat-overseer` and `context-fuser` (the two new merged agents). State Mutator stays enabled.
+3. **Enable** `combat-overseer` and `context-fuser`. `state-mutator` stays enabled.
 4. Verify in chat: a turn should now fire three agents (overseer / fuser / state-mutator) instead of five.
 
-**Backward compatibility:** the legacy four agents are NOT removed from the repo. They're marked "Legacy as of 2026-05-22" in their docstrings and remain installable for users who prefer per-responsibility focus over token thrift. The build pipeline (`build-agents.mjs`) emits all seven agents into each ruleset's `agents.json` so both surfaces are available.
+**Per-ruleset overrides** apply to either path. A ruleset can override `combat-overseer` / `context-fuser` (canonical) OR any of `combat-adjudicator` / `npc-bookkeeper` / `lore-query` / `state-reminder` (legacy) via `rulesets/<id>/agents/<role>.md`. Per-system parallel overlays live ONLY at `rulesets/<id>/agents/<role>.md` — no shared baseline.
 
-**Per-ruleset overrides still apply.** A ruleset can override either merged agent via `rulesets/<id>/agents/combat-overseer.md` or `rulesets/<id>/agents/context-fuser.md` to tune the prompt for that system — same pattern as the legacy four. Exalted's per-ruleset overrides currently target the legacy four; they will stay accurate as long as `combat-adjudicator` etc. remain enabled. To migrate a ruleset's overrides to the merged agents, port the system-specific clauses from each pair into a merged-agent override.
+**Token-savings estimate:** each saved AI call ≈ one full chat-history-sized prompt overhead (~2000-4000 tokens per turn). Over a 100-turn session: ~200k-400k tokens saved per merge; double that with both merges active.
 
-**Token-savings estimate:** each saved AI call is ~one full chat-history-sized prompt (~2000-4000 tokens depending on history length). Over a 100-turn session at typical chat lengths, the consolidation saves ~200k-400k tokens per user. With both merges active simultaneously, that doubles.
+**GM-mode alignment break (2026-05-22):** the sibling [GM-mode extension](https://github.com/Kenhito/Marinara-RPG-Extension) deleted the legacy four agents outright and ships only the canonical path with `enabled:true` — GM-mode has no Settings → Agents toggle UI, so the bundle IS the install. RP-mode preserves both paths because RP users CAN toggle.
 
 ## Custom renderers (open extensibility)
 

@@ -805,7 +805,7 @@
                   "type": "string",
                   "enum": ["flat", "dice"],
                   "default": "flat",
-                  "description": "How the renderer interprets `penalty` for display and state-reminder text. 'flat' (default, back-compat) — penalty applies as a flat numeric subtraction to the relevant total (Exalted Wound Levels, WoD health-state penalties). 'dice' — penalty applies as a DICE subtraction (OpenD6 / WEG D6 / Mini Six Wound Levels: 'Wounded -1D' removes one die from every pool until healed). When 'dice', the renderer prefixes the cell text with 'D' (e.g. '-1D' instead of '-1') and the state-reminder agent emits 'minus N dice from every pool' instead of 'minus N to total'."
+                  "description": "How the renderer interprets `penalty` for display and state-reminder text. 'flat' (default, back-compat) — penalty applies as a flat numeric subtraction to the relevant total (Exalted Wound Levels, WoD health-state penalties). 'dice' — penalty applies as a DICE subtraction (OpenD6 / WEG D6 / Mini Six Wound Levels: 'Wounded -1D' removes one die from every pool until healed). When 'dice', the renderer prefixes the cell text with 'D' (e.g. '-1D' instead of '-1') and the active state agent (context-fuser on the canonical path, state-reminder on the legacy path) emits 'minus N dice from every pool' instead of 'minus N to total'."
                 }
               }
             },
@@ -1177,7 +1177,7 @@
     },
     "roundCounters": {
       "type": "array",
-      "description": "Optional ephemeral per-round counters that the framework auto-resets on a 'round ended' signal from the combat-adjudicator agent. Use for OpenD6's multi-action penalty (declare N actions → every roll that round takes -(N-1) dice), Mini Six rate-of-fire penalties, or any per-round-only modifier that should NOT persist as a sticky state. The schema declares the counter; v0.2.2 does NOT auto-wire the dice-widget penalty application (that's downstream UX work — Task #5). Authors using v0.2.2 should document the workaround in their gm-agent.md and rely on the narrator to apply the penalty.",
+      "description": "Optional ephemeral per-round counters that the framework auto-resets on a 'round ended' signal from the active combat agent — either combat-overseer (canonical path) or combat-adjudicator (legacy path). Use for OpenD6's multi-action penalty (declare N actions → every roll that round takes -(N-1) dice), Mini Six rate-of-fire penalties, or any per-round-only modifier that should NOT persist as a sticky state. The schema declares the counter; v0.2.2 does NOT auto-wire the dice-widget penalty application (that's downstream UX work — Task #5). Authors using v0.2.2 should document the workaround in their gm-agent.md and rely on the narrator to apply the penalty.",
       "items": {
         "type": "object",
         "required": ["id", "name", "resetOn"],
@@ -1201,7 +1201,7 @@
           "resetOn": {
             "type": "string",
             "enum": ["next-round", "end-of-encounter"],
-            "description": "When the framework auto-zeroes this counter. 'next-round' clears on the combat-adjudicator's 'round ended' signal. 'end-of-encounter' clears when combat exits."
+            "description": "When the framework auto-zeroes this counter. 'next-round' clears on the active combat agent's 'round ended' signal (combat-overseer on the canonical path, combat-adjudicator on the legacy path). 'end-of-encounter' clears when combat exits."
           },
           "penaltyFormula": {
             "type": "string",

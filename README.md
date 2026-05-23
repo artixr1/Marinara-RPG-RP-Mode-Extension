@@ -30,6 +30,19 @@ If you want a system the framework doesn't ship, see [`releases/v0.2.0/BUILD-YOU
 
 See [`CHANGELOG.md`](CHANGELOG.md) for the full list.
 
+## Agent layout (canonical pool + RP-mode toggle policy)
+
+The canonical agent pool shared with the [GM-mode extension](https://github.com/Kenhito/Marinara-RPG-Extension):
+
+- **Universal sub-agents (shared baselines in `agents/`):** `combat-overseer` (pre_generation — combat math + NPC roster in one prompt), `context-fuser` (pre_generation — rules-query answers + player-state reminder in one prompt), `state-mutator` (post_processing — parses GM output for `[mrr-state: ...]` tags and writes to the sheet).
+- **Optional pre-input-transformer:** auto-derived from `ruleset.vocabularyHints[]` when present. Translates D&D-flavored player input into ruleset vocabulary.
+- **Per-system parallel-phase overlays:** live only at `rulesets/<id>/agents/<role>.md`. Examples: `anima-banner-monitor` + `charm-cooldown-tracker` for `exalted3e`; `blood-pool-tracker` for `vtmv20`. These run alongside the narrator without blocking it; cannot be merged into universal baselines because the resources they track are unique to that system.
+- **Main GM agent (`gm-agent.md`):** per-system narrator brain. Teaches the model your dice mechanic, skill list, derived stats, dice-tag format.
+
+**RP-mode install posture:** sub-agents install via Marinara's Import Agents dialog with `enabled:false` by default. RP-mode HAS per-agent toggle UI in Settings → Agents, so users opt into the sub-agents they want. This is a deliberate departure from GM-mode (which ships `enabled:true` because GM-mode lacks the toggle UI — see GM repo for that policy). Both modes share the same canonical agent pool; only the enablement default differs.
+
+**Migration from v0.4.x legacy installs (matched against the GM-mode change):** if you had the older `combat-adjudicator` / `npc-bookkeeper` / `lore-query` / `state-reminder` set installed in RP-mode, they're no longer shipped from the build pipeline. Use Marinara's Import Agents dialog with the current bundle to refresh; remove orphaned legacy sub-agents through Marinara's stock agent UI.
+
 ## Why a separate project for Roleplay Mode?
 
 Marinara Engine has four chat modes: `conversation`, `roleplay`,
@@ -84,13 +97,33 @@ flip individual ones on in **Marinara → Settings → Agents** to opt
 into specific behaviors. Each sub-agent adds one model call per turn
 while enabled, so enable only what your campaign needs.
 
+**Pick ONE pre-gen path — canonical (recommended) or legacy. Don't enable both at once or you get double-coverage.** Per-system parallel-phase overlays work alongside either path.
+
+### Canonical path (recommended, post-2026-05-22)
+
 | Sub-agent | What it does | Enable when… |
 |---|---|---|
-| `state-mutator` | Tells the narration model to emit hidden `[mrr-state: …]` tags when narrative changes the sheet (HP, conditions, inventory). Extension parses tags, applies the change, shows a toast. | You want narration to drive the sheet automatically. |
+| `combat-overseer` | Combat-math framing AND NPC roster in one prompt. Wakes when combat is active or NPCs are in scene; outputs `"No combat active."` / `"No NPCs to track."` for whichever section is idle. | You want combat math + NPC state without paying for two separate AI calls per turn. |
+| `context-fuser` | Rules-query answers AND player-state reminder in one prompt. Section 1 wakes on rules questions; Section 2 fires when there's meaningful tracked state. | You want both rules support and sheet-state continuity in a single agent. |
+| `state-mutator` | Tells the narration model to emit hidden `[mrr-state: …]` tags when narrative changes the sheet (HP, conditions, inventory). Extension parses tags, applies the change, shows a toast. | You want narration to drive the sheet automatically. Stays enabled on either path. |
+
+### Legacy path (v0.4.x compatibility, kept for per-responsibility focus)
+
+| Sub-agent | What it does | Enable when… |
+|---|---|---|
+| `state-mutator` | (same as canonical — shared between paths) | (same) |
 | `state-reminder` | Surfaces a short bulleted list of current PC state (HP, conditions, gear, resources) at the top of every turn. | Long sessions or complex sheets, the model is forgetting your stats. |
 | `combat-adjudicator` | Wakes only in combat; restates initiative, action economy, attack/damage formulas, conditions in the active ruleset's terms. Outputs `"No combat active."` and stops in social/ambient scenes. | You run heavy-mechanics combat encounters. |
 | `lore-query` | Wakes only when the latest user message is a rules question. Answers from the installed lorebook + system RAW. Outputs `"No rules query."` otherwise. | You frequently ask the model rules questions mid-RP. |
 | `npc-bookkeeper` | Tracks active and recently-engaged NPC HP, conditions, tactical state, and telegraphed intentions across turns. Outputs `"No NPCs to track."` when no NPCs are in scene. | Combat/social scenes with multiple named NPCs you want continuity on. |
+
+### Per-system parallel-phase overlays (universal across paths)
+
+| Sub-agent | Ruleset | What it does |
+|---|---|---|
+| `anima-banner-monitor` | `exalted3e` | Tracks each Solar/Lunar/Sidereal/Dragon-Blooded character's anima banner level based on Peripheral mote spend across the scene. Runs in parallel — no added per-turn latency. |
+| `charm-cooldown-tracker` | `exalted3e` | Scans recent turns for Charm activations; emits a per-scene cooldown summary. Runs in parallel. |
+| `blood-pool-tracker` | `vtmv20` | Tracks each Kindred's current Blood Pool, per-turn generation cap, recent significant changes. Runs in parallel. |
 
 The same descriptions are also in each system's installed lorebook
 (under "Optional Sub-Agents") so they surface in-engine when you ask
@@ -239,12 +272,16 @@ rulesets/                # Reference systems — same four as the GM-mode siblin
   exalted3e/             # Exalted 3rd Edition (paraphrased mechanics).
   fate-core/             # Fate Core (4dF + ladder).
   pathfinder2e/          # Pathfinder 2nd Edition (Remaster) — bundle-only.
-agents/                  # Sub-agent prompt sources (same five as GM-mode).
-  state-mutator.md       # Emits [mrrp-state: ...] tags from narration.
-  state-reminder.md      # Surfaces current PC state each turn.
-  combat-adjudicator.md  # Combat-only; restates initiative + math.
-  lore-query.md          # Rules-question-only; cites lorebook + RAW.
-  npc-bookkeeper.md      # Tracks NPC HP / conditions / intent across turns.
+agents/                  # Sub-agent prompt sources. Two pre-gen paths coexist; pick one.
+  combat-overseer.md     # Canonical: combat math + NPC roster in one prompt.
+  context-fuser.md       # Canonical: rules-query answers + player-state in one prompt.
+  state-mutator.md       # Both paths: emits [mrrp-state: ...] tags from narration.
+  state-reminder.md      # Legacy: surfaces current PC state each turn.
+  combat-adjudicator.md  # Legacy: combat-only; restates initiative + math.
+  lore-query.md          # Legacy: rules-question-only; cites lorebook + RAW.
+  npc-bookkeeper.md      # Legacy: tracks NPC HP / conditions / intent across turns.
+  # Per-system parallel-phase overlays live at rulesets/<id>/agents/<role>.md
+  # (anima-banner-monitor, charm-cooldown-tracker, blood-pool-tracker, etc).
 docs/                    # Authoring + install + engine-constraints reference.
   ADDING-RULESETS.md
   AUTHORING.md

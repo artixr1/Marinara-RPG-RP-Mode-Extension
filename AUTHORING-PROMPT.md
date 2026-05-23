@@ -133,11 +133,19 @@ on install.
 
 ## Optional sub-agents (`additionalAgents[]`)
 
-A bundle MAY include up to five focused `pre_generation` sub-agents in `additionalAgents[]`: `state-mutator`, `state-reminder`, `combat-adjudicator`, `lore-query`, `npc-bookkeeper`. Each is a distinct agent with its own `promptTemplate` and `role`-based idempotency key. The five reference prompts live at `agents/<role>.md` in this repo — copy their content into `additionalAgents[].promptTemplate` for parity with what the existing reference bundles ship.
+A bundle MAY include focused sub-agents in `additionalAgents[]`. Two paths are available; pick one (do NOT enable both simultaneously or you get double-coverage):
 
-**Install posture:** sub-agents install **disabled by default** (post-2026-05-04 behavior). The user opts in per-agent in Marinara → Settings → Agents. If a specific sub-agent is so essential to your bundle that it should fire on first install, set `"enabled": true` on that item in `additionalAgents[]` — the installer reads the field and creates the agent enabled. Use sparingly; every enabled sub-agent costs one model call per turn, and the cooperative roleplay-mode posture argues for opt-in over opt-out.
+**Recommended canonical path (post-2026-05-22 default):** the merged pool — `combat-overseer` (pre_generation, combat math + NPC roster in one prompt), `context-fuser` (pre_generation, rules-query answers + player-state reminder in one prompt), and `state-mutator` (post_processing). Reference prompts live at `agents/combat-overseer.md`, `agents/context-fuser.md`, `agents/state-mutator.md`. Two pre-gen AI calls per turn + one post-proc.
+
+**Legacy path (v0.4.x compatibility):** the original five — `combat-adjudicator`, `npc-bookkeeper`, `lore-query`, `state-reminder`, `state-mutator`. Each has its own narrow responsibility. Reference prompts live at `agents/<role>.md`. Four pre-gen AI calls per turn + one post-proc — roughly 40% more cost than the canonical path. Kept available for users who prefer per-responsibility focus.
+
+**Per-system parallel-phase overlays:** systems whose mechanics include resources no other RPG has (Exalted's anima banner, Charm cooldowns; VTM's blood pool) ship additional `parallel`-phase agents at `rulesets/<id>/agents/<role>.md`. They run alongside the main narrator without blocking it — zero added per-turn latency. Examples: `anima-banner-monitor`, `charm-cooldown-tracker` (Exalted); `blood-pool-tracker` (VTM).
+
+**Install posture:** sub-agents install **disabled by default**. The user opts in per-agent in Marinara → Settings → Agents — RP mode has the per-agent toggle UI, so the bundle ships the menu and the user picks the path. If a specific sub-agent is so essential to your bundle that it should fire on first install, set `"enabled": true` on that item explicitly — but use sparingly; every enabled sub-agent costs one model call per turn (parallel overlays excepted).
 
 **On re-install (PATCH), the user's enabled-toggle is preserved.** The installer carries `enabled` only on the initial CREATE. So a user who toggled a sub-agent on after install still has it on after re-install of the bundle.
+
+**GM-mode alignment break (2026-05-22):** the sibling [GM-mode extension](https://github.com/Kenhito/Marinara-RPG-Extension) ships ONLY the canonical pool (no legacy four, no menu, all `enabled:true`) because GM-mode has no per-agent toggle UI in Marinara Settings. RP-mode preserves the two-path model because RP users CAN toggle.
 
 **Document each sub-agent in the lorebook.** Conventionally, ship one lorebook entry titled "Optional Sub-Agents — what they do and how to enable" that lists each agent's purpose + the Settings → Agents flow. The dnd5e and exalted3e reference bundles in this repo show the canonical content.
 

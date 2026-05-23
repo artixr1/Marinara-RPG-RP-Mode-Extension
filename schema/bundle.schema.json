@@ -93,7 +93,7 @@
     },
     "additionalAgents": {
       "type": "array",
-      "description": "Optional additional pre_generation context_injection agents installed alongside the main gmAgent. Each provides a focused capability (state-reminder, combat-adjudicator, lore-query, npc-bookkeeper, etc). Idempotency: each agent's settings carry mrrpAgentRole=<role> so re-install matches by (rulesetId, role).",
+      "description": "Optional additional agents installed alongside the main gmAgent. Two pre-gen paths coexist for RP-mode (users pick one via Settings → Agents): the canonical pool (combat-overseer, context-fuser, state-mutator) OR the legacy pool (combat-adjudicator, npc-bookkeeper, lore-query, state-reminder, state-mutator). Per-system parallel-phase overlays (e.g. anima-banner-monitor + charm-cooldown-tracker for exalted3e, blood-pool-tracker for vtmv20) run alongside either path. Idempotency: each agent's settings carry mrrpAgentRole=<role> so re-install matches by (rulesetId, role).",
       "items": {
         "type": "object",
         "required": [
@@ -107,7 +107,7 @@
             "minLength": 1,
             "maxLength": 50,
             "pattern": "^[a-z][a-z0-9-]*$",
-            "description": "Stable identifier for this agent within the bundle (e.g. \"state-reminder\", \"combat-adjudicator\"). Used in idempotency keys."
+            "description": "Stable identifier for this agent within the bundle (e.g. \"combat-overseer\", \"context-fuser\", \"state-mutator\"). Used in idempotency keys."
           },
           "name": {
             "type": "string",

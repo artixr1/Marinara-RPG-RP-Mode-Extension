@@ -59,6 +59,19 @@ function titleCase(s) {
   return s.split(/[-_]/).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
 }
 
+/* See build-agents.mjs for the source of truth. Kept in sync here defensively
+   — loadAdditionalAgents below is currently dead in RP-mode bundles (V5
+   transformer is the only push into bundle.additionalAgents) but was the
+   bundle-side install path and may be revived; either way, both should
+   parse Phase identically so a future revival doesn't silently regress. */
+function extractPhase(md) {
+  const m = md.match(/^\s*\*\*Phase:\*\*\s*`?([a-zA-Z_]+)`?/m);
+  if (!m) return "pre_generation";
+  const declared = (m[1] || "").trim().toLowerCase();
+  const ALLOWED = new Set(["pre_generation", "post_generation", "parallel"]);
+  return ALLOWED.has(declared) ? declared : "pre_generation";
+}
+
 function loadAdditionalAgents(rulesetName, rulesetDir) {
   /* Resolve agent prompts with per-ruleset override precedence:
      prefer rulesets/<id>/agents/<role>.md, fall back to <repo>/agents/<role>.md.
@@ -84,6 +97,7 @@ function loadAdditionalAgents(rulesetName, rulesetDir) {
     try { md = readFileSync(overridePath, "utf8"); isOverride = true; }
     catch (e) { md = readFileSync(join(sharedDir, role + ".md"), "utf8"); isOverride = false; }
     const promptTemplate = extractPromptBlock(md);
+    const phase = extractPhase(md);
     const firstHeading = (md.match(/^#\s+(.+)$/m) || [])[1] || titleCase(role);
     const tunedNote = isOverride
       ? " — tuned for " + rulesetName
@@ -92,7 +106,7 @@ function loadAdditionalAgents(rulesetName, rulesetDir) {
       role,
       name: rulesetName + " — " + firstHeading.replace(/\s+Agent\s*$/i, ""),
       description: "Focused " + role.replace(/-/g, " ") + " agent for " + rulesetName + tunedNote + ".",
-      phase: "pre_generation",
+      phase,
       promptTemplate,
       settings: {}
     };

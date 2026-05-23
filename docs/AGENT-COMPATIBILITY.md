@@ -1,9 +1,13 @@
 # Agent compatibility — Marinara built-ins alongside the RP-mode sub-agents
 
 This file is the in-repo reference for which of Marinara Engine's built-in
-agents are safe to enable in a chat that already runs this extension's five
-`mrrp-` sub-agents (`state-mutator`, `state-reminder`, `combat-adjudicator`,
-`lore-query`, `npc-bookkeeper`). The goal is to avoid two failure modes:
+agents are safe to enable in a chat that already runs this extension's
+`mrrp-` sub-agents. As of 2026-05-22 two coexisting sub-agent paths ship —
+the **canonical** trio (`combat-overseer`, `context-fuser`, `state-mutator`)
+and the **legacy** five (`combat-adjudicator`, `lore-query`, `npc-bookkeeper`,
+`state-mutator`, `state-reminder`), plus per-system **parallel-phase**
+overlays (e.g. `anima-banner-monitor` + `charm-cooldown-tracker` for Exalted,
+`blood-pool-tracker` for VTM). The goal is to avoid two failure modes:
 
 1. **Double-tap.** Two agents inject contradictory or duplicate context every
    turn. Wastes tokens, confuses the narration model.
@@ -14,18 +18,35 @@ agents are safe to enable in a chat that already runs this extension's five
 The matrix below was derived directly from engine source — see [Sources](#sources)
 at the bottom. Regenerate when Marinara ships new built-ins.
 
-## Our 5 sub-agents (recap)
+## Our sub-agents (recap)
 
-All five are `pre_generation` `context_injection` agents. All install
-**disabled by default** (post-2026-05-04 audit). All in the `mrrp-` namespace.
+All install **disabled by default** in RP mode (post-2026-05-04 audit). All in the `mrrp-` namespace. Pick ONE pre-gen path — canonical OR legacy — never both at once.
 
-| Sub-agent | What it does |
-|---|---|
-| `state-mutator` | Tells the narration model to emit `[mrrp-state: ...]` tags when narrative establishes a durable sheet change (HP, conditions, inventory). The extension's chat-message observer parses the tags from the rendered message and applies them to the active character's `mrrp-sheet-{chatId}-{characterId}` localStorage. |
-| `state-reminder` | Surfaces a short bulleted list of current PC mechanical state (HP, resources, conditions, equipped gear) at the top of every turn so narration stays consistent with the sheet. |
-| `combat-adjudicator` | Wakes only in combat. Restates initiative, action economy, attack/damage formulas in the **active ruleset's** terms. Outputs `"No combat active."` and stops in ambient/social scenes. |
-| `lore-query` | Wakes only when the latest user message is a rules question. Cites the installed lorebook + system RAW. Outputs `"No rules query."` otherwise. |
-| `npc-bookkeeper` | Tracks active and recently-engaged NPC HP, conditions, tactical state, and intent across turns. Outputs `"No NPCs to track."` when no NPCs are in scene. |
+### Canonical path (recommended, post-2026-05-22)
+
+| Sub-agent | Phase | What it does |
+|---|---|---|
+| `combat-overseer` | `pre_generation` | Combat-math framing AND NPC roster in one prompt. Wakes when combat is active OR NPCs are in scene; outputs `"No combat active."` / `"No NPCs to track."` for the inactive section. Replaces `combat-adjudicator` + `npc-bookkeeper`. |
+| `context-fuser` | `pre_generation` | Rules-query answers AND player-state reminder in one prompt. Section 1 wakes only on rules questions; Section 2 fires when there's meaningful tracked state. Replaces `lore-query` + `state-reminder`. |
+| `state-mutator` | `post_processing` | Tells the narration model to emit `[mrrp-state: ...]` tags when narrative establishes a durable sheet change (HP, conditions, inventory). The extension's chat-message observer parses the tags from the rendered message and applies them to the active character's `mrrp-sheet-{chatId}-{characterId}` localStorage. Unchanged from legacy; stays enabled on either path. |
+
+### Legacy path (v0.4.x compatibility)
+
+| Sub-agent | Phase | What it does |
+|---|---|---|
+| `state-mutator` | `post_processing` | (same as canonical — shared between paths) |
+| `state-reminder` | `pre_generation` | Surfaces a short bulleted list of current PC mechanical state (HP, resources, conditions, equipped gear) at the top of every turn so narration stays consistent with the sheet. |
+| `combat-adjudicator` | `pre_generation` | Wakes only in combat. Restates initiative, action economy, attack/damage formulas in the **active ruleset's** terms. Outputs `"No combat active."` and stops in ambient/social scenes. |
+| `lore-query` | `pre_generation` | Wakes only when the latest user message is a rules question. Cites the installed lorebook + system RAW. Outputs `"No rules query."` otherwise. |
+| `npc-bookkeeper` | `pre_generation` | Tracks active and recently-engaged NPC HP, conditions, tactical state, and intent across turns. Outputs `"No NPCs to track."` when no NPCs are in scene. |
+
+### Per-system parallel-phase overlays (universal across paths)
+
+| Sub-agent | Phase | Rulesets | What it does |
+|---|---|---|---|
+| `anima-banner-monitor` | `parallel` | `exalted3e` | Tracks each Solar/Lunar/Sidereal/Dragon-Blooded character's anima banner level based on Peripheral mote spend across the scene. |
+| `charm-cooldown-tracker` | `parallel` | `exalted3e` | Scans recent turns for Charm activations; emits a per-scene cooldown summary. |
+| `blood-pool-tracker` | `parallel` | `vtmv20` | Tracks each Kindred character's current Blood Pool, per-turn generation cap, recent significant changes. |
 
 ## Engine roleplay defaults — already on, leave them on
 

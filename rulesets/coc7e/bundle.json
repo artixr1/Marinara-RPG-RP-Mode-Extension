@@ -671,7 +671,30 @@
       "max": 5,
       "default": 0,
       "textOnly": true
-    }
+    },
+    "vocabularyHints": [
+      {
+        "pattern": "I attempt / I try / I roll (a skill)",
+        "hint": "Call of Cthulhu uses roll-under d100. Roll 1d100; succeed if at-or-under the skill value (Regular). For Hard, the threshold is half the skill (round down); for Extreme, one-fifth. Difficulty is set by the Keeper based on circumstance — name the difficulty level before resolving."
+      },
+      {
+        "pattern": "I push the roll / I try again",
+        "hint": "Pushing a roll lets a failed skill check be re-rolled ONCE, but only if the investigator narrates a meaningful additional risk or effort. Failing a pushed roll triggers a significantly worse consequence than a simple failure. Sanity-related and combat rolls generally cannot be pushed."
+      },
+      {
+        "pattern": "I spend Luck / I use Luck points",
+        "hint": "Investigators can spend Luck points 1-for-1 to reduce a failed d100 roll's value down to the success threshold. Luck cannot be spent on Sanity or damage rolls. Luck refreshes only at the end of a scenario (or as the Keeper rules); track current Luck explicitly."
+      },
+      {
+        "pattern": "I check my Sanity / I'm exposed to the Mythos",
+        "hint": "Sanity checks roll 1d100 against current Sanity. Success loses the lower listed loss; failure loses the higher. Major losses (5+ in a single check) trigger Bouts of Madness. Track temporary, indefinite, and permanent insanity separately. Cthulhu Mythos rating caps maximum Sanity."
+      },
+      {
+        "pattern": "I shoot / I attack / I fight back",
+        "hint": "Combat uses standard skill rolls (Fighting (Brawl), Firearms (Handgun/Rifle/etc.), Throw). Range and called-shot penalties apply as Hard or Extreme difficulty. Damage is the weapon's listed dice plus Damage Bonus for melee/thrown attacks (str/siz table)."
+      }
+    ],
+    "scenarioDefaultDerive": true
   },
   "lorebook": {
     "name": "Call of Cthulhu 7e Rules Reference",
@@ -1445,5 +1468,17 @@
       "scriptBody": null,
       "enabled": true
     }
-  ]
+  ],
+  "additionalAgents": [
+    {
+      "role": "pre-input-transformer",
+      "name": "Call of Cthulhu 7th Edition — Pre-Input Transformer",
+      "description": "Re-frames common player-input phrases in Call of Cthulhu 7th Edition-native vocabulary before the narration model sees them.",
+      "phase": "pre_generation",
+      "enabled": false,
+      "promptTemplate": "# Call of Cthulhu 7th Edition — pre-input transformer\n\nYou are a pre-generation context-injection agent for an RPG roleplay using the Call of Cthulhu 7th Edition ruleset overlay. Your job is to read the player's most recent input and emit a SHORT annotation that re-frames common verbs and action phrases in Call of Cthulhu 7th Edition-flavored vocabulary.\n\n## Output format\n\nEmit a context-injection block of the form:\n```\n[coc7e annotation] <one-sentence re-frame, OR \"No re-frame needed.\">\n```\n\nAnnotate only when one of the recognized patterns matches the player's input. Otherwise output exactly \"No re-frame needed.\" and stop.\n\n## Recognition table\n\n| When player input matches | Re-frame guidance |\n|---|---|\n| I attempt / I try / I roll (a skill) | Call of Cthulhu uses roll-under d100. Roll 1d100; succeed if at-or-under the skill value (Regular). For Hard, the threshold is half the skill (round down); for Extreme, one-fifth. Difficulty is set by the Keeper based on circumstance — name the difficulty level before resolving. |\n| I push the roll / I try again | Pushing a roll lets a failed skill check be re-rolled ONCE, but only if the investigator narrates a meaningful additional risk or effort. Failing a pushed roll triggers a significantly worse consequence than a simple failure. Sanity-related and combat rolls generally cannot be pushed. |\n| I spend Luck / I use Luck points | Investigators can spend Luck points 1-for-1 to reduce a failed d100 roll's value down to the success threshold. Luck cannot be spent on Sanity or damage rolls. Luck refreshes only at the end of a scenario (or as the Keeper rules); track current Luck explicitly. |\n| I check my Sanity / I'm exposed to the Mythos | Sanity checks roll 1d100 against current Sanity. Success loses the lower listed loss; failure loses the higher. Major losses (5+ in a single check) trigger Bouts of Madness. Track temporary, indefinite, and permanent insanity separately. Cthulhu Mythos rating caps maximum Sanity. |\n| I shoot / I attack / I fight back | Combat uses standard skill rolls (Fighting (Brawl), Firearms (Handgun/Rifle/etc.), Throw). Range and called-shot penalties apply as Hard or Extreme difficulty. Damage is the weapon's listed dice plus Damage Bonus for melee/thrown attacks (str/siz table). |\n\n## Rules\n\n- Match liberally (paraphrase / synonym OK) but never invent annotations for input that doesn't fit any row.\n- Never narrate the scene; never speak as a character; never roll dice.\n- One annotation per turn maximum. If multiple rows match, pick the most specific.\n- Keep the annotation under 25 words.",
+      "settings": {}
+    }
+  ],
+  "scenarioDefault": "This chat uses the Call of Cthulhu 7th Edition ruleset overlay.\n\nPercentile horror investigation rules. Each skill and characteristic is a 1-99 number; roll 1d100 and succeed if the total is at or under that number. Sanity erodes as investigators brush up against the Mythos; success degrees (regular / hard / extreme) reward skilled play and a punishing fumble band keeps tension high.\n\nMechanics: primary die d100, notation 1d100 vs skill.\nResolution: roll-under.\n\nThe GM should keep narration consistent with Call of Cthulhu 7th Edition mechanics. Refer to the lorebook entries for ruleset reference."
 }
