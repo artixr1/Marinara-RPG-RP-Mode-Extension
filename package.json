@@ -1,6 +1,6 @@
 {
   "name": "marinara-rpg-rp-mode-extension",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Custom RPG rulesets for Marinara Engine's Roleplay Mode. System-agnostic framework with reference rulesets (D&D 5e, Exalted 3e, Fate Core, Pathfinder 2e, VTM V20, Call of Cthulhu 7e, and more), AI-feedable build documentation, and a two-path agent architecture: canonical pool (main narrator + combat-overseer + context-fuser + state-mutator) or legacy pool (main narrator + state-mutator + state-reminder + combat-adjudicator + lore-query + npc-bookkeeper) plus per-system parallel-phase overlays for system-specific resources (Exalted anima banner + Charm cooldowns, VTM blood pool). Runs alongside Marinara's default world-state, prose-guardian, continuity, and expression agents.",
   "type": "module",

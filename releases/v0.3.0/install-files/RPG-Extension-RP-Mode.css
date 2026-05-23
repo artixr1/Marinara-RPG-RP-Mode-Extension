@@ -1,0 +1,3402 @@
+/*
+ * Marinara-RPG-RP-Mode-Extension — RPG-Extension-RP-Mode.css
+ * Companion stylesheet for RPG-Extension-RP-Mode.js. Paste this CSS into Marinara
+ * Engine -> Settings -> Extensions -> Add Extension -> CSS field.
+ *
+ * License: MIT
+ * Source:  https://github.com/Kenhito/Marinara-RPG-RP-Mode-Extension
+ */
+
+:root {
+  /* Phase 4 — design-token migration: oklch palette + Geist font stack
+   * Ported from ~/projects/claude-design-updates/styles.css. Token NAMES preserved
+   * so existing rules resolve unchanged. New tokens (h/c/l, *-soft, *-line, *-app,
+   * *-input, hairline, hairline-strong, *-text-faint, *-sans) added per prototype.
+   * Tracked in tools/token-migration-map.json. */
+
+  /* tweakable accent (purple, port of prototype --accent-h/c/l) */
+  --mrrp-accent-h: 280;
+  --mrrp-accent-c: 0.12;
+  --mrrp-accent-l: 0.78;
+
+  /* derived accent — original token names preserved */
+  --mrrp-accent:       oklch(var(--mrrp-accent-l) var(--mrrp-accent-c) var(--mrrp-accent-h));
+  --mrrp-accent-soft:  oklch(var(--mrrp-accent-l) var(--mrrp-accent-c) var(--mrrp-accent-h) / 0.18);
+  --mrrp-accent-line:  oklch(var(--mrrp-accent-l) var(--mrrp-accent-c) var(--mrrp-accent-h) / 0.32);
+  --mrrp-accent-dim:   oklch(var(--mrrp-accent-l) var(--mrrp-accent-c) var(--mrrp-accent-h) / 0.30);
+  --mrrp-on-accent:    oklch(0.18 0.04 var(--mrrp-accent-h));
+
+  /* surfaces — purple/dark mood per prototype --bg-app/--bg/--bg-elev/--bg-input */
+  --mrrp-bg:           oklch(0.21 0.025 285 / 0.96);
+  --mrrp-bg-elev:      oklch(0.26 0.03 285 / 0.92);
+  --mrrp-bg-app:       oklch(0.16 0.02 285);
+  --mrrp-bg-input:     oklch(0.18 0.02 285);
+
+  /* hairlines (NEW) and borders (NAMES retained) */
+  --mrrp-hairline:        oklch(1 0 0 / 0.07);
+  --mrrp-hairline-strong: oklch(1 0 0 / 0.14);
+  --mrrp-border:          oklch(1 0 0 / 0.10);
+  --mrrp-border-strong:   oklch(1 0 0 / 0.20);
+
+  /* tints — port of prototype --tint/--tint-2 (--tint-strong retained) */
+  --mrrp-tint-1:       oklch(1 0 0 / 0.04);
+  --mrrp-tint-2:       oklch(1 0 0 / 0.07);
+  --mrrp-tint-strong:  oklch(1 0 0 / 0.20);
+
+  /* text — three tiers per prototype --text/--text-dim/--text-faint */
+  --mrrp-text:        oklch(0.97 0.005 285);
+  --mrrp-text-dim:    oklch(0.72 0.01 285);
+  --mrrp-text-faint:  oklch(0.55 0.012 285);
+
+  /* status — port of prototype --ok/--warn/--bad */
+  --mrrp-success:    oklch(0.82 0.13 155);
+  --mrrp-warning:    oklch(0.84 0.14 85);
+  --mrrp-fail:       oklch(0.72 0.16 25);
+  --mrrp-on-fail:    oklch(0.18 0.02 25);
+
+  /* radii / spacing — preserved (density toggle deferred to step 4.4) */
+  --mrrp-radius:     8px;
+  --mrrp-radius-sm:  4px;
+  --mrrp-pad:        10px;
+  --mrrp-gap:        6px;
+
+  /* shadow — ported from prototype --shadow (richer drop) */
+  --mrrp-shadow:     0 24px 60px -20px rgba(0, 0, 0, 0.6), 0 6px 16px -8px rgba(0, 0, 0, 0.5);
+
+  /* typography — ported from prototype --sans/--mono (Geist-first stack) */
+  --mrrp-sans:       "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mrrp-mono:       "Geist Mono", ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+
+  /* layering — preserved */
+  --mrrp-z-sheet:    9997;
+  --mrrp-z-dice:     9998;
+  --mrrp-z-dialog:   9999;
+
+  /* Phase 5 step 5.5 — density toggle (cozy preset defaults; branched per
+   * .mrrp-sheet[data-density="…"] at end of file). Drives padding, gap,
+   * row height, and body font-size across density-aware components. */
+  --mrrp-density-pad-x: 12px;
+  --mrrp-density-pad-y: 12px;
+  --mrrp-density-gap:    6px;
+  --mrrp-density-row-h: 28px;
+  --mrrp-density-fs:    13px;
+}
+
+.mrrp-hidden { display: none !important; }
+.mrrp-msg--hidden,
+.mrrp-dice__result--hidden { display: none; }
+
+/*  ─────  Sheet panel (replaces the hidden built-in attribute panel) ───── */
+
+.mrrp-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mrrp-gap);
+  background: var(--mrrp-bg);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius);
+  padding: var(--mrrp-pad);
+  margin: var(--mrrp-gap) 0;
+  color: var(--mrrp-text);
+  font-family: var(--mrrp-sans);
+  font-size: var(--mrrp-density-fs);
+}
+
+.mrrp-sheet--floating {
+  position: fixed;
+  left: 16px;
+  top: 80px;
+  width: 320px;
+  min-width: 280px;
+  max-width: calc(100vw - 32px);
+  min-height: 200px;
+  max-height: 70vh;
+  overflow: auto;
+  resize: both;
+  z-index: var(--mrrp-z-sheet);
+}
+
+.mrrp-sheet__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mrrp-density-gap);
+  border-bottom: 1px solid var(--mrrp-border);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+.mrrp-sheet__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mrrp-sheet__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-sheet__meta {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+}
+
+.mrrp-sheet__char-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Phase 5 step 5.1 — Identity card (port of prototype's `.identity`).
+   Sits at the bottom of the sheet header, immediately above the body.
+   Wraps the existing renderIdentityField inputs so save/load behavior
+   is preserved verbatim. Ruleset-driven sub-row honors identityFields[]
+   when declared; otherwise falls back to header.raceLabel/classLabel.
+   Token names mirror the prototype: __avatar, __main, __name, __sub,
+   __sub-item, __sub-label, __sub-input. Type scale matches UI-build.md
+   §3.4 exactly: name 16px/600, sub-label 9px uppercase letter-spacing
+   0.1em, sub-input 12px borderless text-dim. */
+.mrrp-identity {
+  background: linear-gradient(145deg, var(--mrrp-accent-soft), transparent 70%), var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: var(--mrrp-radius);
+  padding: var(--mrrp-pad);
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-top: var(--mrrp-gap);
+}
+.mrrp-identity__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    oklch(0.3 0.04 285) 0 6px,
+    oklch(0.26 0.04 285) 6px 12px
+  );
+  color: var(--mrrp-text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  border: 1px dashed var(--mrrp-hairline-strong);
+}
+.mrrp-identity__main {
+  min-width: 0;
+}
+.mrrp-identity__name {
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+.mrrp-identity__name:focus {
+  color: var(--mrrp-accent);
+}
+.mrrp-identity__sub {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.mrrp-identity__sub-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+.mrrp-identity__sub-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-identity__sub-input {
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text-dim);
+  font-size: 12px;
+  padding: 0;
+  width: 100px;
+  outline: none;
+  font-family: inherit;
+}
+.mrrp-identity__sub-input:focus {
+  color: var(--mrrp-accent);
+}
+
+.mrrp-sheet__char-label {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-char-select {
+  flex: 1;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.mrrp-char-btn {
+  background: var(--mrrp-tint-2);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mrrp-char-btn:hover { background: var(--mrrp-accent-dim); }
+
+.mrrp-char-btn--danger:hover {
+  background: rgba(251, 113, 133, 0.30);
+  border-color: var(--mrrp-fail);
+}
+
+.mrrp-char-btn--accent {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
+
+.mrrp-char-btn--dashed {
+  border-style: dashed;
+  border-color: var(--mrrp-accent-dim);
+}
+
+.mrrp-draggable-handle { cursor: grab; user-select: none; touch-action: none; }
+.mrrp-draggable-handle:active { cursor: grabbing; }
+
+.mrrp-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mrrp-density-gap);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
+  background: var(--mrrp-bg-elev);
+}
+
+.mrrp-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-dim);
+  margin-bottom: 2px;
+}
+
+.mrrp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.mrrp-group__label {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+  margin-top: 4px;
+}
+
+.mrrp-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--mrrp-density-gap);
+  padding: 2px 4px;
+  border-radius: var(--mrrp-radius-sm);
+}
+
+.mrrp-row:hover {
+  background: var(--mrrp-tint-1);
+}
+
+.mrrp-row--compact {
+  grid-template-columns: 1fr auto auto;
+}
+
+.mrrp-row__name {
+  font-weight: 500;
+}
+
+.mrrp-row__abbr {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-row__value {
+  min-width: 32px;
+  text-align: right;
+  font-family: var(--mrrp-mono);
+}
+
+/* Editable numeric input — replaces the historical value <span> on every
+   numeric sheet row (attributes, skills, derived, backgrounds, custom
+   skills, bar current values). Visually flush with the surrounding row;
+   the user types directly. The browser's native number-input spinners
+   are suppressed because the +/- stepper next to the field already
+   provides the same affordance and double controls are visual noise. */
+.mrrp-row__value--editable {
+  width: 48px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 1px 4px;
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  text-align: right;
+  -moz-appearance: textfield;
+}
+.mrrp-row__value--editable:focus {
+  outline: none;
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-bg);
+}
+.mrrp-row__value--editable::-webkit-outer-spin-button,
+.mrrp-row__value--editable::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Condition row inline effect summary — small, dim, italic so it
+   reads as metadata next to the condition name without competing for
+   the row's primary attention. */
+.mrrp-condition-effect {
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  font-style: italic;
+  flex: 1;
+  margin-left: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Advantage / disadvantage toggle row in the d20 dice widget. Three
+   buttons sit beside a label; the active mode picks up the accent
+   color so the player can see at a glance which mode is armed. */
+.mrrp-dice__adv-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+.mrrp-dice__adv-row label {
+  flex: 0 0 80px;
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-adv-btn {
+  flex: 1;
+  padding: 4px 8px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.mrrp-adv-btn:hover { background: var(--mrrp-accent-dim); }
+.mrrp-adv-btn--active {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+}
+
+/* "/" separator that sits between the editable current and editable
+   max inputs on bars without an engine-declared cap (D&D HP, etc.).
+   Dimmed because it's a visual cue, not a control. */
+.mrrp-bar__sep {
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  color: var(--mrrp-text-dim);
+  padding: 0 2px;
+}
+
+/* Auto-calculated derived stat — value computed from `valueFormula` every
+   time the stat context changes. Read-only by design; the formula IS the
+   override path. Subtle accent stripe on the left distinguishes it from
+   manually-entered values without screaming for attention. */
+.mrrp-row__value--autocalc {
+  min-width: 32px;
+  text-align: right;
+  font-family: var(--mrrp-mono);
+  color: var(--mrrp-accent);
+  border-left: 2px solid var(--mrrp-accent-dim);
+  padding-left: 6px;
+}
+
+.mrrp-row__roll {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-accent-dim);
+  border: 1px solid var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mrrp-row__roll:hover { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }
+
+/*  ─────  Skill proficiency tier button + specialty sub-row  ───── */
+
+/* Shared base for the small letter buttons that sit inside the stepper
+   group on each skill row. Kept separate from `.mrrp-stepper button` so
+   the stepper can be 18×18 (numeric +/-) while these are 22×18 (single
+   uppercase letter or "+S") without re-spec'ing every property. */
+.mrrp-skill-tier-btn,
+.mrrp-skill-spec-btn {
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  background: var(--mrrp-tint-2);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mrrp-skill-tier-btn { letter-spacing: 0.04em; }
+.mrrp-skill-spec-btn { border-style: dashed; border-color: var(--mrrp-accent-dim); }
+
+.mrrp-skill-tier-btn:hover,
+.mrrp-skill-spec-btn:hover { background: var(--mrrp-accent-dim); }
+
+/* Tier modifier classes — visual cue for the active tier. The renderer
+   adds `--<code>` for the active tier; codes are ruleset-defined so
+   these mappings cover the common cases (PF2e U/T/E/M/L, Exalted U/C/F,
+   D&D U/T/E). Untrained-equivalent stays at the default tint. */
+.mrrp-skill-tier-btn--T,
+.mrrp-skill-tier-btn--C { background: var(--mrrp-tint-strong); }
+.mrrp-skill-tier-btn--E,
+.mrrp-skill-tier-btn--F { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent-dim); }
+.mrrp-skill-tier-btn--M { background: var(--mrrp-accent); color: var(--mrrp-on-accent); border-color: var(--mrrp-accent); }
+.mrrp-skill-tier-btn--L {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+  box-shadow: 0 0 0 1px var(--mrrp-accent-dim);
+}
+
+.mrrp-skill-spec-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 2px 18px;
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+  margin-top: 2px;
+}
+
+.mrrp-skill-spec-name {
+  width: 100%;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+/* Custom skill / lore row — inherits the specialty layout but adds an
+   attribute selector between the name and the value so user-added skills
+   can declare which attribute they roll under. The select stays compact
+   so the row's grid columns line up with the existing specialty rows. */
+.mrrp-custom-skill-row { grid-template-columns: 1fr auto auto auto auto auto; }
+.mrrp-custom-skill-attr {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 1px 4px;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+}
+
+.mrrp-skill-spec-label {
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+}
+
+/*  ─────  Dice widget specialty pane  ───── */
+
+.mrrp-dice__specs {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px dashed var(--mrrp-accent-dim);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+}
+
+.mrrp-dice__specs-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+  margin-bottom: 4px;
+}
+
+.mrrp-dice__spec-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+.mrrp-dice__spec-checkbox {
+  margin: 0;
+  cursor: pointer;
+}
+
+.mrrp-stepper {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.mrrp-stepper button {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-tint-2);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text);
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  padding: 0;
+  line-height: 1;
+}
+
+.mrrp-stepper button:hover { background: var(--mrrp-accent-dim); }
+.mrrp-stepper button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/*  ─────  Derived stats  ───── */
+
+.mrrp-derived {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrrp-derived__formula {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-bar {
+  position: relative;
+  height: 14px;
+  background: var(--mrrp-tint-2);
+  border-radius: var(--mrrp-radius-sm);
+  overflow: hidden;
+}
+
+.mrrp-bar__fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--mrrp-accent-dim), var(--mrrp-accent));
+  width: 0;
+  transition: width 0.18s ease-out;
+}
+
+.mrrp-bar__label {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-family: var(--mrrp-mono);
+  text-align: center;
+  line-height: 14px;
+  color: var(--mrrp-text);
+  text-shadow: 0 0 2px rgba(0,0,0,0.6);
+}
+
+.mrrp-track {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.mrrp-track__cell {
+  min-width: 38px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-family: var(--mrrp-mono);
+  text-align: center;
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mrrp-track__cell--filled {
+  background: var(--mrrp-fail);
+  color: var(--mrrp-on-fail);
+  border-color: var(--mrrp-fail);
+}
+
+.mrrp-track__cell--active {
+  outline: 2px solid var(--mrrp-warning);
+}
+
+.mrrp-track__cell--extra {
+  border-style: dashed;
+  border-color: var(--mrrp-accent-dim);
+}
+
+/*  ─────  Damage-type tones  ─────
+    Used by rulesets that declare damageTypes on a track-renderAs derived
+    stat (Exalted, WoD, anything Storyteller-flavored). Bashing is mild
+    (warning yellow), Lethal is severe (fail red, same hue as legacy
+    single-fill), Aggravated is dire (deep maroon — meant to read as
+    'something supernatural just hit you'). The renderer overlays the
+    damage-type label (B/L/A) on the cell when filled. */
+.mrrp-track__cell--bashing {
+  background: var(--mrrp-warning);
+  color: #1a0f0f;
+  border-color: var(--mrrp-warning);
+}
+.mrrp-track__cell--lethal {
+  background: var(--mrrp-fail);
+  color: var(--mrrp-on-fail);
+  border-color: var(--mrrp-fail);
+}
+.mrrp-track__cell--aggravated {
+  background: #5a1a1a;
+  color: #f5f0ff;
+  border-color: #7a2a2a;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.mrrp-track-ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.mrrp-track-ctrl__label {
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  margin-right: 2px;
+}
+
+.mrrp-track-add-btn {
+  background: var(--mrrp-tint-2);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 1px 6px;
+  font-size: 10px;
+  font-family: var(--mrrp-mono);
+  cursor: pointer;
+}
+
+.mrrp-track-add-btn:hover { background: var(--mrrp-accent-dim); }
+
+.mrrp-track-add-btn--danger:hover {
+  background: rgba(251, 113, 133, 0.30);
+  border-color: var(--mrrp-fail);
+}
+
+.mrrp-saved-indicator {
+  font-size: 10px;
+  color: var(--mrrp-success);
+  font-family: var(--mrrp-mono);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/*  ─────  States (anima banner / stunt tier / D&D conditions)  ───── */
+
+.mrrp-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.mrrp-state__name { font-weight: 500; }
+
+.mrrp-state__select {
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+/*  ─────  Floating dice widget  ───── */
+
+.mrrp-dice {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  width: 280px;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border-strong);
+  border-radius: var(--mrrp-radius);
+  padding: var(--mrrp-pad);
+  box-shadow: var(--mrrp-shadow);
+  z-index: var(--mrrp-z-dice);
+  font-size: var(--mrrp-density-fs);
+  display: none;
+}
+
+.mrrp-dice--open { display: block; }
+
+.mrrp-dice__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mrrp-border);
+}
+
+.mrrp-dice__title {
+  font-weight: 600;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-dice__close {
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.mrrp-dice__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.mrrp-dice__row label {
+  flex: 0 0 80px;
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-dice__input {
+  flex: 1;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 6px;
+  font-family: var(--mrrp-mono);
+  font-size: var(--mrrp-density-fs);
+  width: 100%;
+}
+
+.mrrp-dice__btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border: 0;
+  border-radius: var(--mrrp-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mrrp-dice__btn:hover { filter: brightness(1.1); }
+
+.mrrp-dice__btn--secondary {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+}
+
+.mrrp-dice__btn--row-spaced { margin-top: 4px; }
+
+.mrrp-dice__result {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.mrrp-dice__result--success { border-color: var(--mrrp-success); }
+.mrrp-dice__result--fail    { border-color: var(--mrrp-fail); }
+.mrrp-dice__result--botch   { border-color: var(--mrrp-warning); background: rgba(251, 191, 36, 0.10); }
+.mrrp-dice__result--tie     { border-color: var(--mrrp-warning); }
+
+.mrrp-dice__faces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.mrrp-dice__face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+}
+
+.mrrp-dice__face--success { background: var(--mrrp-accent-dim); border-color: var(--mrrp-accent); }
+.mrrp-dice__face--double  { background: var(--mrrp-accent); color: var(--mrrp-on-accent); }
+.mrrp-dice__face--one     { background: rgba(251, 113, 133, 0.20); border-color: var(--mrrp-fail); }
+
+/*  ─────  Header gear button + dialog  ───── */
+
+.mrrp-gear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.mrrp-gear-btn:hover { background: var(--mrrp-accent-dim); }
+
+/*  ─────  Header sheet-toggle button (scroll icon)  ───── */
+
+.mrrp-sheet-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 8px;
+  padding: 0;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: inherit;
+  vertical-align: middle;
+}
+
+.mrrp-sheet-toggle-btn:hover { background: var(--mrrp-accent-dim); }
+
+.mrrp-sheet-toggle-btn--active {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+}
+
+.mrrp-sheet-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.mrrp-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: var(--mrrp-z-dialog);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.mrrp-dialog-backdrop--open { display: flex; }
+
+.mrrp-dialog {
+  width: min(560px, 92vw);
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border-strong);
+  border-radius: var(--mrrp-radius);
+  padding: 16px;
+  box-shadow: var(--mrrp-shadow);
+}
+
+.mrrp-dialog h3 {
+  margin: 0 0 8px;
+  color: var(--mrrp-accent);
+  font-size: 16px;
+}
+
+.mrrp-dialog p {
+  color: var(--mrrp-text-dim);
+  font-size: 12px;
+  margin: 4px 0 8px;
+}
+
+.mrrp-dialog textarea {
+  width: 100%;
+  min-height: 220px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 8px;
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  resize: vertical;
+}
+
+.mrrp-dialog__row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.mrrp-dialog__label {
+  flex: 0 0 50px;
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-dialog__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.mrrp-dialog__lib-title {
+  margin-top: 18px;
+  border-top: 1px solid var(--mrrp-border);
+  padding-top: 14px;
+}
+.mrrp-dialog__lib-help {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+.mrrp-dialog__lib {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.mrrp-dialog__lib-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: rgba(0, 0, 0, 0.15);
+}
+.mrrp-dialog__lib-name {
+  flex: 1;
+  font-family: var(--mrrp-mono);
+  font-size: var(--mrrp-density-fs);
+}
+
+.mrrp-msg {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: var(--mrrp-radius-sm);
+  font-size: 12px;
+  font-family: var(--mrrp-mono);
+}
+
+.mrrp-msg--ok    { background: rgba(110, 231, 183, 0.12); border: 1px solid var(--mrrp-success); }
+.mrrp-msg--err   { background: rgba(251, 113, 133, 0.12); border: 1px solid var(--mrrp-fail); }
+.mrrp-msg--info  { background: rgba(212, 168, 255, 0.10); border: 1px solid var(--mrrp-accent-dim); }
+
+/*  ─────  Inventory section + item editor  ───── */
+
+.mrrp-inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrrp-inv-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+}
+
+.mrrp-inv-item--equipped {
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-tint-2);
+}
+
+.mrrp-inv-item__name {
+  font-weight: 500;
+}
+
+.mrrp-inv-item__slot {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+}
+
+/* Damage cell on a weapon row — visually distinct from the slot tag so a
+   skim of the inventory tells the player at a glance which items hit
+   and how much. Color picks up the warning hue (the cue for "this is
+   the violent thing"). */
+.mrrp-inv-item__damage {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-warning);
+  white-space: nowrap;
+}
+
+.mrrp-inv-item__bonus-summary {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mrrp-inv-empty {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  font-style: italic;
+}
+
+.mrrp-item-form__row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+}
+
+.mrrp-item-form__row label {
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  text-align: right;
+}
+
+.mrrp-item-form__input,
+.mrrp-item-form__select {
+  width: 100%;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.mrrp-item-form__textarea {
+  width: 100%;
+  min-height: 50px;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.mrrp-bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 6px;
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.mrrp-bonus-list__title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-bonus-row {
+  display: grid;
+  grid-template-columns: 2fr 50px 70px 1.2fr auto;
+  align-items: center;
+  gap: 4px;
+}
+
+.mrrp-bonus-row__input {
+  width: 100%;
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border-strong);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 4px;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+/* <option> elements ignore most parent styling on Linux/Chromium and fall back
+   to OS-default (often white bg + inherited near-white text => invisible until
+   highlighted). Explicit colors here force a readable dark dropdown panel. */
+.mrrp-bonus-row__input option,
+.mrrp-item-form__select option,
+.mrrp-item-form__input option {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+}
+
+/*  ─────  Derived / skill row equipment-bonus suffix  ───── */
+
+.mrrp-row__bonus {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  color: var(--mrrp-success);
+  margin-left: 2px;
+}
+
+.mrrp-row__bonus--neg { color: var(--mrrp-fail); }
+
+/*  ─────  Derived value cap suffix ("/ max")  ───── */
+
+.mrrp-row__cap {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
+
+/*  ─────  state-mutator tag visual hiding  ───── */
+/* The state-mutator agent instructs the main model to emit
+   [mrrp-state: ...] tags inline at paragraph ends. The extension's
+   chat observer parses + applies them, then wraps each tag in a
+   span.mrrp-state-tag for this CSS rule to hide visually. The state
+   change itself has already been applied to localStorage; the tag
+   is purely a wire-format artifact and should not appear in chat. */
+.mrrp-state-tag { display: none; }
+
+
+/*  ─────  state mutation confirmation toast  ───── */
+/* Top-right floating stack of brief notifications shown when the
+   state-mutator agent's tags fire. Each toast confirms one mutation:
+   prefix (HP / Condition / Inventory), change (signed delta or +/- name),
+   and the agent-reported reason. Stacks vertically; auto-dismisses. */
+.mrrp-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.mrrp-toast {
+  background: var(--mrrp-bg-elev);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-left: 3px solid var(--mrrp-accent);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  box-shadow: var(--mrrp-shadow);
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  max-width: 320px;
+}
+
+.mrrp-toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mrrp-toast__prefix {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrrp-text-dim);
+  flex-shrink: 0;
+}
+
+.mrrp-toast__change {
+  font-family: var(--mrrp-mono);
+  font-weight: 700;
+  color: var(--mrrp-accent);
+  flex-shrink: 0;
+}
+
+.mrrp-toast__reason {
+  color: var(--mrrp-text-dim);
+  font-size: 11px;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*  ─────  Spellbook flyout (third floating panel, system-labeled)  ───── */
+/* Per-ruleset abilities/charms/stunts panel. Toggled from the main sheet's
+   spellbook row; renders one collapsible category section per
+   ruleset.abilities.categories[]. Position persists to mrrp-spellbook-pos.
+   Mirrors GM-mode architecture; mrrp- namespace. */
+
+.mrrp-spellbook {
+  position: fixed;
+  top: 80px;
+  left: 360px;
+  width: 320px;
+  max-height: 70vh;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border-strong);
+  border-radius: var(--mrrp-radius);
+  padding: var(--mrrp-pad);
+  box-shadow: var(--mrrp-shadow);
+  z-index: 9996;
+  font-size: var(--mrrp-density-fs);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mrrp-spellbook--open { display: flex; }
+
+.mrrp-spellbook__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mrrp-border);
+  cursor: grab;
+  user-select: none;
+}
+
+.mrrp-spellbook__header:active { cursor: grabbing; }
+
+.mrrp-spellbook__title {
+  font-weight: 600;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-spellbook__body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mrrp-spellbook-row { cursor: default; }
+.mrrp-spellbook-row__btn { width: 100%; text-align: left; }
+
+.mrrp-spellbook-cat {
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  background: var(--mrrp-tint-1);
+  padding: 4px 6px;
+}
+
+.mrrp-spellbook-cat__head {
+  width: 100%;
+  background: transparent;
+  color: var(--mrrp-text);
+  border: 0;
+  padding: 4px 2px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-spellbook-cat__head:hover { color: var(--mrrp-accent); }
+
+.mrrp-spellbook-cat__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__list,
+.mrrp-spellbook-cat--collapsed .mrrp-spellbook-cat__add {
+  display: none;
+}
+
+.mrrp-spellbook-cat__add { margin-top: 4px; }
+
+.mrrp-spellbook-ab {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  background: var(--mrrp-bg-elev);
+  border-radius: var(--mrrp-radius-sm);
+  border: 1px solid var(--mrrp-border);
+}
+
+.mrrp-spellbook-ab__name { font-weight: 500; font-size: 12px; }
+.mrrp-spellbook-ab__cost {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  white-space: nowrap;
+}
+
+/*  ─────  Chip primitive  ─────────────────────────────────────────────────
+    Small inline pill used for status-flavored item details: Hardness,
+    Overwhelming, intimacy kind. Tints lean on existing CSS variables so
+    the palette stays consistent. */
+.mrrp-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--mrrp-border);
+  background: var(--mrrp-tint-1);
+  color: var(--mrrp-text-dim);
+  white-space: nowrap;
+}
+
+.mrrp-chip--hardness {
+  color: #b9d8ff;
+  border-color: rgba(133, 173, 220, 0.45);
+  background: rgba(80, 120, 180, 0.18);
+}
+
+.mrrp-chip--overwhelming {
+  color: #ffd0a8;
+  border-color: rgba(220, 140, 80, 0.45);
+  background: rgba(180, 90, 40, 0.20);
+}
+
+/* Commitment chips — surface per-item magic-binding state on the inventory
+   row. Attuned and Invested share the accent palette (the system's "magic
+   is active" cue). Mote uses the warning hue since Exalted essence reads
+   as "energy held in reserve" rather than a passive enchantment. */
+.mrrp-chip--attuned {
+  color: var(--mrrp-on-accent);
+  background: var(--mrrp-accent);
+  border-color: var(--mrrp-accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--invested {
+  color: var(--mrrp-on-accent);
+  background: var(--mrrp-accent);
+  border-color: var(--mrrp-accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--mote {
+  color: #1a0f0f;
+  background: var(--mrrp-warning);
+  border-color: var(--mrrp-warning);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--intimacy-kind {
+  cursor: pointer;
+  background: var(--mrrp-tint-2);
+  border-color: var(--mrrp-border-strong);
+  color: var(--mrrp-text);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mrrp-chip--intimacy-kind-tie {
+  color: var(--mrrp-accent);
+  border-color: var(--mrrp-accent-dim);
+}
+
+.mrrp-chip--intimacy-kind-principle {
+  color: var(--mrrp-success);
+  border-color: rgba(110, 231, 183, 0.45);
+  background: rgba(110, 231, 183, 0.10);
+}
+
+/*  ─────  Intimacies flyout panel  ────────────────────────────────────────
+    Shares the .mrrp-spellbook structural classes so position, header,
+    body scroll, and category collapse all "just work." Only the layout
+    of an individual intimacy row is custom: a two-line grid with the
+    kind chip + degree dropdown + delete on the first line and the text
+    input on the second so the field is wide enough to read. */
+.mrrp-intimacies { /* inherits .mrrp-spellbook positioning + open class */ }
+
+.mrrp-intimacy-group {
+  /* inherits .mrrp-spellbook-cat */
+}
+
+.mrrp-intimacy-group--defining .mrrp-spellbook-cat__head {
+  color: var(--mrrp-accent);
+}
+
+.mrrp-intimacy-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--mrrp-bg-elev);
+  border-radius: var(--mrrp-radius-sm);
+  border: 1px solid var(--mrrp-border);
+}
+
+.mrrp-intimacy-row__text {
+  grid-column: 1 / -1;
+  width: 100%;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  order: 2;
+}
+
+.mrrp-intimacy-row > .mrrp-chip--intimacy-kind { order: 1; }
+
+.mrrp-intimacy-row__degree {
+  order: 3;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 4px;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.mrrp-intimacy-row__target {
+  order: 4;
+  grid-column: 1 / -1;
+  width: 100%;
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 3px 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.mrrp-intimacy-row > .mrrp-char-btn--danger { order: 5; }
+
+.mrrp-intimacies__top-add {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+/*  ─────  XP card  ─────────────────────────────────────────────────────────
+    Sits between identity row and the section list in the main sheet. Two
+    layouts driven by ruleset.resolution.mode:
+      "single-roll" (D&D, PF2e) — level + current/next + 4px progress bar
+                                  fed by ruleset.xpTable
+      "dice-pool"   (Exalted)   — current + total earned + +1 XP button
+                                  (a pure int accumulator)
+    Hidden entirely for rulesets whose mode isn't one of the two above
+    (Fate Core uses Fate Points, not XP). */
+
+.mrrp-xp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  margin-top: 4px;
+}
+
+.mrrp-xp-card__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+}
+
+.mrrp-xp-card__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mrrp-xp-card__group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.mrrp-xp-card__sub {
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-xp-card__input {
+  background: var(--mrrp-bg);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 2px 6px;
+  font-family: var(--mrrp-mono);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  width: 80px;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.mrrp-xp-card__input:focus {
+  outline: none;
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-bg-elev);
+}
+
+.mrrp-xp-card__input::-webkit-outer-spin-button,
+.mrrp-xp-card__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.mrrp-xp-card__input--lvl {
+  width: 50px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.mrrp-xp-card__sep {
+  font-family: var(--mrrp-mono);
+  font-size: 16px;
+  color: var(--mrrp-text-dim);
+  align-self: flex-end;
+  padding-bottom: 2px;
+}
+
+.mrrp-xp-card__next {
+  font-family: var(--mrrp-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+  padding: 2px 6px;
+  font-variant-numeric: tabular-nums;
+  align-self: flex-end;
+}
+
+.mrrp-xp-card__bar {
+  height: 4px;
+  background: var(--mrrp-tint-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mrrp-xp-card__bar-fill {
+  height: 100%;
+  background: var(--mrrp-accent);
+  width: 0;
+  transition: width 0.18s ease-out;
+}
+
+.mrrp-xp-card__add {
+  align-self: flex-start;
+  background: var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-accent);
+  border-radius: var(--mrrp-radius-sm);
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.mrrp-xp-card__add:hover {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * Phase 3.1 — row-primitive CSS (mrrp-p3-* namespace)
+ * ═══════════════════════════════════════════════════════════════
+ * Sibling to the existing .mrrp-section / .mrrp-row / .mrrp-stepper /
+ * .mrrp-bar rules used by the running renderer. Phase-3 namespace
+ * prevents collision; cutover in a future session renames or
+ * removes the -p3 infix when the new renderer is the only path.
+ *
+ * Density values inlined as cozy defaults (12/8/30/13). Token
+ * migration will swap these for --density-* later.
+ * ═══════════════════════════════════════════════════════════════ */
+
+.mrrp-p3-section {
+  /* display:flex + column makes the card a flex container AND fixes
+     the flex-item height collapse: when this card is itself a flex
+     item of .mrrp-sheet (which is column flex), Chrome computes its
+     intrinsic min-height as 0 if the card isn't a flex container,
+     which causes head + body to render outside the card's painted
+     bounds. Matching the existing .mrrp-section pattern (also column
+     flex) keeps the card sized to its children. overflow:hidden
+     dropped — children have padding so they don't bleed past the
+     rounded corners. */
+  display: flex;
+  flex-direction: column;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius);
+  margin-bottom: 8px;
+}
+.mrrp-p3-section__head {
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+}
+.mrrp-p3-section--open .mrrp-p3-section__head { border-bottom-color: var(--mrrp-border); }
+.mrrp-p3-section__head:hover { background: var(--mrrp-tint-1); }
+.mrrp-p3-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mrrp-text);
+}
+.mrrp-p3-section__count {
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+}
+.mrrp-p3-section__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mrrp-p3-section__right { margin-left: auto; }
+.mrrp-p3-section__chev {
+  margin-left: auto;
+  color: var(--mrrp-text-dim);
+  transition: transform 150ms ease;
+  display: inline-block;
+}
+.mrrp-p3-section--open .mrrp-p3-section__chev { transform: rotate(90deg); }
+.mrrp-p3-section__body {
+  display: none;
+  padding: 8px var(--mrrp-density-pad-x) var(--mrrp-density-pad-y);
+  flex-direction: column;
+  gap: 8px;
+}
+.mrrp-p3-section--open .mrrp-p3-section__body { display: flex; }
+
+/* Stepper */
+.mrrp-p3-stepper {
+  display: inline-flex;
+  gap: 2px;
+}
+.mrrp-p3-stepper button {
+  width: 22px;
+  height: 22px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: var(--mrrp-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.mrrp-p3-stepper button:hover {
+  background: var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-border-strong);
+}
+
+/* Row base + variants */
+.mrrp-p3-row {
+  display: grid;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  height: var(--mrrp-density-row-h);
+  border-radius: var(--mrrp-radius-sm);
+}
+.mrrp-p3-row:hover { background: var(--mrrp-tint-1); }
+.mrrp-p3-row--attr { grid-template-columns: 1fr auto auto auto auto; }
+.mrrp-p3-row--skill {
+  grid-template-columns: 1fr auto auto auto;
+  align-items: start;
+  height: auto;
+  min-height: var(--mrrp-density-row-h);
+}
+.mrrp-p3-row--save { grid-template-columns: 1fr auto auto auto; }
+.mrrp-p3-row__name {
+  font-size: var(--mrrp-density-fs);
+  color: var(--mrrp-text);
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mrrp-p3-row__abbr {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  margin-left: 4px;
+}
+.mrrp-p3-row__kind {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+}
+.mrrp-p3-row__gear {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-accent);
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--mrrp-accent-dim);
+  border-radius: 6px;
+  background: var(--mrrp-tint-1);
+}
+.mrrp-p3-row__mod {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  color: var(--mrrp-text-dim);
+  min-width: 22px;
+  text-align: right;
+}
+.mrrp-p3-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mrrp-p3-row__del {
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: auto;
+  line-height: 1;
+}
+.mrrp-p3-row__del:hover { color: var(--mrrp-warning); }
+.mrrp-p3-row__val {
+  width: 64px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text);
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: var(--mrrp-radius-sm);
+  text-align: center;
+}
+.mrrp-p3-row__val::-webkit-outer-spin-button,
+.mrrp-p3-row__val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mrrp-p3-row__val:focus { outline: 0; border-color: var(--mrrp-accent); }
+.mrrp-p3-row__val--auto {
+  background: transparent;
+  border: 0;
+  font-size: var(--mrrp-density-fs);
+  font-weight: 600;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  color: var(--mrrp-text);
+}
+.mrrp-p3-row__roll {
+  background: transparent;
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  min-width: 48px;
+}
+.mrrp-p3-row__roll:hover {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+}
+.mrrp-p3-row__roll--sm {
+  padding: 2px 6px;
+  font-size: 10px;
+  min-width: 0;
+}
+
+/* Tier pill */
+.mrrp-p3-tier {
+  width: 36px;
+  height: 22px;
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mrrp-p3-tier:hover { background: var(--mrrp-accent-dim); }
+.mrrp-p3-tier--T {
+  background: var(--mrrp-tint-2);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-border-strong);
+}
+.mrrp-p3-tier--E {
+  background: var(--mrrp-accent-dim);
+  border-color: var(--mrrp-border-strong);
+  color: var(--mrrp-text);
+}
+.mrrp-p3-tier--M {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-accent);
+}
+
+/* Specialty chips + editor */
+.mrrp-p3-row__spec-toggle {
+  background: transparent;
+  border: 1px dashed var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+.mrrp-p3-row__spec-toggle:hover {
+  border-style: solid;
+  border-color: var(--mrrp-border-strong);
+  color: var(--mrrp-accent);
+}
+.mrrp-p3-row__specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.mrrp-p3-spec-chip {
+  background: var(--mrrp-tint-1);
+  border: 1px solid var(--mrrp-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--mrrp-text);
+}
+.mrrp-p3-spec-chip:hover {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
+.mrrp-p3-spec-chip__name { font-weight: 500; }
+.mrrp-p3-spec-chip__dice {
+  font-family: var(--mrrp-mono);
+  font-size: 9.5px;
+  opacity: 0.85;
+}
+.mrrp-p3-spec-chip__x {
+  margin-left: 2px;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.mrrp-p3-spec-chip__x:hover { opacity: 1; color: var(--mrrp-warning); }
+.mrrp-p3-row__spec-editor {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 4px;
+}
+.mrrp-p3-row__spec-input {
+  flex: 1;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text);
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: var(--mrrp-radius-sm);
+}
+.mrrp-p3-row__spec-input:focus { outline: 0; border-color: var(--mrrp-accent); }
+.mrrp-p3-row__spec-add,
+.mrrp-p3-row__spec-done {
+  background: transparent;
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+}
+.mrrp-p3-row__spec-add:hover { border-color: var(--mrrp-accent); color: var(--mrrp-accent); }
+.mrrp-p3-row__spec-done:hover { border-color: var(--mrrp-border-strong); color: var(--mrrp-text); }
+
+/* Auto-calc bonus pill (skill + save rows) */
+.mrrp-p3-save__bonus {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mrrp-accent);
+}
+.mrrp-p3-row--save .mrrp-p3-save__bonus { color: var(--mrrp-accent); }
+
+/* Bar */
+.mrrp-p3-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+}
+.mrrp-p3-bar__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.mrrp-p3-bar__name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mrrp-text);
+}
+.mrrp-p3-bar__values {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-p3-bar__val-input {
+  width: 40px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dotted var(--mrrp-border);
+  color: var(--mrrp-text);
+  font-family: var(--mrrp-mono);
+  font-size: 12px;
+  text-align: center;
+  padding: 1px 0;
+}
+.mrrp-p3-bar__val-input::-webkit-outer-spin-button,
+.mrrp-p3-bar__val-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mrrp-p3-bar__val-input:hover,
+.mrrp-p3-bar__val-input:focus {
+  outline: 0;
+  border-bottom-color: var(--mrrp-border-strong);
+}
+.mrrp-p3-bar__sep { color: var(--mrrp-text-dim); }
+.mrrp-p3-bar__track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--mrrp-tint-2);
+  overflow: hidden;
+}
+.mrrp-p3-bar__fill {
+  height: 100%;
+  transition: width 200ms ease, background 200ms ease;
+}
+.mrrp-p3-bar__fill--ok { background: var(--mrrp-success); }
+.mrrp-p3-bar__fill--warn { background: var(--mrrp-warning); }
+.mrrp-p3-bar__fill--bad { background: var(--mrrp-fail); }
+.mrrp-p3-bar__quick {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+.mrrp-p3-bar__quick button {
+  background: transparent;
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+}
+.mrrp-p3-bar__quick button:hover {
+  background: var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-border-strong);
+}
+
+/* Damage track (Exalted) */
+.mrrp-p3-bar--damage .mrrp-p3-bar__values--track {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-p3-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.mrrp-p3-cell {
+  width: 36px;
+  height: 22px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mrrp-p3-cell:hover {
+  border-color: var(--mrrp-border-strong);
+  color: var(--mrrp-text);
+}
+.mrrp-p3-cell--B {
+  background: var(--mrrp-warning);
+  color: var(--mrrp-on-accent);
+  border-color: var(--mrrp-warning);
+}
+.mrrp-p3-cell--L {
+  background: var(--mrrp-fail);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-fail);
+}
+.mrrp-p3-cell--A {
+  background: var(--mrrp-on-fail);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-fail);
+}
+.mrrp-p3-track-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.mrrp-p3-track-tools__group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mrrp-p3-track-tools__label {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  margin-right: 2px;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-p3-track-tools__add,
+.mrrp-p3-track-tools__heal {
+  background: transparent;
+  border: 1px solid var(--mrrp-border);
+  color: var(--mrrp-text-dim);
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: var(--mrrp-radius-sm);
+  cursor: pointer;
+}
+.mrrp-p3-track-tools__add:hover,
+.mrrp-p3-track-tools__heal:hover:not(:disabled) {
+  background: var(--mrrp-accent-dim);
+  color: var(--mrrp-text);
+  border-color: var(--mrrp-border-strong);
+}
+.mrrp-p3-track-tools__heal:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * Phase 3.2 — panel-frame chrome (port of panel-frame.jsx)
+ * ═══════════════════════════════════════════════════════════════
+ * Standalone floating panel: drag head + 8 resize handles + body.
+ * Used by future Session 3.4+ flyouts. Phase 3.3 sheet body REUSES
+ * the existing .mrrp-sheet shell so toggling renderers doesn't
+ * disturb the saved sheet position.
+ * ═══════════════════════════════════════════════════════════════ */
+
+.mrrp-p3-panel {
+  position: fixed;
+  background: var(--mrrp-bg);
+  border: 1px solid var(--mrrp-border);
+  border-radius: var(--mrrp-radius);
+  box-shadow: var(--mrrp-shadow);
+  color: var(--mrrp-text);
+  z-index: var(--mrrp-z-sheet);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.mrrp-p3-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px var(--mrrp-density-pad-x);
+  cursor: move;
+  user-select: none;
+  border-bottom: 1px solid var(--mrrp-border);
+  background: var(--mrrp-bg-elev);
+}
+.mrrp-p3-panel__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mrrp-accent);
+}
+.mrrp-p3-panel__title-meta {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mrrp-text-dim);
+  letter-spacing: 0;
+  text-transform: none;
+  margin-left: 4px;
+}
+.mrrp-p3-panel__close {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: var(--mrrp-text-dim);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: var(--mrrp-radius-sm);
+}
+.mrrp-p3-panel__close:hover {
+  background: var(--mrrp-tint-1);
+  color: var(--mrrp-text);
+}
+.mrrp-p3-panel__body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--mrrp-density-pad-y) var(--mrrp-density-pad-x);
+}
+
+.mrrp-p3-panel__resize {
+  position: absolute;
+  background: transparent;
+  z-index: 1;
+}
+.mrrp-p3-panel__resize--n  { top: 0;     left: 8px;   right: 8px;   height: 6px; cursor: ns-resize; }
+.mrrp-p3-panel__resize--s  { bottom: 0;  left: 8px;   right: 8px;   height: 6px; cursor: ns-resize; }
+.mrrp-p3-panel__resize--e  { top: 8px;   right: 0;    bottom: 8px;  width: 6px;  cursor: ew-resize; }
+.mrrp-p3-panel__resize--w  { top: 8px;   left: 0;     bottom: 8px;  width: 6px;  cursor: ew-resize; }
+.mrrp-p3-panel__resize--ne { top: 0;     right: 0;                              width: 12px; height: 12px; cursor: nesw-resize; }
+.mrrp-p3-panel__resize--nw { top: 0;     left: 0;                               width: 12px; height: 12px; cursor: nwse-resize; }
+.mrrp-p3-panel__resize--se {
+  bottom: 0; right: 0;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  color: var(--mrrp-text-dim);
+}
+.mrrp-p3-panel__resize--se:hover { color: var(--mrrp-accent); }
+.mrrp-p3-panel__resize--sw { bottom: 0;  left: 0;                               width: 12px; height: 12px; cursor: nesw-resize; }
+
+.mrrp-p3-section__subgroup-label {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrrp-text-dim);
+  margin: 8px 0 4px;
+  padding-left: 4px;
+}
+
+/* Phase 3 derived-stat row wrapper (used by mrrpP3RenderDerivedSection's
+ * value branch — bars and tracks display their name inside the primitive,
+ * but renderValue does not, so the wrapper supplies a name + formula
+ * label outside the value primitive). */
+.mrrp-p3-derived {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.mrrp-p3-derived__label {
+  font-family: var(--mrrp-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--mrrp-text-dim);
+  padding-left: 4px;
+}
+
+/* ── Phase 5 step 5.5: density toggle ──────────────────────────────────
+ * 3-way data-density attribute on .mrrp-sheet swaps the five
+ * --mrrp-density-* variables. UI: pill button group in the actions row
+ * with aria-pressed indicating selection. Per-character (state.sheet.density),
+ * defaults to "cozy". Source: ~/projects/claude-design-updates/UI-build.md §2.3.
+ * ────────────────────────────────────────────────────────────────────── */
+.mrrp-sheet[data-density="compact"] {
+  --mrrp-density-pad-x: 8px;
+  --mrrp-density-pad-y: 8px;
+  --mrrp-density-gap:   4px;
+  --mrrp-density-row-h: 24px;
+  --mrrp-density-fs:   12px;
+}
+.mrrp-sheet[data-density="cozy"] {
+  --mrrp-density-pad-x: 12px;
+  --mrrp-density-pad-y: 12px;
+  --mrrp-density-gap:    6px;
+  --mrrp-density-row-h: 28px;
+  --mrrp-density-fs:    13px;
+}
+.mrrp-sheet[data-density="roomy"] {
+  --mrrp-density-pad-x: 16px;
+  --mrrp-density-pad-y: 16px;
+  --mrrp-density-gap:   10px;
+  --mrrp-density-row-h: 34px;
+  --mrrp-density-fs:   14px;
+}
+
+/* density toggle pill button group (rendered inside the actions row) */
+.mrrp-density-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 999px;
+  background: var(--mrrp-tint-1);
+}
+.mrrp-density-toggle__label {
+  font-family: var(--mrrp-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+  padding: 0 8px 0 6px;
+}
+.mrrp-density-toggle__btn {
+  font-family: var(--mrrp-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-dim);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.mrrp-density-toggle__btn:hover {
+  color: var(--mrrp-text);
+  background: var(--mrrp-tint-2);
+}
+.mrrp-density-toggle__btn:focus-visible {
+  outline: 1px solid var(--mrrp-accent-line);
+  outline-offset: 1px;
+}
+.mrrp-density-toggle__btn[aria-pressed="true"] {
+  background: var(--mrrp-accent-soft);
+  color: var(--mrrp-text);
+  box-shadow: inset 0 0 0 1px var(--mrrp-accent-line);
+}
+
+/* ── Phase 5 step 5.4: derived tooltip math ──────────────────────────
+ * Cursor + underline affordance on derived value cells whose ruleset
+ * declares a tooltipFormula. The browser's native title-attr tooltip
+ * carries the breakdown ("Soak (Bashing): 7 = Stamina (4) + Bashing
+ * Soak (3)"). Affordance is intentionally subtle — dotted underline
+ * + help cursor is the long-established "this has hover info" pattern
+ * (matches the prototype's skill-bonus pill UX). Scoped to autocalc
+ * value cells with a non-empty title so static-rendered derived stats
+ * without a tooltipFormula keep their default cursor + no underline. */
+.mrrp-row__value--autocalc[title]:not([title=""]) {
+  cursor: help;
+  text-decoration: underline dotted var(--mrrp-text-faint);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.mrrp-row__value--autocalc[title]:not([title=""]):hover {
+  text-decoration-color: var(--mrrp-accent-line);
+}
+
+/* ── Phase 5 step 5.2: XP card ───────────────────────────────────────
+ * Visual restructure to prototype parity (sheet.jsx XpCard, UI-build.md
+ * §3.4 + §4.7). The baseline rules at the .mrrp-xp-card section above
+ * already supply structure (flex column, row, group). This section
+ * tightens the type scale + spacing to match the prototype:
+ *   - card-level label: 10px / 600 / 0.12em uppercase (already)
+ *   - sub-labels:       9px  / 0.10em uppercase (already)
+ *   - numeric value:    14px → 16px / 600  (PROTOTYPE TARGET)
+ *   - level input:      16px → 18px / 600 / 56px wide (PROTOTYPE)
+ *   - + button placed inline at row end via flex-end self-align.
+ * Selector specificity matches the baseline rule (single-class) so the
+ * cascade resolves the override by source order — appended last wins.
+ * Pool-mode (Exalted) and formula-mode (D&D, PF2e) both consume the
+ * same primitives; the only mode difference is which primitives
+ * appear (pool: current/sep/total/+1; formula: level/current/sep/next/bar).
+ * Mode dispatch lives in renderXpCard() which keys off
+ * ruleset.resolution.mode. */
+.mrrp-xp-card__input {
+  font-size: 16px;
+}
+.mrrp-xp-card__input--lvl {
+  font-size: 18px;
+  width: 56px;
+}
+.mrrp-xp-card__sep {
+  font-size: 18px;
+  padding-bottom: 6px;
+}
+.mrrp-xp-card__next {
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 4px;
+}
+/* Pool-mode +1 button now lives inside the row (see renderXpCard pool
+   branch). Anchor it to flex-end so it baselines with the inputs and
+   doesn't stretch the row vertically. The baseline alignment already
+   says align-self: flex-start at the .mrrp-xp-card__add base rule;
+   this overrides for the inline placement. */
+.mrrp-xp-card__row .mrrp-xp-card__add {
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+/* ── Phase 5 step 5.6: state badges + anima banner ──
+ * Visual treatments for state rows whose active value carries narrative
+ * weight: Initiative=Crashed (distress) and Anima=Suppressed (muted).
+ * Uses a data-active-value attribute on .mrrp-state plus paired modifier
+ * classes so the row + select restyle without changing the underlying
+ * select-based render (which already handles N values natively, including
+ * the 6-value Anima Banner with Suppressed prepended in Plan B step B.2).
+ *
+ * Crashed token: scoped to this section, no global :root pollution beyond
+ * the three new --mrrp-state-crashed-* tokens.
+ * Suppressed: leans on existing --mrrp-text-faint for the "no anima" feel.
+ */
+
+:root {
+  --mrrp-state-crashed-color: oklch(0.62 0.18 28);
+  --mrrp-state-crashed-soft:  oklch(0.62 0.18 28 / 0.18);
+  --mrrp-state-crashed-line:  oklch(0.62 0.18 28 / 0.42);
+}
+
+/* Initiative=Crashed — red distress treatment on row + select.
+ * Subtle pulse on the name to draw the eye without being jarring; respects
+ * prefers-reduced-motion below. (!)-glyph appended via ::after pseudo. */
+.mrrp-state--initiative-crashed .mrrp-state__name {
+  color: var(--mrrp-state-crashed-color);
+  font-weight: 600;
+  animation: mrrp-state-crashed-pulse 2.4s ease-in-out infinite;
+}
+
+.mrrp-state--initiative-crashed .mrrp-state__name::after {
+  content: " (!)";
+  color: var(--mrrp-state-crashed-color);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mrrp-state--initiative-crashed .mrrp-state__select {
+  color: var(--mrrp-state-crashed-color);
+  border-color: var(--mrrp-state-crashed-line);
+  background: var(--mrrp-state-crashed-soft);
+}
+
+@keyframes mrrp-state-crashed-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.72; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mrrp-state--initiative-crashed .mrrp-state__name { animation: none; }
+}
+
+/* Anima=Suppressed — muted "no anima visible" treatment.
+ * Suppressed renders at the top of the Anima Banner select because Plan B
+ * step B.2 prepended it as the first value in ruleset.json — option order
+ * follows ruleset value order. */
+.mrrp-state--anima-suppressed .mrrp-state__name {
+  color: var(--mrrp-text-faint);
+  font-style: italic;
+}
+
+.mrrp-state--anima-suppressed .mrrp-state__select {
+  color: var(--mrrp-text-faint);
+}
+
+/* Defensive overflow guard for state rows on narrow panels (≥320px).
+ * The row is flex-row name+select; if a future ruleset adds a long state
+ * name, the select should compress rather than spill. Anima Banner with 6
+ * values (Suppressed/Dim/Glowing/Burning/Bonfire/Iconic) renders inside
+ * the native <select>, so option count never affects row width. */
+.mrrp-state {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.mrrp-state__select {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ── Phase 5 step 5.3: Resources cluster ──────────────────────────────
+ * Horizontal "charbar" cluster of resource readouts rendered above
+ * Attributes when the active ruleset declares resources[] (Plan B v1
+ * schema add). Driven by mrrpP3RenderResourcesSection — sub-renderers
+ * dispatch by resource.type (bar / dice / counter / pool / custom).
+ *
+ * Layout: flex-wrap with min 120px per resource so 4+ pools at the top
+ * of a 280-320px panel collapse to a 2x2 grid rather than spilling
+ * horizontally. Adjacent resources sharing a `group` value render under
+ * a shared subheader (D&D Spell Slots case).
+ *
+ * Auto-color thresholds match prototype <Bar> in sheet.jsx:151
+ *   pct < 30%  → bad
+ *   pct < 65%  → warn
+ *   pct >= 65% → ok
+ * Override via resource.color ∈ {ok|warn|bad|accent}.
+ *
+ * Tokens: reuses --mrrp-success/-warning/-fail and --mrrp-accent. No
+ * global :root pollution. Local section-scoped tokens for the dice
+ * glyph treatment only.
+ */
+
+:root {
+  --mrrp-resources-pad: 10px;
+  --mrrp-resources-gap: 10px;
+  --mrrp-resource-min-w: 120px;
+  --mrrp-resource-bar-h: 6px;
+  --mrrp-resource-die-size: 22px;
+}
+
+.mrrp-resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mrrp-resources-gap);
+  padding: var(--mrrp-resources-pad);
+  margin: 0 0 8px 0;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: 8px;
+}
+
+/* Sub-group subheader (D&D Spell Slots). Forces a wrap break so all
+ * resources sharing a group cluster under their label. */
+.mrrp-resources__group-break {
+  flex-basis: 100%;
+  height: 0;
+  margin: 0;
+  border: 0;
+}
+.mrrp-resources__group-label {
+  flex-basis: 100%;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+  margin: 4px 0 -2px 0;
+}
+
+.mrrp-resource {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 var(--mrrp-resource-min-w);
+  min-width: var(--mrrp-resource-min-w);
+  padding: 6px 8px;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: 6px;
+}
+/* Full-width resource (used by exalted-health-track so the track has room
+   to grow with extra HL added via Ox-Body, Mutations, etc.). Wraps onto
+   its own row regardless of cluster width. */
+.mrrp-resource--full-width {
+  flex-basis: 100%;
+}
+
+.mrrp-resource__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+  line-height: 1.1;
+}
+
+.mrrp-resource__values {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 13px;
+  color: var(--mrrp-text);
+}
+.mrrp-resource__val {
+  font-weight: 600;
+}
+.mrrp-resource__val-input {
+  min-width: 3ch;
+  width: auto;
+  max-width: 5ch;
+  padding: 2px 4px;
+  background: var(--mrrp-bg-app);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 3px;
+  color: inherit;
+  font: inherit;
+  text-align: right;
+  box-sizing: content-box;
+}
+.mrrp-resource__val-input:focus {
+  outline: none;
+  border-color: var(--mrrp-accent-line);
+}
+.mrrp-resource__sep {
+  color: var(--mrrp-text-faint);
+  opacity: 0.7;
+}
+
+/* Bar render (type=bar) — fill bar with auto-color. */
+.mrrp-resource__bar {
+  position: relative;
+  height: var(--mrrp-resource-bar-h);
+  width: 100%;
+  background: var(--mrrp-bg-app);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mrrp-resource__bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  transition: width 120ms ease-out, background-color 120ms ease-out;
+}
+.mrrp-resource__bar-fill--ok     { background: var(--mrrp-success, oklch(0.78 0.14 145)); }
+.mrrp-resource__bar-fill--warn   { background: var(--mrrp-warning, oklch(0.82 0.14 85)); }
+.mrrp-resource__bar-fill--bad    { background: var(--mrrp-fail, oklch(0.65 0.18 28)); }
+.mrrp-resource__bar-fill--accent { background: var(--mrrp-accent); }
+
+/* Dice render (type=dice) — pool of clickable dice glyphs. Spent dice
+ * dim. Reuses --mrrp-resource-die-size for sizing. */
+.mrrp-resource__dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+.mrrp-resource__die {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mrrp-resource-die-size);
+  height: var(--mrrp-resource-die-size);
+  padding: 0;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 100ms ease-out, opacity 100ms ease-out;
+}
+.mrrp-resource__die:hover { background: var(--mrrp-accent-soft); }
+.mrrp-resource__die--spent {
+  opacity: 0.32;
+  cursor: default;
+}
+.mrrp-resource__die--spent:hover { background: var(--mrrp-bg-elev); }
+
+/* Counter render (type=counter) — numeric stepper. */
+.mrrp-resource__counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mrrp-resource__step {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-border);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+.mrrp-resource__step:hover { background: var(--mrrp-accent-soft); }
+.mrrp-resource__step:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Pool render (type=pool) — current/max display, no bar (matches
+ * Exalted motes/willpower pattern; the prominent type-scale recalls the
+ * XP card values). */
+.mrrp-resource--pool .mrrp-resource__values {
+  font-size: 15px;
+}
+
+/* Custom placeholder — renders when a resource declares
+ * type=custom with a rendererConfig.component name that has not been
+ * registered in the custom-component registry yet. Distinct visual
+ * marker so missing components are obvious during integration. */
+.mrrp-resource__placeholder {
+  font-size: 11px;
+  color: var(--mrrp-text-faint);
+  font-style: italic;
+  padding: 4px 6px;
+  background: var(--mrrp-bg-app);
+  border: 1px dashed var(--mrrp-hairline-strong);
+  border-radius: 4px;
+}
+.mrrp-resource__placeholder code {
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+  color: var(--mrrp-text);
+}
+
+/* Quick-button row — pill-style, matches XpCard +1 XP affordance. */
+.mrrp-resource__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.mrrp-resource__quick-btn {
+  padding: 2px 8px;
+  background: var(--mrrp-accent-soft);
+  border: 1px solid var(--mrrp-accent-line);
+  border-radius: 999px;
+  color: var(--mrrp-text);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color 100ms ease-out;
+}
+.mrrp-resource__quick-btn:hover {
+  background: var(--mrrp-accent-dim);
+}
+
+/* Narrow-panel guard (≥320px). Below ~280px the cluster collapses to a
+ * single column; above that the resources wrap as a 2-up grid via
+ * flex-wrap + min-width. */
+@media (max-width: 320px) {
+  .mrrp-resource {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
+
+/* ── Phase 5 step 5.6: V20 morality + paths + virtues + health-track ─────
+ * V20 visual treatment. Owns the .mrrp-morality cluster (Path Rating,
+ * path picker + description, virtue rows with paired-choice toggle) and
+ * the .mrrp-health-track grid (7 boxes cycling through B / L / A damage
+ * types per V20 RAW). All rules namespaced under .mrrp-morality* and
+ * .mrrp-health-track* so they don't collide with the Phase 5 step 5.3
+ * resources cluster above. */
+
+.mrrp-morality {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: 6px;
+}
+.mrrp-morality__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mrrp-morality__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-morality__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mrrp-morality__rating-label {
+  font-size: 11px;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-morality__rating-step {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mrrp-morality__rating-step:hover:not([disabled]) {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-morality__rating-step[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mrrp-morality__rating-value {
+  min-width: 1.5em;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+}
+.mrrp-morality__path-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mrrp-morality__path-select {
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  padding: 4px 6px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.mrrp-morality__path-desc {
+  font-size: 11px;
+  color: var(--mrrp-text-faint);
+  line-height: 1.4;
+  padding: 4px 6px;
+  background: var(--mrrp-bg-app);
+  border-left: 2px solid var(--mrrp-accent-line);
+  border-radius: 2px;
+}
+.mrrp-morality__virtues {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mrrp-morality__virtue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mrrp-morality__virtue-label {
+  flex: 1 1 auto;
+  font-size: 12px;
+  color: var(--mrrp-text);
+}
+.mrrp-morality__virtue-toggle {
+  display: inline-flex;
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.mrrp-morality__virtue-toggle-btn {
+  padding: 2px 8px;
+  background: var(--mrrp-bg-input);
+  border: 0;
+  color: var(--mrrp-text-faint);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 100ms ease-out, color 100ms ease-out;
+}
+.mrrp-morality__virtue-toggle-btn[aria-pressed="true"] {
+  background: var(--mrrp-accent-soft);
+  color: var(--mrrp-text);
+  font-weight: 600;
+}
+.mrrp-morality__virtue-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.mrrp-morality__virtue-step {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 3px;
+  color: var(--mrrp-text);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mrrp-morality__virtue-step:hover:not([disabled]) {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-morality__virtue-step[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mrrp-morality__virtue-value {
+  min-width: 1.25em;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+}
+
+/* v20-health-track — 7-level V20 health grid. Each box cycles
+ * empty → B (bashing) → L (lethal) → A (aggravated) → empty on click.
+ * Color tier matches damage severity (B = faint, L = warn, A = bad). */
+.mrrp-health-track {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.mrrp-health-track__levels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+.mrrp-health-track__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mrrp-health-track__box {
+  width: 100%;
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mrrp-bg-input);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 3px;
+  color: var(--mrrp-text);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  cursor: pointer;
+  transition: background-color 100ms ease-out, border-color 100ms ease-out;
+}
+.mrrp-health-track__box[data-damage="B"] {
+  background: var(--mrrp-accent-soft);
+  border-color: var(--mrrp-accent-line);
+}
+.mrrp-health-track__box[data-damage="L"] {
+  background: oklch(0.55 0.16 60 / 0.32);
+  border-color: oklch(0.65 0.18 60 / 0.55);
+  color: oklch(0.94 0.04 60);
+}
+.mrrp-health-track__box[data-damage="A"] {
+  background: oklch(0.50 0.20 25 / 0.42);
+  border-color: oklch(0.62 0.22 25 / 0.65);
+  color: oklch(0.96 0.05 25);
+}
+.mrrp-health-track__label {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--mrrp-text-faint);
+  text-align: center;
+  line-height: 1.1;
+}
+.mrrp-health-track__penalty {
+  font-size: 9px;
+  color: var(--mrrp-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.mrrp-health-track__summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--mrrp-text-faint);
+}
+.mrrp-health-track__legend {
+  display: inline-flex;
+  gap: 6px;
+}
+.mrrp-health-track__legend code {
+  font-family: var(--mrrp-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+}
+
+@media (max-width: 320px) {
+  .mrrp-health-track__levels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .mrrp-morality__virtue {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ── Round 6: roll-under mechanic ── */
+/* Visual states for roll-under outcomes. The dice tray's existing success/fail
+   modifiers (lines ~870) cover plain pass/fail; these two add crit-success and
+   fumble bands the roll-under widget emits. accent ring for crit, warning fill
+   for fumble — same vocabulary as the dice-pool botch state. */
+.mrrp-dice__result--crit {
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-dice__result--fumble {
+  border-color: var(--mrrp-warning);
+  background: rgba(251, 191, 36, 0.10);
+}
+
+/* ── Round 7: stance-modal-pool ── */
+/* Segmented stance toggle for stance-modal-pool resolution mode (Lasers &
+   Feelings). Two pill buttons render in a single row above the pool size
+   input. Active stance is filled with accent; inactive is the standard
+   hairline-button look so the choice reads at a glance. Per-die "exact"
+   highlight class lights the LASER FEELINGS dice in the result row, and
+   outcome tier classes give the dice tray's result strip a per-tier
+   gradient so miss / barely / good / critical are distinguishable without
+   reading text. */
+.mrrp-dice__stance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 4px;
+}
+.mrrp-dice__stance-row > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mrrp-text-faint, oklch(0.7 0.02 285));
+  min-width: 48px;
+}
+.mrrp-dice__stance-group {
+  display: inline-flex;
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--mrrp-bg-input);
+}
+.mrrp-stance-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--mrrp-text, inherit);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.mrrp-stance-btn + .mrrp-stance-btn {
+  border-left: 1px solid var(--mrrp-hairline);
+}
+.mrrp-stance-btn:hover {
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-stance-btn--active {
+  background: var(--mrrp-accent);
+  color: var(--mrrp-on-accent);
+}
+.mrrp-stance-btn--active:hover {
+  background: var(--mrrp-accent);
+}
+
+/* Pool-formula hint label under the pool input. Pure cosmetic — exposes
+   the rules-text formula for pool composition to the player without
+   forcing them into a parser. */
+.mrrp-dice__hint {
+  font-size: 10px;
+  color: var(--mrrp-text-faint, oklch(0.65 0.02 285));
+  padding: 0 8px 4px;
+  font-style: italic;
+}
+
+/* LASER FEELINGS / exact-match die highlight. Stronger accent ring than a
+   plain stance-success so the exact-match dice pop on the result strip. */
+.mrrp-dice__face--exact {
+  outline: 2px solid var(--mrrp-accent);
+  outline-offset: -2px;
+  background: var(--mrrp-accent-soft);
+  position: relative;
+}
+
+/* Stance-modal-pool result strip — per-tier visual states. Outcome tiers
+   are open-ended labels (the spec doesn't enumerate them) so we map by
+   the canonical L&F label set: miss / barely / good / critical. Any other
+   tier label falls through to the default --success / --fail kind chosen
+   by rollStanceModalPool. */
+.mrrp-dice__result--tier-miss {
+  border-color: var(--mrrp-warning);
+  background: rgba(251, 191, 36, 0.08);
+}
+.mrrp-dice__result--tier-barely {
+  border-color: var(--mrrp-hairline-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+.mrrp-dice__result--tier-good {
+  border-color: var(--mrrp-accent-line);
+  background: var(--mrrp-accent-soft);
+}
+.mrrp-dice__result--tier-critical {
+  border-color: var(--mrrp-accent);
+  background: var(--mrrp-accent-soft);
+  box-shadow: 0 0 0 1px var(--mrrp-accent-dim) inset;
+}
+
+/* ── Phase 6: DERIVED POOLS card grid ────────────────────────────────────
+ * 2-column grid of compact stat cards replacing the legacy row layout.
+ * Card anatomy: name top-left, big value top-right, faint formula
+ * tokens below the head. Auto-calc cards show the computed value with
+ * no edit input; manual cards keep an inline stepper.
+ * Grid wraps to one column at narrow widths so the cards never crowd.
+ * Source: ~/projects/claude-design-updates intent + image 7 (2026-05-08).
+ * ────────────────────────────────────────────────────────────────────── */
+.mrrp-derived-pools__subtitle {
+  font-size: 11px;
+  color: var(--mrrp-text-faint, var(--mrrp-text-dim));
+  margin: 2px 0 8px;
+  padding-left: 4px;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.mrrp-derived-pools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+@media (max-width: 320px) {
+  .mrrp-derived-pools {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mrrp-derived-pool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--mrrp-bg-elev);
+  border: 1px solid var(--mrrp-hairline);
+  border-radius: 6px;
+  min-width: 0;
+}
+
+.mrrp-derived-pool-card:hover {
+  border-color: var(--mrrp-hairline-strong);
+}
+
+.mrrp-derived-pool-card__head {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mrrp-derived-pool-card__name {
+  font-family: var(--mrrp-sans, inherit);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mrrp-text);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.mrrp-derived-pool-card__value-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mrrp-derived-pool-card__value {
+  font-family: var(--mrrp-mono, monospace);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--mrrp-text);
+  line-height: 1;
+  min-width: 1.5ch;
+  text-align: right;
+}
+
+.mrrp-derived-pool-card__value--autocalc {
+  color: var(--mrrp-accent);
+}
+
+.mrrp-derived-pool-card__value-input {
+  font-family: var(--mrrp-mono, monospace);
+  font-size: 18px;
+  font-weight: 600;
+  width: auto;
+  min-width: 3ch;
+  max-width: 5ch;
+  padding: 2px 4px;
+  background: var(--mrrp-bg-app);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  text-align: right;
+  box-sizing: content-box;
+}
+
+.mrrp-derived-pool-card__max {
+  font-family: var(--mrrp-mono, monospace);
+  font-size: 12px;
+  color: var(--mrrp-text-dim);
+}
+
+.mrrp-derived-pool-card__bonus {
+  font-family: var(--mrrp-mono, monospace);
+  font-size: 12px;
+  color: var(--mrrp-success, var(--mrrp-accent));
+  white-space: nowrap;
+}
+
+.mrrp-derived-pool-card__bonus--neg {
+  color: var(--mrrp-fail);
+}
+
+.mrrp-derived-pool-card__formula {
+  font-family: var(--mrrp-mono, monospace);
+  font-size: 10px;
+  color: var(--mrrp-text-faint, var(--mrrp-text-dim));
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mrrp-derived-pool-card__roll {
+  margin-top: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  background: var(--mrrp-bg-app);
+  border: 1px solid var(--mrrp-hairline-strong);
+  border-radius: 4px;
+  color: var(--mrrp-text);
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.mrrp-derived-pool-card__roll:hover {
+  background: var(--mrrp-accent-soft);
+  border-color: var(--mrrp-accent-line);
+}
+
+/* ── Phase 6: state-banner resource (Anima Banner inline) ────────────────
+ * Cycle-button pill that lives inline in the Resources cluster. Per-tier
+ * color tints communicate the banner's intensity at a glance.
+ * Hidden dropdown stays in DOM (sr-only-ish) so keyboard users can pick
+ * a value directly rather than clicking through the cycle.
+ * ────────────────────────────────────────────────────────────────────── */
+.mrrp-resource--state-banner {
+  /* Allow the banner to use a contrasting background so it reads as a
+     status pill rather than another stepper. */
+  background: transparent;
+  border: 1px dashed var(--mrrp-hairline);
+}
+
+.mrrp-state-banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.mrrp-state-banner__pill {
+  font-family: var(--mrrp-sans, inherit);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--mrrp-bg-app);
+  color: var(--mrrp-text);
+  border: 1px solid var(--mrrp-hairline-strong);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.mrrp-state-banner__pill:hover {
+  border-color: var(--mrrp-accent-line);
+}
+
+/* Anima Banner tiers — dim → bonfire follows intensity gradient. */
+.mrrp-state-banner__pill--suppressed,
+.mrrp-state-banner__pill--none {
+  background: var(--mrrp-bg-app);
+  color: var(--mrrp-text-dim);
+  border-color: var(--mrrp-hairline);
+}
+.mrrp-state-banner__pill--dim {
+  background: oklch(0.25 0.04 60 / 0.30);
+  color: oklch(0.85 0.06 60);
+  border-color: oklch(0.6 0.10 60 / 0.5);
+}
+.mrrp-state-banner__pill--glowing {
+  background: oklch(0.30 0.08 60 / 0.45);
+  color: oklch(0.92 0.10 60);
+  border-color: oklch(0.7 0.14 60 / 0.7);
+}
+.mrrp-state-banner__pill--burning {
+  background: oklch(0.36 0.13 50 / 0.55);
+  color: oklch(0.95 0.14 50);
+  border-color: oklch(0.75 0.18 50 / 0.8);
+  box-shadow: 0 0 8px oklch(0.7 0.20 50 / 0.35);
+}
+.mrrp-state-banner__pill--bonfire {
+  background: oklch(0.42 0.18 45 / 0.65);
+  color: oklch(0.97 0.15 50);
+  border-color: oklch(0.80 0.20 45 / 0.9);
+  box-shadow: 0 0 12px oklch(0.75 0.22 45 / 0.50);
+}
+.mrrp-state-banner__pill--iconic {
+  background: oklch(0.48 0.22 40 / 0.75);
+  color: oklch(0.98 0.18 45);
+  border-color: oklch(0.85 0.22 40);
+  box-shadow: 0 0 16px oklch(0.80 0.24 40 / 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Visually hide the redundant keyboard-accessible <select> — it's still in
+   the DOM for keyboard users and screen readers (assistive tech can focus
+   the hidden element and pick a value), but it doesn't overlap the pill.
+   The click-to-cycle pill is the primary affordance for mouse users. */
+.mrrp-state-banner__select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

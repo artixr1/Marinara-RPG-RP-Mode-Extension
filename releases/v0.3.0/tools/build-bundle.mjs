@@ -1,0 +1,231 @@
+#!/usr/bin/env node
+/**
+ * build-bundle.mjs — Generate a bundle.json from a ruleset directory's
+ * three source files: ruleset.json, gm-agent.md, lorebook.json.
+ *
+ * Usage:
+ *   node tools/build-bundle.mjs rulesets/dnd5e/         # builds rulesets/dnd5e/bundle.json
+ *   node tools/build-bundle.mjs --all                    # builds all rulesets/ * /bundle.json
+ *
+ * Translation rules:
+ *   - gm-agent.md: extracts the first ```text fenced block as promptTemplate.
+ *   - lorebook entries: drops the "id" field (server-assigned), defaults
+ *     position to 0 if absent, passes all other fields through verbatim.
+ *   - bundle: wraps in { schema, version, ruleset, gmAgent, lorebook }.
+ */
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve, basename, join } from "node:path";
+import buildRegexScripts from "./build-regex-scripts.mjs";
+import buildCustomTools from "./build-custom-tools.mjs";
+import buildLorebookExpansions from "./build-lorebook-expansions.mjs";
+import buildPreInputTransformer from "./build-pre-input-transformer.mjs";
+import buildScenarioDefault from "./build-scenario-default.mjs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, "..");
+
+function extractPromptBlock(md) {
+  const fenced = md.match(/```text\s*\n([\s\S]*?)\n```/);
+  if (fenced) return fenced[1].trim();
+  const sep = md.match(/^---\s*$/m);
+  if (sep) {
+    const after = md.slice((sep.index ?? 0) + sep[0].length);
+    if (after.trim().length > 100) return after.trim();
+  }
+  throw new Error(
+    "gm-agent.md has no ```text fenced block and no `---` separator with prose after it. " +
+    "Wrap the prompt in a ```text fenced block or place it after a horizontal rule."
+  );
+}
+
+function buildEntry(src) {
+  const out = {};
+  for (const k of Object.keys(src)) {
+    if (k === "id") continue;
+    out[k] = src[k];
+  }
+  if (!out.name) {
+    const id = src.id || (Array.isArray(src.keys) && src.keys[0]) || "entry";
+    out.name = id.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  }
+  if (typeof out.position !== "number") out.position = 0;
+  if (!out.content) out.content = "";
+  if (!Array.isArray(out.keys)) out.keys = [];
+  return out;
+}
+
+function titleCase(s) {
+  return s.split(/[-_]/).map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+}
+
+/* See build-agents.mjs for the source of truth. Kept in sync here defensively
+   — loadAdditionalAgents below is currently dead in RP-mode bundles (V5
+   transformer is the only push into bundle.additionalAgents) but was the
+   bundle-side install path and may be revived; either way, both should
+   parse Phase identically so a future revival doesn't silently regress. */
+function extractPhase(md) {
+  const m = md.match(/^\s*\*\*Phase:\*\*\s*`?([a-zA-Z_]+)`?/m);
+  if (!m) return "pre_generation";
+  const declared = (m[1] || "").trim().toLowerCase();
+  const ALLOWED = new Set(["pre_generation", "post_generation", "parallel"]);
+  return ALLOWED.has(declared) ? declared : "pre_generation";
+}
+
+function loadAdditionalAgents(rulesetName, rulesetDir) {
+  /* Resolve agent prompts with per-ruleset override precedence:
+     prefer rulesets/<id>/agents/<role>.md, fall back to <repo>/agents/<role>.md.
+     Roles are the union of files in both directories — a per-ruleset override
+     can introduce a role that doesn't exist as a shared baseline, and a shared
+     agent applies to rulesets without overrides. */
+  const sharedDir = resolve(root, "agents");
+  const overrideDir = join(rulesetDir, "agents");
+  const roles = new Set();
+  function collectFrom(dir) {
+    try {
+      for (const f of readdirSync(dir)) {
+        if (f.endsWith(".md")) roles.add(f.replace(/\.md$/, ""));
+      }
+    } catch (e) { /* directory absent — fine */ }
+  }
+  collectFrom(sharedDir);
+  collectFrom(overrideDir);
+  if (roles.size === 0) return [];
+  return Array.from(roles).sort().map(function (role) {
+    const overridePath = join(overrideDir, role + ".md");
+    let md, isOverride;
+    try { md = readFileSync(overridePath, "utf8"); isOverride = true; }
+    catch (e) { md = readFileSync(join(sharedDir, role + ".md"), "utf8"); isOverride = false; }
+    const promptTemplate = extractPromptBlock(md);
+    const phase = extractPhase(md);
+    const firstHeading = (md.match(/^#\s+(.+)$/m) || [])[1] || titleCase(role);
+    const tunedNote = isOverride
+      ? " — tuned for " + rulesetName
+      : " — shared baseline";
+    return {
+      role,
+      name: rulesetName + " — " + firstHeading.replace(/\s+Agent\s*$/i, ""),
+      description: "Focused " + role.replace(/-/g, " ") + " agent for " + rulesetName + tunedNote + ".",
+      phase,
+      promptTemplate,
+      settings: {}
+    };
+  });
+}
+
+function buildBundle(dir) {
+  const ruleset = JSON.parse(readFileSync(join(dir, "ruleset.json"), "utf8"));
+  const lb = JSON.parse(readFileSync(join(dir, "lorebook.json"), "utf8"));
+
+  /* Agents decoupled from the bundle as of v0.4. Use build-agents.mjs to
+     produce per-ruleset agents.json files; users install them via the
+     extension's "Import Agents" dialog (delete-then-replace, no
+     duplicate-accumulation). The bundle ships ruleset + lorebook only. */
+  const regexScripts = buildRegexScripts(ruleset);
+  const customTools = buildCustomTools(ruleset);
+
+  /* Vector 2: derive auto-lorebook entries from ruleset.json
+     (attributes, skills, conditions, derivedStats, difficulties), then
+     merge into the hand-authored lorebook.json entries. Hand-authored
+     entries WIN on name conflict — they're more specific than the
+     generator's defaults. Merge happens at build time so bundle.json
+     is the single source of truth at install time. */
+  const handAuthoredEntries = (lb.entries || []).map(buildEntry);
+  const derivedEntries = buildLorebookExpansions(ruleset);
+  const handAuthoredNames = new Set(handAuthoredEntries.map(e => e.name));
+  const derivedFiltered = derivedEntries.filter(e => !handAuthoredNames.has(e.name));
+  const mergedEntries = handAuthoredEntries.concat(derivedFiltered);
+
+  const bundle = {
+    schema: "mrrp-bundle",
+    version: 1,
+    minExtensionVersion: "0.4.0",
+    authorId: "kenhito",
+    generator: { name: "build-bundle.mjs", version: "1.6.0" },
+    ruleset,
+    lorebook: {
+      name: lb.name,
+      description: lb.description || "",
+      category: "world",
+      scanDepth: typeof lb.scanDepth === "number" ? lb.scanDepth : 4,
+      tokenBudget: typeof lb.tokenBudget === "number" ? lb.tokenBudget : 1500,
+      recursiveScanning: !!lb.recursiveScanning,
+      entries: mergedEntries
+    }
+  };
+
+  /* Vector 9: only embed regexScripts when the generator emitted at
+     least one. Bundles without scripts stay byte-compatible with v0.4.x
+     readers that don't know the field. */
+  if (Array.isArray(regexScripts) && regexScripts.length > 0) {
+    bundle.regexScripts = regexScripts;
+  }
+
+  /* Vector 3: only embed customTools when the generator emitted at
+     least one. Same back-compat contract as Vector 9. */
+  if (Array.isArray(customTools) && customTools.length > 0) {
+    bundle.customTools = customTools;
+  }
+
+  /* Vector 5: pre-input transformer agent. The generator returns either
+     a single agent object (from vocabularyHints[] derivation or from
+     ruleset.preInputTransformerAgent override) or null. We attach it
+     into bundle.additionalAgents so the existing additionalAgents
+     install path handles it idempotently. */
+  const transformerAgent = buildPreInputTransformer(ruleset);
+  if (transformerAgent && typeof transformerAgent === "object") {
+    if (!Array.isArray(bundle.additionalAgents)) bundle.additionalAgents = [];
+    bundle.additionalAgents.push(transformerAgent);
+  }
+
+  /* Vector 8: scenario default (NON-persona). When present the engine
+     reads it via chatMeta.groupScenarioText override. Per-chat
+     auto-install deferred to next session — tonight the bundle just
+     ships the string. */
+  const scenarioDefault = buildScenarioDefault(ruleset);
+  if (typeof scenarioDefault === "string" && scenarioDefault.trim()) {
+    bundle.scenarioDefault = scenarioDefault;
+  }
+
+  const outPath = join(dir, "bundle.json");
+  writeFileSync(outPath, JSON.stringify(bundle, null, 2) + "\n");
+  return {
+    outPath,
+    entryCount: bundle.lorebook.entries.length,
+    handAuthoredCount: handAuthoredEntries.length,
+    derivedCount: derivedFiltered.length,
+    regexCount: (bundle.regexScripts || []).length,
+    toolCount: (bundle.customTools || []).length,
+    addAgentCount: (bundle.additionalAgents || []).length,
+    scenarioBytes: (bundle.scenarioDefault || "").length
+  };
+}
+
+const args = process.argv.slice(2);
+if (args.length === 0) {
+  console.error("Usage: node tools/build-bundle.mjs <rulesetDir> | --all");
+  process.exit(2);
+}
+
+const dirs = [];
+if (args[0] === "--all") {
+  const rulesetsDir = resolve(root, "rulesets");
+  for (const name of readdirSync(rulesetsDir)) {
+    const p = join(rulesetsDir, name);
+    if (statSync(p).isDirectory()) dirs.push(p);
+  }
+} else {
+  dirs.push(resolve(root, args[0]));
+}
+
+let failed = 0;
+for (const dir of dirs) {
+  try {
+    const { outPath, entryCount, handAuthoredCount, derivedCount, regexCount, toolCount, addAgentCount, scenarioBytes } = buildBundle(dir);
+    console.log("PASS " + basename(dir) + " -> " + outPath + " (" + entryCount + " entries [" + handAuthoredCount + " hand + " + derivedCount + " derived], " + regexCount + " regex scripts, " + toolCount + " custom tools, " + addAgentCount + " add'l agents, " + scenarioBytes + " scenario bytes)");
+  } catch (e) {
+    console.error("FAIL " + basename(dir) + " — " + e.message);
+    failed++;
+  }
+}
+process.exit(failed === 0 ? 0 : 1);
