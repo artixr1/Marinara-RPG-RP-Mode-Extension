@@ -1,0 +1,458 @@
+{
+  "id": "lewd-attack",
+  "name": "Lewd Attack",
+  "version": "1.0.0",
+  "edition": "v0.42 (alpha)",
+  "license": "Original mechanics references only; no verbatim rulebook text reproduced.",
+  "summary": "A solo-play sexual-fantasy RPG using d6 dice pools. Each skill rolls two stats worth of d6s, counting successes per proficiency tier (Untrained 5-6, Trained 4-6, Expert 3-6). Opposed tests in combat, difficulty-based outside combat.",
+  "dice": {
+    "type": "d6",
+    "notation": "Nd6, count successes"
+  },
+  "resolution": {
+    "mode": "dice-pool",
+    "poolFormula": "Stat + Stat (two attributes per skill, per the skill's own pair)",
+    "target": 5,
+    "botches": {
+      "onFace": 1,
+      "trigger": "any-on-zero-successes"
+    }
+  },
+  "difficulties": {
+    "Easy": {
+      "threshold": 1,
+      "description": "A bare pass; trivial for someone with the right skill."
+    },
+    "Standard": {
+      "threshold": 2,
+      "description": "Default difficulty for most tests."
+    },
+    "Hard": {
+      "threshold": 3,
+      "description": "Demands real competence."
+    },
+    "Very Hard": {
+      "threshold": 4,
+      "description": "Even a trained character may fail."
+    }
+  },
+  "attributes": [
+    {
+      "name": "Strength",
+      "abbreviation": "STR",
+      "group": "Physical",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Raw physical power. Melee damage bonus, lifting, grappling."
+    },
+    {
+      "name": "Body",
+      "abbreviation": "BOD",
+      "group": "Physical",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Constitution and physique. HP calculation, resistance, soak."
+    },
+    {
+      "name": "Agility",
+      "abbreviation": "AGI",
+      "group": "Physical",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Speed, grace, coordination. Dodging, acrobatics, many combat skills."
+    },
+    {
+      "name": "Endurance",
+      "abbreviation": "END",
+      "group": "Physical",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Stamina and resilience. Stamina pool, many skills, survival."
+    },
+    {
+      "name": "Dexterity",
+      "abbreviation": "DEX",
+      "group": "Physical",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Fine motor control. Precision tasks, sex skills, thievery."
+    },
+    {
+      "name": "Perception",
+      "abbreviation": "PER",
+      "group": "Mental",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Senses and awareness. Spotting, tracking, ranged attacks."
+    },
+    {
+      "name": "Willpower",
+      "abbreviation": "WIL",
+      "group": "Mental",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Mental fortitude. MP calculation, Sanity, persuasion, resisting."
+    },
+    {
+      "name": "Intelligence",
+      "abbreviation": "INT",
+      "group": "Mental",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Reasoning and knowledge. Spellcasting, studying, crafting."
+    },
+    {
+      "name": "Charisma",
+      "abbreviation": "CHA",
+      "group": "Mental",
+      "min": 1,
+      "max": 20,
+      "default": 2,
+      "description": "Force of personality. Seduction, persuasion, performance, miracles."
+    }
+  ],
+  "skills": [
+    { "name": "Blacksmithing", "description": "Str+Int. Repair heavy armor." },
+    { "name": "Bluffing", "description": "Int+Cha. Deceive, swindle, lie." },
+    { "name": "Climbing", "description": "Str+End. Scale walls and terrain." },
+    { "name": "Dancing", "description": "Agi+Cha. Entertain crowds, earn coin." },
+    { "name": "Gambling", "description": "Dex+Cha. Cards, dice, cheating at games." },
+    { "name": "Haggle", "description": "Int+Cha. Bargain better prices." },
+    { "name": "Hunting", "description": "Agi+End. Track and kill prey for food." },
+    { "name": "Intimidation", "description": "Str+Cha. Threaten, frighten, force compliance." },
+    { "name": "Investigation", "description": "Per+Int. Find hidden things, traps, secrets." },
+    { "name": "Labor", "description": "Str+End. Hard physical work for coin." },
+    { "name": "Lockpicking", "description": "Dex+Int. Open locks on doors and chests." },
+    { "name": "Persuasion", "description": "Wil+Cha. Convince others through reason." },
+    { "name": "Playing Music", "description": "Dex+Cha. Entertain with instruments, earn coin." },
+    { "name": "Seduction", "description": "Dex+Cha. Sway with charm, in or out of combat." },
+    { "name": "Tracking", "description": "End+Per. Follow tracks through the wild." },
+    { "name": "Reaction", "description": "Agi+Int. Avoid traps and sudden dangers." },
+    { "name": "Resistance", "description": "Bod+Wil. Withstand poison, intoxication, illness." },
+    { "name": "Regeneration", "description": "Bod+End. Daily HP recovery, death-save skill." },
+    { "name": "Running", "description": "Agi+End. Chase, flee, close distance." },
+    { "name": "Service", "description": "End+Dex. Work as servant, wench, or attendant." },
+    { "name": "Sewing", "description": "Dex+Int. Repair light armor and clothes." },
+    { "name": "Singing", "description": "Int+Cha. Entertain with voice, earn coin." },
+    { "name": "Sneaking", "description": "Agi+Int. Move unseen, ambush enemies." },
+    { "name": "Stealing", "description": "Dex+Per. Pickpocket, lift valuables." },
+    { "name": "Studying", "description": "Int+End. Memorize books, learn knowledge." },
+    { "name": "Teaching", "description": "Int+End. Share knowledge for coin." },
+    { "name": "Arcane Spells", "description": "Wil+Int. Cast learned arcane spells in combat." },
+    { "name": "Axes", "description": "Str+End. One-handed and two-handed axe combat." },
+    { "name": "Blocking", "description": "Agi+Bod. Defend with shield; +1 die vs ranged." },
+    { "name": "Bows", "description": "Str+Per. Shortbows and longbows at range." },
+    { "name": "Brawling", "description": "Str+Agi. Unarmed strikes, fists and kicks." },
+    { "name": "Crossbows", "description": "Dex+Per. Crossbows and heavy crossbows at range." },
+    { "name": "Daggers", "description": "Dex+Agi. Quick blades, throwing knives." },
+    { "name": "Dodging", "description": "Agi+Per. Default defense; works vs all attack types." },
+    { "name": "Grappling", "description": "Str+Bod. Wrestle, pin, throw, or restrain enemies." },
+    { "name": "Halberds", "description": "Bod+Agi. Two-handed polearm combat." },
+    { "name": "Maces", "description": "Str+Bod. One-handed and two-handed crushing weapons." },
+    { "name": "Miracles", "description": "Wil+Cha. Cast holy blessings and miracles." },
+    { "name": "Parrying", "description": "Str+Dex. Deflect with weapon; riposte on excess successes." },
+    { "name": "Spears", "description": "Agi+End. One-handed and two-handed thrusting weapons." },
+    { "name": "Staffs", "description": "Bod+Dex. One-handed or two-handed; grants +MP to casters." },
+    { "name": "Swords", "description": "Str+Agi. One-handed and two-handed blade combat." },
+    { "name": "Throwing", "description": "Agi+Per. Hurl knives, axes, or objects accurately." },
+    { "name": "Blowjob", "description": "Dex+Cha. Oral service. Pleasure: 1d10, End cost: 5." },
+    { "name": "Buttjob", "description": "Bod+End. Butt-rubbing. Pleasure: 1d6+Butt, End cost: 4." },
+    { "name": "Footjob", "description": "Agi+Dex. Foot service. Pleasure: 1d6+Feet, End cost: 4." },
+    { "name": "Handjob", "description": "Dex+End. Hand service. Pleasure: 1d6+Hand, End cost: 3." },
+    { "name": "Masturbation/Lesbian", "description": "Dex+Int. Self-pleasure or with another woman. Pleasure: 1d6." },
+    { "name": "Sex Consensual", "description": "Agi+End. Penetrative sex, taking initiative. Reciprocal Pleasure: 1d6+Dick." },
+    { "name": "Sex Dominant", "description": "Str+End. Dominant penetrative sex, including coerced. Reciprocal Pleasure: 1d6+Dick." },
+    { "name": "Thighjob", "description": "Agi+Bod. Thigh-rubbing. Pleasure: 1d6+Thigh, End cost: 4." },
+    { "name": "Titjob", "description": "Bod+Cha. Breast service. Pleasure: 1d6+Tit, End cost: 4." }
+  ],
+  "skillProficiency": {
+    "tiers": [
+      { "code": "U", "label": "Untrained", "rollBonusFormula": "0" },
+      { "code": "T", "label": "Trained", "rollBonusFormula": "0" },
+      { "code": "E", "label": "Expert", "rollBonusFormula": "0" }
+    ],
+    "default": "U"
+  },
+  "derivedStats": [
+    {
+      "name": "Hit Points",
+      "formula": "2*Body + Agility + Strength + Endurance + Willpower",
+      "renderAs": "bar",
+      "maxFormula": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+      "aliases": ["hp", "HP", "hitPoints", "hitpoints"],
+      "default": 14
+    },
+    {
+      "name": "Magic Points",
+      "formula": "2*Willpower + 2*Intelligence + Endurance + Charisma",
+      "renderAs": "bar",
+      "maxFormula": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+      "aliases": ["mp", "MP", "magicPoints", "mana"],
+      "default": 14
+    },
+    {
+      "name": "Stamina",
+      "formula": "Strength + 3*Endurance + Agility + Willpower",
+      "renderAs": "bar",
+      "maxFormula": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+      "aliases": ["stamina", "STAM", "end"],
+      "default": 13
+    },
+    {
+      "name": "Sanity",
+      "formula": "Endurance + Perception + 2*Willpower + Intelligence + Charisma",
+      "renderAs": "bar",
+      "maxFormula": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+      "aliases": ["sanity", "SAN", "mentalHealth"],
+      "default": 13
+    },
+    {
+      "name": "Lust",
+      "formula": "Daily accumulation (1d4+0 base) plus situational modifiers. Thresholds at 10 and 20.",
+      "renderAs": "value",
+      "aliases": ["lust", "lustPoints"],
+      "default": 0
+    },
+    {
+      "name": "Satisfaction",
+      "formula": "Accumulated during sex from Sex Skill rolls. Compare to Lust to determine orgasm.",
+      "renderAs": "value",
+      "aliases": ["satisfaction", "sat"],
+      "default": 0
+    },
+    {
+      "name": "Gold",
+      "formula": "Currency tracked from loot, work, and purchases.",
+      "renderAs": "value",
+      "aliases": ["gold", "gp", "coin", "money"],
+      "default": 100
+    },
+    {
+      "name": "Fame",
+      "formula": "Known for heroic deeds. +1 per mission completed in a region. At 10, gain +1 permanent.",
+      "renderAs": "value",
+      "aliases": ["fame", "renown"],
+      "default": 0
+    },
+    {
+      "name": "Reputation",
+      "formula": "Sexual conduct renown. Higher = people consider you a slut. Gated social effects.",
+      "renderAs": "value",
+      "aliases": ["reputation", "rep"],
+      "default": 0
+    },
+    {
+      "name": "Corruption",
+      "formula": "Permanent taint from dark magic, demonic encounters, or Mind Break. Blocks Blessings.",
+      "renderAs": "value",
+      "aliases": ["corruption", "corrupt"],
+      "default": 0
+    },
+    {
+      "name": "Criminal",
+      "formula": "Underworld renown. Raised by committing crimes and escaping. Gates black-market access.",
+      "renderAs": "value",
+      "aliases": ["criminal", "crime"],
+      "default": 0
+    }
+  ],
+  "states": [
+    {
+      "name": "Armor Coverage",
+      "values": [
+        { "label": "Covered", "description": "Full concealment. No Lust caused. Enemy cannot harass." },
+        { "label": "Revealing", "description": "Some skin. Lust on sight per bonuses (max +1 per bonus). Harassment enabled." },
+        { "label": "Exposed", "description": "Underwear-level. 2d4 Lust on sight, bonuses up to +2 each. Full harassment." },
+        { "label": "Naked", "description": "No protection. 2d4 Lust on sight, no bonus cap. Max vulnerability." }
+      ]
+    },
+    {
+      "name": "Lust State",
+      "values": [
+        { "label": "Normal", "description": "Lust 0-10. No mechanical effect." },
+        { "label": "Horny", "description": "Lust 10-20. -1 die to all non-Seduction/non-rape tests. +1 die to Seduction and rape attempts." },
+        { "label": "Extremely Horny", "description": "Lust 20+. -2 dice to all non-Seduction/non-rape tests. Lose 3 Sanity immediately, +3 Sanity loss per day in this state." }
+      ]
+    }
+  ],
+  "conditions": [
+    { "name": "Bleeding", "description": "Lose HP per round until healed or bandaged. Amount depends on source." },
+    { "name": "Burning", "description": "Fire DoT. Extinguish via water, Clean spell, or Dodge roll (each success removes 1 Burning)." },
+    { "name": "Exhausted", "description": "Stamina reaches 0. -2 dice to ALL tests until rest restores Stamina above 0." },
+    { "name": "Poisoned", "description": "Varies by source. Antidote Miracle or potion cures. Damage/interval per poison type." },
+    { "name": "Slimed", "description": "+1 per slime enemy per round. Each stack gives -1 die to attack/defense/movement. Wash to remove." },
+    { "name": "Bukkake'd", "description": "Covered in cum. -1 die to Agility-based tests, attacks, and defense. Wash or Clean to remove." },
+    { "name": "Darkness", "description": "Night/caves. -3 Perception. Affects all Perception-based skills. Torch reduces to -1." },
+    { "name": "Frustrated", "description": "Failed to orgasm during sex. -1 die for next 3 tests." },
+    { "name": "Satisfied", "description": "Orgasm achieved (Satisfaction > Lust). +1 die for next 3 tests that day." },
+    { "name": "Mind Broken", "description": "Sanity reached 0 during sex. Roll on appropriate Mind Break table. Permanent consequences." }
+  ],
+  "diceTagFormat": {
+    "template": "[dice: {pool}d6 vs 5+ -> {successes} successes] - call: {Attribute} + {Attribute} vs difficulty {D}",
+    "example": "[dice: 7d6 vs 5+ -> 3 successes] - call: Strength + Agility vs difficulty 2 (Swords attack)"
+  },
+  "sheetSections": [
+    "attributes",
+    "skills",
+    "derived",
+    "states",
+    "conditions",
+    "backgrounds",
+    "inventory",
+    "abilities",
+    "notes"
+  ],
+  "sections": {
+    "order": [
+      "identity",
+      "resources",
+      "attributes",
+      "skills",
+      "derived",
+      "abilities",
+      "states",
+      "conditions",
+      "backgrounds",
+      "inventory",
+      "notes"
+    ]
+  },
+  "resources": [
+    {
+      "id": "hit-points",
+      "label": "HP",
+      "type": "bar",
+      "max": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+      "current": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+      "color": "bad",
+      "stateName": "Hit Points",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-5", "delta": -5 },
+        { "label": "-10", "delta": -10 },
+        { "label": "Heal", "delta": "max" }
+      ]
+    },
+    {
+      "id": "magic-points",
+      "label": "MP",
+      "type": "bar",
+      "max": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+      "current": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+      "color": "accent",
+      "stateName": "Magic Points",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-5", "delta": -5 },
+        { "label": "Rest", "delta": "max" }
+      ]
+    },
+    {
+      "id": "stamina",
+      "label": "Stamina",
+      "type": "bar",
+      "max": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+      "current": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+      "color": "warn",
+      "stateName": "Stamina",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-5", "delta": -5 },
+        { "label": "Rest", "delta": "max" }
+      ]
+    },
+    {
+      "id": "sanity",
+      "label": "Sanity",
+      "type": "bar",
+      "max": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+      "current": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+      "color": "accent",
+      "stateName": "Sanity",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-5", "delta": -5 },
+        { "label": "Rest", "delta": "max" }
+      ]
+    },
+    {
+      "id": "lust",
+      "label": "Lust",
+      "type": "counter",
+      "max": 40,
+      "current": 0,
+      "color": "warn",
+      "stateName": "Lust",
+      "quickButtons": [
+        { "label": "+1", "delta": 1 },
+        { "label": "+5", "delta": 5 },
+        { "label": "Reset", "delta": "max" }
+      ]
+    },
+    {
+      "id": "gold",
+      "label": "Gold",
+      "type": "counter",
+      "max": 99999,
+      "current": 100,
+      "color": "ok",
+      "stateName": "Gold",
+      "quickButtons": [
+        { "label": "+10", "delta": 10 },
+        { "label": "+50", "delta": 50 },
+        { "label": "-10", "delta": -10 },
+        { "label": "-50", "delta": -50 }
+      ]
+    }
+  ],
+  "lorebookKeys": [
+    "skill",
+    "class",
+    "race",
+    "trait",
+    "fetish",
+    "condition",
+    "spell",
+    "miracle",
+    "armor",
+    "weapon",
+    "seduction",
+    "lust",
+    "satisfaction",
+    "mind break",
+    "rape",
+    "gangbang",
+    "harass"
+  ],
+  "abilities": {
+    "label": "Spells & Miracles",
+    "categories": [
+      { "id": "minor-spells", "label": "Minor Spells" },
+      { "id": "greater-spells", "label": "Greater Spells" },
+      { "id": "dark-magic", "label": "Dark Magic" },
+      { "id": "miracles", "label": "Miracles" },
+      { "id": "combat-abilities", "label": "Combat Abilities" }
+    ]
+  },
+  "header": {
+    "raceLabel": "Race",
+    "classLabel": "Class"
+  },
+  "backgrounds": {
+    "enabled": true,
+    "label": "Traits & Merits",
+    "min": 0,
+    "max": 5,
+    "default": 0
+  },
+  "equipmentSlots": ["Weapon", "Shield", "Armor", "Accessory", "Ring", "Amulet", "Tool"],
+  "equipmentBonusTargets": ["Melee", "Ranged", "Defense", "Damage Reduction", "Rape Protection"]
+}
