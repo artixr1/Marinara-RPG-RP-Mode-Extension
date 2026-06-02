@@ -1,0 +1,476 @@
+{
+  "id": "vice-and-violence",
+  "name": "Vice & Violence",
+  "version": "1.0.0",
+  "edition": "Vice & Violence (Original Edition)",
+  "license": "Original mechanics references. System design belongs to the V&V publisher. No verbatim flavor text reproduced.",
+  "summary": "A lewd, rules-light, sword & sorcery sandbox TTRPG. Roll a d20 + ability modifier (Smarts, Brawn, Guts, or Charm) against a difficulty threshold. Attacks auto-hit; defense rolls armour + Guts to negate damage. Characters start at Level Zero with no class, earning class abilities through Downtime training.",
+  "dice": {
+    "type": "d20",
+    "notation": "1d20+MOD"
+  },
+  "resolution": {
+    "mode": "single-roll",
+    "modifierFormula": "1d20 + ability_mod"
+  },
+  "difficulties": {
+    "Really Easy": {
+      "threshold": 5,
+      "description": "Anyone can do it barring truly terrible luck."
+    },
+    "Simple": {
+      "threshold": 10,
+      "description": "A decent chance for an untrained commoner."
+    },
+    "Normal Difficulty": {
+      "threshold": 12,
+      "description": "Hit or miss. Standard for spells and Martial Skills."
+    },
+    "Pretty Difficult": {
+      "threshold": 15,
+      "description": "Requires skill or a strong ability score."
+    },
+    "Almost Impossible": {
+      "threshold": 20,
+      "description": "Heroic effort required. Even masters may fail."
+    }
+  },
+  "attributes": [
+    {
+      "name": "Smarts",
+      "abbreviation": "SMT",
+      "min": -6,
+      "max": 9,
+      "default": 0,
+      "description": "Intelligence and cunning. Used for casting spells, picking locks, disarming traps, investigating clues, and outwitting opponents."
+    },
+    {
+      "name": "Brawn",
+      "abbreviation": "BRN",
+      "min": -6,
+      "max": 9,
+      "default": 0,
+      "description": "Raw physical power. Used for melee attacks, lifting, breaking things, arm wrestling, intimidation, and Martial Skills."
+    },
+    {
+      "name": "Guts",
+      "abbreviation": "GTS",
+      "min": -6,
+      "max": 9,
+      "default": 0,
+      "description": "Endurance and agility. Used for Armour Saves, resisting poison, avoiding traps, staying sober, dodging, and impressing people."
+    },
+    {
+      "name": "Charm",
+      "abbreviation": "CHM",
+      "min": -6,
+      "max": 9,
+      "default": 0,
+      "description": "Charisma and attractiveness. Used for Disposition checks, seduction, bribery, blending in, standing out, and Charm-based Martial Skills."
+    }
+  ],
+  "skills": [
+    {
+      "name": "Swift Kick in The Bollocks",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "A vicious kick to the testicles. Deals d6+Brawn damage and causes Stunned. Requires a target with testicles. (DC12 Brawn to perform)"
+    },
+    {
+      "name": "Cleave",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Rip your weapon through one enemy into another. If the first target is Downed, excess damage hits a second Adjacent target. (DC12 Brawn)"
+    },
+    {
+      "name": "Lunge",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Leap through the air at an enemy with your weapon. Move Adjacent to a Further target and make an immediate basic attack. (DC12 Brawn)"
+    },
+    {
+      "name": "Power Strike",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "One massive blow, adding Brawn twice to your weapon damage. (DC12 Brawn)"
+    },
+    {
+      "name": "Leg Sweep",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Hack at a Kin's knees, dealing Brawn damage and knocking them Prone. (DC12 Brawn)"
+    },
+    {
+      "name": "Conk on The Noggin",
+      "linkedAttribute": "Brawn",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Hurl an improvised weapon at a target's head. Causes the Stunned status effect at range. (DC12 Brawn)"
+    },
+    {
+      "name": "Go Nuts",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Psyche yourself into a rage. Deliberately gain the Berserk status effect. (DC12 Guts)"
+    },
+    {
+      "name": "Protect",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Jump in front of an ally and take the damage meant for them. Uses a Tactical Action as a Reaction. (DC12 Guts)"
+    },
+    {
+      "name": "Counter Attack",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Ready a dodge. Negate the first incoming attack entirely and deliver a retaliatory basic attack. (DC12 Guts)"
+    },
+    {
+      "name": "Taunt",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Goad a target into attacking you with a rude gesture and insult. Uses a Tactical Action. (DC12 Guts)"
+    },
+    {
+      "name": "Grapple",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Grab an enemy and pin them with the Restrained status effect until they wriggle free. (DC12 Guts)"
+    },
+    {
+      "name": "Shake it Off",
+      "linkedAttribute": "Guts",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Dig deep and remove any one status effect except Dehydrated, Starving, or Exhausted. (DC12 Guts)"
+    },
+    {
+      "name": "Flash the Goods",
+      "linkedAttribute": "Charm",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Show off your figure to an enemy, increasing Disposition by d6+Charm. If they become Indifferent or Friendly, they stop attacking you. (DC12 Charm)"
+    },
+    {
+      "name": "Quick Smooch",
+      "linkedAttribute": "Charm",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Give an ally a reassuring peck, restoring Health equal to your Charm stat. Only works in combat. (DC12 Charm)"
+    },
+    {
+      "name": "Cheer On",
+      "linkedAttribute": "Charm",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Words of encouragement. Add your Charm to an ally's next Dice Challenge. Uses a Tactical Action. (DC12 Charm)"
+    },
+    {
+      "name": "Cutting Remark",
+      "linkedAttribute": "Charm",
+      "min": 0,
+      "max": 1,
+      "default": 0,
+      "description": "Shout something unbelievably insulting, causing the Berserk status effect on one target. (DC12 Charm)"
+    }
+  ],
+  "derivedStats": [
+    {
+      "name": "Health",
+      "formula": "Rolled at character creation: base plus Guts. Increases by d6 (or 4 + Guts) when levelling up.",
+      "renderAs": "bar",
+      "default": 8,
+      "aliases": [
+        "hp",
+        "HP",
+        "health",
+        "Health"
+      ]
+    },
+    {
+      "name": "Motes",
+      "formula": "Spellcasting energy. Regain full Motes after a Long Rest; regain d4 per half-hour of Short Rest.",
+      "renderAs": "bar",
+      "default": 0,
+      "aliases": [
+        "motes",
+        "spell uses",
+        "spell points",
+        "mana"
+      ]
+    },
+    {
+      "name": "Exertion",
+      "formula": "Three points per Long Rest. Can be used to reroll failed checks, dodge attacks, or remove status effects.",
+      "max": 3,
+      "default": 3,
+      "renderAs": "value",
+      "aliases": [
+        "exertion",
+        "exertion points"
+      ]
+    },
+    {
+      "name": "Level",
+      "formula": "0-10. New adventurers start at Level Zero. Max Level is Ten.",
+      "max": 10,
+      "default": 0,
+      "renderAs": "value",
+      "aliases": [
+        "level",
+        "lvl",
+        "character level"
+      ]
+    },
+    {
+      "name": "Armour Save",
+      "formula": "Roll armour die type + Guts to negate incoming damage. Determined by armour worn (Skimpy d2, Light d4, Medium d6, Full d8, Fitted 2d6).",
+      "renderAs": "value",
+      "aliases": [
+        "armour",
+        "armor",
+        "defense",
+        "defence"
+      ]
+    },
+    {
+      "name": "Refractory Period",
+      "formula": "Time between Sex encounters. Rolled at character creation (d6: 30 min to 1h45m). Decreases by 15 min on even levels.",
+      "renderAs": "value",
+      "aliases": [
+        "refractory",
+        "sage time"
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "name": "Prone",
+      "description": "You've fallen over. Cannot cast spells or use Martial Skills until you use a Tactical Action to stand up."
+    },
+    {
+      "name": "Poisoned",
+      "description": "Something inside you your body rejects. Take 1 damage when using Combat or Tactical Actions until cured. Cured by antidote or eating 1 ration."
+    },
+    {
+      "name": "Drunk",
+      "description": "All DCs are +3 (harder). Sex takes twice as long and Quality caps at Fine. Sober up in d4 hours or eat 1 ration."
+    },
+    {
+      "name": "Filthy",
+      "description": "Covered in grime. All Disposition checks at -5. Stealth checks at +10. Extra 1 damage if also Poisoned. Cured by using 1 day's water."
+    },
+    {
+      "name": "Burning",
+      "description": "On fire. Take d6 damage on turn 1, 2d6 on turn 2, 3d6 on turn 3, escalating until extinguished. Costs 1 day's water per d6 of current Burning damage to douse."
+    },
+    {
+      "name": "Stunned",
+      "description": "Bonk on the noggin. Miss your next turn. Ally can snap you out of it with a Tactical Action, or succeed a Guts Resist Check."
+    },
+    {
+      "name": "Terrified",
+      "description": "Paralysed with fear. Lose one Tactical Action, all spells/skills/attacks at half effect. Gain a Vice. Cured by getting Drunk or an ally's encouraging hug."
+    },
+    {
+      "name": "Horny",
+      "description": "Inconceivably aroused. Lose 1 Guts or 1 Smarts (whichever is higher) every 12 hours up to -3 total. Cured by Sex or 30 minutes of private remedy."
+    },
+    {
+      "name": "Blinded",
+      "description": "All you see is light or darkness. Must roll a successful DC10 before each action or fall Prone. Resist with Guts Check."
+    },
+    {
+      "name": "Charmed",
+      "description": "Compelled to obey. The GM controls your character until you succeed a Resist Check each turn."
+    },
+    {
+      "name": "Restrained",
+      "description": "Ropes, chains, tentacles, or something's mouth. Unable to perform any action except attempting a Resist Check to escape. Ally can free you with a Tactical Action and Guts DC."
+    },
+    {
+      "name": "Berserk",
+      "description": "Lost your marbles. Can only use Basic Attacks, but all Basic Attacks deal double damage. Cured by succeeding a Resist Check or drinking 1 water."
+    },
+    {
+      "name": "Dehydrated",
+      "description": "Need water. Cured by drinking 1 day's water."
+    },
+    {
+      "name": "Starving",
+      "description": "Need food. Cured by eating 1 ration."
+    },
+    {
+      "name": "Exhausted",
+      "description": "No sleep for 24 hours. -1 Smarts and -1 Brawn. Cured by a Long Rest (6 hours sleep)."
+    }
+  ],
+  "diceTagFormat": {
+    "template": "[mrrp-roll: skill=\"{Skill}\" vs DC{DC} = {result}]",
+    "example": "[mrrp-roll: skill=\"Fireball\" vs DC12 = 14 success]"
+  },
+  "sheetSections": [
+    "attributes",
+    "skills",
+    "derived",
+    "conditions",
+    "abilities",
+    "inventory",
+    "notes"
+  ],
+  "sections": {
+    "order": [
+      "identity",
+      "attributes",
+      "skills",
+      "derived",
+      "abilities",
+      "conditions",
+      "inventory",
+      "notes"
+    ]
+  },
+  "resources": [
+    {
+      "id": "health",
+      "label": "Health",
+      "type": "bar",
+      "max": 20,
+      "current": 8,
+      "color": "bad",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-5", "delta": -5 },
+        { "label": "Heal", "delta": "max" }
+      ]
+    },
+    {
+      "id": "motes",
+      "label": "Motes",
+      "type": "bar",
+      "max": 12,
+      "current": 0,
+      "color": "accent",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "-3", "delta": -3 },
+        { "label": "Rest", "delta": "max" }
+      ]
+    },
+    {
+      "id": "exertion",
+      "label": "Exertion",
+      "type": "counter",
+      "max": 3,
+      "current": 3,
+      "color": "ok",
+      "quickButtons": [
+        { "label": "-1", "delta": -1 },
+        { "label": "Long Rest", "delta": "max" }
+      ]
+    }
+  ],
+  "lorebookKeys": [
+    "class",
+    "spell",
+    "condition",
+    "kin",
+    "race",
+    "mundain",
+    "fae",
+    "sex",
+    "vice",
+    "downtime",
+    "mundainian"
+  ],
+  "abilities": {
+    "label": "Class Abilities & Spells",
+    "categories": [
+      { "id": "basic-spells", "label": "Basic Spells" },
+      { "id": "martial-skills", "label": "Martial Skills" },
+      { "id": "bard", "label": "Bard Songs" },
+      { "id": "blood-mage", "label": "Blood Magic" },
+      { "id": "cleric", "label": "Holy Relics" },
+      { "id": "dancer", "label": "Dancer Skills" },
+      { "id": "druid", "label": "Druid Forms" },
+      { "id": "fae-knight", "label": "Fae Knight" },
+      { "id": "fighter", "label": "Fighter Perks" },
+      { "id": "paladin", "label": "Paladin Oaths" },
+      { "id": "ranger", "label": "Ranger Skills" },
+      { "id": "thief", "label": "Thief Skills" },
+      { "id": "wizard", "label": "Advanced Spells" },
+      { "id": "warlock", "label": "Warlock Boons" }
+    ]
+  },
+  "backgrounds": {
+    "enabled": true,
+    "label": "Vices",
+    "min": 0,
+    "max": 10,
+    "default": 0,
+    "textOnly": true
+  },
+  "equipmentSlots": [
+    "Weapon",
+    "Armour",
+    "Shield",
+    "Magic Staff",
+    "Instrument",
+    "Trinket"
+  ],
+  "equipmentBonusTargets": [
+    "Brawn",
+    "Guts",
+    "Charm",
+    "Health",
+    "Armour Save"
+  ],
+  "vocabularyHints": [
+    {
+      "pattern": "I attack / I swing / I shoot",
+      "hint": "In V&V, basic attacks always hit. Roll weapon damage + material + Brawn. No attack roll needed. The target rolls their Armour Save (armour die + Guts) to negate damage."
+    },
+    {
+      "pattern": "I cast a spell",
+      "hint": "Casting a spell costs 1 Mote and requires a DC12 Smarts check. Failure causes Weird Magic (consult the Weird Magic table). A Magic Staff can absorb a failure at the cost of 1 Staff Health."
+    },
+    {
+      "pattern": "I use a Martial Skill",
+      "hint": "Martial Skills require a DC12 check using the skill's linked ability (Brawn, Guts, or Charm). Failure wastes your Combat Action but has no additional penalty."
+    },
+    {
+      "pattern": "I want to seduce / flash / charm",
+      "hint": "In V&V, use the Flash the Goods Martial Skill or roll a Disposition check (d20 + Charm). NPCs with Indifferent or Friendly disposition can be engaged for Sex, which heals and restores Motes."
+    },
+    {
+      "pattern": "I rest / I short rest / I long rest",
+      "hint": "Short Rest: 30-min increments restore d6 Health + d4 Motes per level. Long Rest: 6 hours sleep restores full Health, Motes, and Exertion, and cures Exhausted."
+    }
+  ],
+  "scenarioDefaultDerive": true
+}
