@@ -1,0 +1,2092 @@
+{
+  "schema": "mrrp-bundle",
+  "version": 1,
+  "minExtensionVersion": "0.4.0",
+  "authorId": "kenhito",
+  "generator": {
+    "name": "build-bundle.mjs",
+    "version": "1.6.0"
+  },
+  "ruleset": {
+    "id": "lewd-attack",
+    "name": "Lewd Attack",
+    "version": "1.0.0",
+    "edition": "v0.42 (alpha)",
+    "license": "Original mechanics references only; no verbatim rulebook text reproduced.",
+    "summary": "A solo-play sexual-fantasy RPG using d6 dice pools. Each skill rolls two stats worth of d6s, counting successes per proficiency tier (Untrained 5-6, Trained 4-6, Expert 3-6). Opposed tests in combat, difficulty-based outside combat.",
+    "dice": {
+      "type": "d6",
+      "notation": "Nd6, count successes"
+    },
+    "resolution": {
+      "mode": "dice-pool",
+      "poolFormula": "Stat + Stat (two attributes per skill, per the skill's own pair)",
+      "target": 5,
+      "botches": {
+        "onFace": 1,
+        "trigger": "any-on-zero-successes"
+      }
+    },
+    "difficulties": {
+      "Easy": {
+        "threshold": 1,
+        "description": "A bare pass; trivial for someone with the right skill."
+      },
+      "Standard": {
+        "threshold": 2,
+        "description": "Default difficulty for most tests."
+      },
+      "Hard": {
+        "threshold": 3,
+        "description": "Demands real competence."
+      },
+      "Very Hard": {
+        "threshold": 4,
+        "description": "Even a trained character may fail."
+      }
+    },
+    "attributes": [
+      {
+        "name": "Strength",
+        "abbreviation": "STR",
+        "group": "Physical",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Raw physical power. Melee damage bonus, lifting, grappling."
+      },
+      {
+        "name": "Body",
+        "abbreviation": "BOD",
+        "group": "Physical",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Constitution and physique. HP calculation, resistance, soak."
+      },
+      {
+        "name": "Agility",
+        "abbreviation": "AGI",
+        "group": "Physical",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Speed, grace, coordination. Dodging, acrobatics, many combat skills."
+      },
+      {
+        "name": "Endurance",
+        "abbreviation": "END",
+        "group": "Physical",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Stamina and resilience. Stamina pool, many skills, survival."
+      },
+      {
+        "name": "Dexterity",
+        "abbreviation": "DEX",
+        "group": "Physical",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Fine motor control. Precision tasks, sex skills, thievery."
+      },
+      {
+        "name": "Perception",
+        "abbreviation": "PER",
+        "group": "Mental",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Senses and awareness. Spotting, tracking, ranged attacks."
+      },
+      {
+        "name": "Willpower",
+        "abbreviation": "WIL",
+        "group": "Mental",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Mental fortitude. MP calculation, Sanity, persuasion, resisting."
+      },
+      {
+        "name": "Intelligence",
+        "abbreviation": "INT",
+        "group": "Mental",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Reasoning and knowledge. Spellcasting, studying, crafting."
+      },
+      {
+        "name": "Charisma",
+        "abbreviation": "CHA",
+        "group": "Mental",
+        "min": 1,
+        "max": 20,
+        "default": 2,
+        "description": "Force of personality. Seduction, persuasion, performance, miracles."
+      }
+    ],
+    "skills": [
+      {
+        "name": "Blacksmithing",
+        "description": "Str+Int. Repair heavy armor."
+      },
+      {
+        "name": "Bluffing",
+        "description": "Int+Cha. Deceive, swindle, lie."
+      },
+      {
+        "name": "Climbing",
+        "description": "Str+End. Scale walls and terrain."
+      },
+      {
+        "name": "Dancing",
+        "description": "Agi+Cha. Entertain crowds, earn coin."
+      },
+      {
+        "name": "Gambling",
+        "description": "Dex+Cha. Cards, dice, cheating at games."
+      },
+      {
+        "name": "Haggle",
+        "description": "Int+Cha. Bargain better prices."
+      },
+      {
+        "name": "Hunting",
+        "description": "Agi+End. Track and kill prey for food."
+      },
+      {
+        "name": "Intimidation",
+        "description": "Str+Cha. Threaten, frighten, force compliance."
+      },
+      {
+        "name": "Investigation",
+        "description": "Per+Int. Find hidden things, traps, secrets."
+      },
+      {
+        "name": "Labor",
+        "description": "Str+End. Hard physical work for coin."
+      },
+      {
+        "name": "Lockpicking",
+        "description": "Dex+Int. Open locks on doors and chests."
+      },
+      {
+        "name": "Persuasion",
+        "description": "Wil+Cha. Convince others through reason."
+      },
+      {
+        "name": "Playing Music",
+        "description": "Dex+Cha. Entertain with instruments, earn coin."
+      },
+      {
+        "name": "Seduction",
+        "description": "Dex+Cha. Sway with charm, in or out of combat."
+      },
+      {
+        "name": "Tracking",
+        "description": "End+Per. Follow tracks through the wild."
+      },
+      {
+        "name": "Reaction",
+        "description": "Agi+Int. Avoid traps and sudden dangers."
+      },
+      {
+        "name": "Resistance",
+        "description": "Bod+Wil. Withstand poison, intoxication, illness."
+      },
+      {
+        "name": "Regeneration",
+        "description": "Bod+End. Daily HP recovery, death-save skill."
+      },
+      {
+        "name": "Running",
+        "description": "Agi+End. Chase, flee, close distance."
+      },
+      {
+        "name": "Service",
+        "description": "End+Dex. Work as servant, wench, or attendant."
+      },
+      {
+        "name": "Sewing",
+        "description": "Dex+Int. Repair light armor and clothes."
+      },
+      {
+        "name": "Singing",
+        "description": "Int+Cha. Entertain with voice, earn coin."
+      },
+      {
+        "name": "Sneaking",
+        "description": "Agi+Int. Move unseen, ambush enemies."
+      },
+      {
+        "name": "Stealing",
+        "description": "Dex+Per. Pickpocket, lift valuables."
+      },
+      {
+        "name": "Studying",
+        "description": "Int+End. Memorize books, learn knowledge."
+      },
+      {
+        "name": "Teaching",
+        "description": "Int+End. Share knowledge for coin."
+      },
+      {
+        "name": "Arcane Spells",
+        "description": "Wil+Int. Cast learned arcane spells in combat."
+      },
+      {
+        "name": "Axes",
+        "description": "Str+End. One-handed and two-handed axe combat."
+      },
+      {
+        "name": "Blocking",
+        "description": "Agi+Bod. Defend with shield; +1 die vs ranged."
+      },
+      {
+        "name": "Bows",
+        "description": "Str+Per. Shortbows and longbows at range."
+      },
+      {
+        "name": "Brawling",
+        "description": "Str+Agi. Unarmed strikes, fists and kicks."
+      },
+      {
+        "name": "Crossbows",
+        "description": "Dex+Per. Crossbows and heavy crossbows at range."
+      },
+      {
+        "name": "Daggers",
+        "description": "Dex+Agi. Quick blades, throwing knives."
+      },
+      {
+        "name": "Dodging",
+        "description": "Agi+Per. Default defense; works vs all attack types."
+      },
+      {
+        "name": "Grappling",
+        "description": "Str+Bod. Wrestle, pin, throw, or restrain enemies."
+      },
+      {
+        "name": "Halberds",
+        "description": "Bod+Agi. Two-handed polearm combat."
+      },
+      {
+        "name": "Maces",
+        "description": "Str+Bod. One-handed and two-handed crushing weapons."
+      },
+      {
+        "name": "Miracles",
+        "description": "Wil+Cha. Cast holy blessings and miracles."
+      },
+      {
+        "name": "Parrying",
+        "description": "Str+Dex. Deflect with weapon; riposte on excess successes."
+      },
+      {
+        "name": "Spears",
+        "description": "Agi+End. One-handed and two-handed thrusting weapons."
+      },
+      {
+        "name": "Staffs",
+        "description": "Bod+Dex. One-handed or two-handed; grants +MP to casters."
+      },
+      {
+        "name": "Swords",
+        "description": "Str+Agi. One-handed and two-handed blade combat."
+      },
+      {
+        "name": "Throwing",
+        "description": "Agi+Per. Hurl knives, axes, or objects accurately."
+      },
+      {
+        "name": "Blowjob",
+        "description": "Dex+Cha. Oral service. Pleasure: 1d10, End cost: 5."
+      },
+      {
+        "name": "Buttjob",
+        "description": "Bod+End. Butt-rubbing. Pleasure: 1d6+Butt, End cost: 4."
+      },
+      {
+        "name": "Footjob",
+        "description": "Agi+Dex. Foot service. Pleasure: 1d6+Feet, End cost: 4."
+      },
+      {
+        "name": "Handjob",
+        "description": "Dex+End. Hand service. Pleasure: 1d6+Hand, End cost: 3."
+      },
+      {
+        "name": "Masturbation/Lesbian",
+        "description": "Dex+Int. Self-pleasure or with another woman. Pleasure: 1d6."
+      },
+      {
+        "name": "Sex Consensual",
+        "description": "Agi+End. Penetrative sex, taking initiative. Reciprocal Pleasure: 1d6+Dick."
+      },
+      {
+        "name": "Sex Dominant",
+        "description": "Str+End. Dominant penetrative sex, including coerced. Reciprocal Pleasure: 1d6+Dick."
+      },
+      {
+        "name": "Thighjob",
+        "description": "Agi+Bod. Thigh-rubbing. Pleasure: 1d6+Thigh, End cost: 4."
+      },
+      {
+        "name": "Titjob",
+        "description": "Bod+Cha. Breast service. Pleasure: 1d6+Tit, End cost: 4."
+      }
+    ],
+    "skillProficiency": {
+      "tiers": [
+        {
+          "code": "U",
+          "label": "Untrained",
+          "rollBonusFormula": "0"
+        },
+        {
+          "code": "T",
+          "label": "Trained",
+          "rollBonusFormula": "0"
+        },
+        {
+          "code": "E",
+          "label": "Expert",
+          "rollBonusFormula": "0"
+        }
+      ],
+      "default": "U"
+    },
+    "derivedStats": [
+      {
+        "name": "Hit Points",
+        "formula": "2*Body + Agility + Strength + Endurance + Willpower",
+        "renderAs": "bar",
+        "maxFormula": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+        "aliases": [
+          "hp",
+          "HP",
+          "hitPoints",
+          "hitpoints"
+        ],
+        "default": 14
+      },
+      {
+        "name": "Magic Points",
+        "formula": "2*Willpower + 2*Intelligence + Endurance + Charisma",
+        "renderAs": "bar",
+        "maxFormula": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+        "aliases": [
+          "mp",
+          "MP",
+          "magicPoints",
+          "mana"
+        ],
+        "default": 14
+      },
+      {
+        "name": "Stamina",
+        "formula": "Strength + 3*Endurance + Agility + Willpower",
+        "renderAs": "bar",
+        "maxFormula": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+        "aliases": [
+          "stamina",
+          "STAM",
+          "end"
+        ],
+        "default": 13
+      },
+      {
+        "name": "Sanity",
+        "formula": "Endurance + Perception + 2*Willpower + Intelligence + Charisma",
+        "renderAs": "bar",
+        "maxFormula": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+        "aliases": [
+          "sanity",
+          "SAN",
+          "mentalHealth"
+        ],
+        "default": 13
+      },
+      {
+        "name": "Lust",
+        "formula": "Daily accumulation (1d4+0 base) plus situational modifiers. Thresholds at 10 and 20.",
+        "renderAs": "value",
+        "aliases": [
+          "lust",
+          "lustPoints"
+        ],
+        "default": 0
+      },
+      {
+        "name": "Satisfaction",
+        "formula": "Accumulated during sex from Sex Skill rolls. Compare to Lust to determine orgasm.",
+        "renderAs": "value",
+        "aliases": [
+          "satisfaction",
+          "sat"
+        ],
+        "default": 0
+      },
+      {
+        "name": "Gold",
+        "formula": "Currency tracked from loot, work, and purchases.",
+        "renderAs": "value",
+        "aliases": [
+          "gold",
+          "gp",
+          "coin",
+          "money"
+        ],
+        "default": 100
+      },
+      {
+        "name": "Fame",
+        "formula": "Known for heroic deeds. +1 per mission completed in a region. At 10, gain +1 permanent.",
+        "renderAs": "value",
+        "aliases": [
+          "fame",
+          "renown"
+        ],
+        "default": 0
+      },
+      {
+        "name": "Reputation",
+        "formula": "Sexual conduct renown. Higher = people consider you a slut. Gated social effects.",
+        "renderAs": "value",
+        "aliases": [
+          "reputation",
+          "rep"
+        ],
+        "default": 0
+      },
+      {
+        "name": "Corruption",
+        "formula": "Permanent taint from dark magic, demonic encounters, or Mind Break. Blocks Blessings.",
+        "renderAs": "value",
+        "aliases": [
+          "corruption",
+          "corrupt"
+        ],
+        "default": 0
+      },
+      {
+        "name": "Criminal",
+        "formula": "Underworld renown. Raised by committing crimes and escaping. Gates black-market access.",
+        "renderAs": "value",
+        "aliases": [
+          "criminal",
+          "crime"
+        ],
+        "default": 0
+      }
+    ],
+    "states": [
+      {
+        "name": "Armor Coverage",
+        "values": [
+          {
+            "label": "Covered",
+            "description": "Full concealment. No Lust caused. Enemy cannot harass."
+          },
+          {
+            "label": "Revealing",
+            "description": "Some skin. Lust on sight per bonuses (max +1 per bonus). Harassment enabled."
+          },
+          {
+            "label": "Exposed",
+            "description": "Underwear-level. 2d4 Lust on sight, bonuses up to +2 each. Full harassment."
+          },
+          {
+            "label": "Naked",
+            "description": "No protection. 2d4 Lust on sight, no bonus cap. Max vulnerability."
+          }
+        ]
+      },
+      {
+        "name": "Lust State",
+        "values": [
+          {
+            "label": "Normal",
+            "description": "Lust 0-10. No mechanical effect."
+          },
+          {
+            "label": "Horny",
+            "description": "Lust 10-20. -1 die to all non-Seduction/non-rape tests. +1 die to Seduction and rape attempts."
+          },
+          {
+            "label": "Extremely Horny",
+            "description": "Lust 20+. -2 dice to all non-Seduction/non-rape tests. Lose 3 Sanity immediately, +3 Sanity loss per day in this state."
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "name": "Bleeding",
+        "description": "Lose HP per round until healed or bandaged. Amount depends on source."
+      },
+      {
+        "name": "Burning",
+        "description": "Fire DoT. Extinguish via water, Clean spell, or Dodge roll (each success removes 1 Burning)."
+      },
+      {
+        "name": "Exhausted",
+        "description": "Stamina reaches 0. -2 dice to ALL tests until rest restores Stamina above 0."
+      },
+      {
+        "name": "Poisoned",
+        "description": "Varies by source. Antidote Miracle or potion cures. Damage/interval per poison type."
+      },
+      {
+        "name": "Slimed",
+        "description": "+1 per slime enemy per round. Each stack gives -1 die to attack/defense/movement. Wash to remove."
+      },
+      {
+        "name": "Bukkake'd",
+        "description": "Covered in cum. -1 die to Agility-based tests, attacks, and defense. Wash or Clean to remove."
+      },
+      {
+        "name": "Darkness",
+        "description": "Night/caves. -3 Perception. Affects all Perception-based skills. Torch reduces to -1."
+      },
+      {
+        "name": "Frustrated",
+        "description": "Failed to orgasm during sex. -1 die for next 3 tests."
+      },
+      {
+        "name": "Satisfied",
+        "description": "Orgasm achieved (Satisfaction > Lust). +1 die for next 3 tests that day."
+      },
+      {
+        "name": "Mind Broken",
+        "description": "Sanity reached 0 during sex. Roll on appropriate Mind Break table. Permanent consequences."
+      }
+    ],
+    "diceTagFormat": {
+      "template": "[dice: {pool}d6 vs 5+ -> {successes} successes] - call: {Attribute} + {Attribute} vs difficulty {D}",
+      "example": "[dice: 7d6 vs 5+ -> 3 successes] - call: Strength + Agility vs difficulty 2 (Swords attack)"
+    },
+    "sheetSections": [
+      "attributes",
+      "skills",
+      "derived",
+      "states",
+      "conditions",
+      "backgrounds",
+      "inventory",
+      "abilities",
+      "notes"
+    ],
+    "sections": {
+      "order": [
+        "identity",
+        "resources",
+        "attributes",
+        "skills",
+        "derived",
+        "abilities",
+        "states",
+        "conditions",
+        "backgrounds",
+        "inventory",
+        "notes"
+      ]
+    },
+    "resources": [
+      {
+        "id": "hit-points",
+        "label": "HP",
+        "type": "bar",
+        "max": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+        "current": "({Body} * 2) + {Agility} + {Strength} + {Endurance} + {Willpower}",
+        "color": "bad",
+        "stateName": "Hit Points",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-5",
+            "delta": -5
+          },
+          {
+            "label": "-10",
+            "delta": -10
+          },
+          {
+            "label": "Heal",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "magic-points",
+        "label": "MP",
+        "type": "bar",
+        "max": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+        "current": "({Willpower} * 2) + ({Intelligence} * 2) + {Endurance} + {Charisma}",
+        "color": "accent",
+        "stateName": "Magic Points",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-5",
+            "delta": -5
+          },
+          {
+            "label": "Rest",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "stamina",
+        "label": "Stamina",
+        "type": "bar",
+        "max": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+        "current": "{Strength} + ({Endurance} * 3) + {Agility} + {Willpower}",
+        "color": "warn",
+        "stateName": "Stamina",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-5",
+            "delta": -5
+          },
+          {
+            "label": "Rest",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "sanity",
+        "label": "Sanity",
+        "type": "bar",
+        "max": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+        "current": "{Endurance} + {Perception} + ({Willpower} * 2) + {Intelligence} + {Charisma}",
+        "color": "accent",
+        "stateName": "Sanity",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-5",
+            "delta": -5
+          },
+          {
+            "label": "Rest",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "lust",
+        "label": "Lust",
+        "type": "counter",
+        "max": 40,
+        "current": 0,
+        "color": "warn",
+        "stateName": "Lust",
+        "quickButtons": [
+          {
+            "label": "+1",
+            "delta": 1
+          },
+          {
+            "label": "+5",
+            "delta": 5
+          },
+          {
+            "label": "Reset",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "gold",
+        "label": "Gold",
+        "type": "counter",
+        "max": 99999,
+        "current": 100,
+        "color": "ok",
+        "stateName": "Gold",
+        "quickButtons": [
+          {
+            "label": "+10",
+            "delta": 10
+          },
+          {
+            "label": "+50",
+            "delta": 50
+          },
+          {
+            "label": "-10",
+            "delta": -10
+          },
+          {
+            "label": "-50",
+            "delta": -50
+          }
+        ]
+      }
+    ],
+    "lorebookKeys": [
+      "skill",
+      "class",
+      "race",
+      "trait",
+      "fetish",
+      "condition",
+      "spell",
+      "miracle",
+      "armor",
+      "weapon",
+      "seduction",
+      "lust",
+      "satisfaction",
+      "mind break",
+      "rape",
+      "gangbang",
+      "harass"
+    ],
+    "abilities": {
+      "label": "Spells & Miracles",
+      "categories": [
+        {
+          "id": "minor-spells",
+          "label": "Minor Spells"
+        },
+        {
+          "id": "greater-spells",
+          "label": "Greater Spells"
+        },
+        {
+          "id": "dark-magic",
+          "label": "Dark Magic"
+        },
+        {
+          "id": "miracles",
+          "label": "Miracles"
+        },
+        {
+          "id": "combat-abilities",
+          "label": "Combat Abilities"
+        }
+      ]
+    },
+    "header": {
+      "raceLabel": "Race",
+      "classLabel": "Class"
+    },
+    "backgrounds": {
+      "enabled": true,
+      "label": "Traits & Merits",
+      "min": 0,
+      "max": 5,
+      "default": 0
+    },
+    "equipmentSlots": [
+      "Weapon",
+      "Shield",
+      "Armor",
+      "Accessory",
+      "Ring",
+      "Amulet",
+      "Tool"
+    ],
+    "equipmentBonusTargets": [
+      "Melee",
+      "Ranged",
+      "Defense",
+      "Damage Reduction",
+      "Rape Protection"
+    ]
+  },
+  "lorebook": {
+    "name": "Lewd Attack Reference",
+    "description": "Keyword-triggered reference for Lewd Attack (v0.42 alpha) mechanics: dice pools, proficiency tiers, Lust/Satisfaction economy, combat, seduction, sex skills, Mind Break, armor, classes, races, fetishes, spells. Original mechanics references only.",
+    "category": "world",
+    "scanDepth": 4,
+    "tokenBudget": 1800,
+    "recursiveScanning": false,
+    "entries": [
+      {
+        "name": "Rule: Dice-pool resolution",
+        "keys": [
+          "roll",
+          "rolls",
+          "check",
+          "test",
+          "dice",
+          "pool",
+          "successes",
+          "d6"
+        ],
+        "content": "Lewd Attack uses d6 dice pools. Each skill is tied to TWO attributes. Pool size = value of first attribute + value of second attribute. Roll that many d6s. Count successes: Untrained = 5-6, Trained = 4-6, Expert = 3-6. Outside combat: compare total successes to difficulty (1 Easy, 2 Standard, 3 Hard, 4 Very Hard). In combat: opposed tests — attacker successes vs defender successes; damage per success exceeding defense. Botch: zero successes AND at least one die showing 1.",
+        "selective": false,
+        "constant": true,
+        "position": 0
+      },
+      {
+        "name": "Rule: Proficiency tiers",
+        "keys": [
+          "proficiency",
+          "trained",
+          "untrained",
+          "expert",
+          "training",
+          "advance",
+          "skill level"
+        ],
+        "content": "Three proficiency tiers that change which dice faces count as successes. UNTRAINED: 5 or 6 count. TRAINED: 4, 5, or 6 count. EXPERT: 3, 4, 5, or 6 count. Advancing: every 5 skill advances (5/10/15/20/30/40 etc.), you gain a tier or bonus. At 5 advances: become Trained. At 20 advances: become Expert. Only one skill can advance per scenario (one combat skill, one regular skill, or one sex skill per fight/scene). Proficiency does NOT change pool size — it only changes which faces succeed.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Difficulty ladder",
+        "keys": [
+          "difficulty",
+          "DC",
+          "target number",
+          "threshold",
+          "easy",
+          "standard",
+          "hard",
+          "very hard"
+        ],
+        "content": "Lewd Attack difficulty ladder (successes needed outside combat). Easy (1 success) — trivial with the right skill. Standard (2 successes) — default for most tests. Hard (3 successes) — demands real competence. Very Hard (4 successes) — even a trained character may fail. Additional enemies or adverse circumstances can raise difficulty one level per factor. In combat, it's an opposed test — no fixed difficulty; the defender's successes are the threshold the attacker must beat.",
+        "selective": false,
+        "constant": true,
+        "position": 0
+      },
+      {
+        "name": "Rule: Derived stats (HP/MP/Stamina/Sanity)",
+        "keys": [
+          "HP",
+          "hit points",
+          "MP",
+          "magic points",
+          "stamina",
+          "sanity",
+          "derived stat",
+          "max HP",
+          "max MP"
+        ],
+        "content": "Four key derived pools: HP = 2×Body + Agility + Strength + Endurance + Willpower. MP = 2×Willpower + 2×Intelligence + Endurance + Charisma. Stamina = Strength + 3×Endurance + Agility + Willpower. Sanity = Endurance + Perception + 2×Willpower + Intelligence + Charisma. HP reaches 0 = KO/defeat (enemies rape or capture). Stamina reaches 0 = Exhausted (-2 dice to all tests). Sanity reaches 0 during sex = Mind Break (roll on appropriate table). Sanity reaches 0 outside sex = mental exhaustion (lose 5 HP/day, no MP/Stamina regen). Stamina can be spent: 5 Stamina = +1 die to any non-combat test (once per test). Sanity can be spent: 5 Sanity = +1 die to any Mental-trait skill (once per test). For Sex Skills, Stamina costs vary per skill (Handjob 3, Titjob 4, Blowjob 5, etc.).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Lust and Satisfaction economy",
+        "keys": [
+          "lust",
+          "lusty",
+          "horny",
+          "satisfaction",
+          "orgasm",
+          "cum",
+          "pleasure",
+          "threshold",
+          "frustrated",
+          "satisfied"
+        ],
+        "content": "Lust accumulates daily (1d4 base + modifiers from traits, fetishes, enemy exposure, groping, armor state, sex without orgasm). Thresholds: 0-10 = Normal (no effect). 10-20 = Horny (-1 die to all tests except Seduction and rape attempts; +1 die to Seduction/rape). 20+ = Extremely Horny (-2 dice except Seduction/rape; lose 3 Sanity immediately + 3/day). Satisfaction is earned from Sex Skill rolls during sexual encounters. Compare Satisfaction to Lust threshold: if Satisfaction ≥ 10 (or current threshold if increased by Mind Break), you orgasm. Subtract Satisfaction from Lust. Heal Sanity = Satisfaction − Lust (if consensual). If Satisfaction < Lust threshold, subtract that amount from Lust but become Frustrated (-1 die for 3 tests). If Satisfaction exceeds 20 (double base Lust threshold), enter Mind Break territory: overflow reduces Sanity. Each Mind Break incrementally raises your Lust threshold (+1 per break: thresholds move to 0/11/22, then 0/12/24, etc.). Servicing (non-penetrative sex) causes no Satisfaction for the character but adds 1d4 Lust.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Combat — opposed tests and action resolution",
+        "keys": [
+          "combat",
+          "attack",
+          "defend",
+          "opposed",
+          "initiative",
+          "outnumbered",
+          "weapon style"
+        ],
+        "content": "Lewd Attack combat uses opposed tests. Attacker rolls weapon skill dice (e.g., Swords = Str+Agi). Defender rolls Blocking (Agi+Bod), Dodging (Agi+Per), or Parrying (Str+Dex). Compare successes: attacker's successes exceeding defender's = hits. Each hit deals weapon damage + attribute bonus (Str for melee, Per for ranged). Armor Damage Reduction subtracts from each hit (minimum 1 damage). Turn order: initiator first unless enemy has Quick trait; surprise = one free unopposed attack. Weapon styles: two weapons (second at -3 dice, daggers/staffs -2), two-handed (+half Str damage), single weapon (+1 die to Parry/attack), weapon+shield (shield bonuses apply). Three range bands: Melee (adjacent), Short Range (melee closes at -2 dice; ranged attacks at normal), Long Range (melee unreachable until closing; bows/crossbows normal). Outnumbered: -1 defense die per attack beyond the first each round. After killing an enemy, leftover successes can apply to another nearby foe (they defend normally).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Seduction in combat",
+        "keys": [
+          "seduction",
+          "seduce",
+          "daze",
+          "tease",
+          "charm enemy",
+          "grope",
+          "harassment",
+          "enemy lust"
+        ],
+        "content": "Seduction in combat uses the Seduction skill (Dex+Cha). Each success increases one enemy's Lust by +1. Flat bonus from physical traits (tit/butt/thigh/face) added at the end, NOT per success. Bonus caps depend on armor Coverage: Covered = 0 bonus, Revealing = max +1 per bonus type, Exposed = max +2, Naked = no cap. Face bonus always applies unless face is covered/masked. At 3+ successes on Seduction, you can daze an enemy — they cannot attack you next turn (does not work if enemy Lust is already maxed). Seduction can also trigger enemies to attempt Harassment (groping) instead of attacking that round. Out of combat, Seduction (Dex+Cha) is used for free sex (Standard difficulty), prostitution (Hard), seducing guards (Very Hard), or spending the night (Hard). Excess successes can add bonus dice to the following Sex Skill test. Physical sex-bonuses (tit/butt/thigh) add +1 die for every 2 combined points of those bonuses (Revealing clothes enable 1 die; Exposed enables 2+ dice; Naked enables full bonus). Face bonus always applies.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Enemy Lust, Harassment, and Rape",
+        "keys": [
+          "enemy lust",
+          "harass",
+          "harassment",
+          "grope",
+          "rape",
+          "rape attempt",
+          "maximum lust",
+          "disciplined"
+        ],
+        "content": "Enemy Lust mechanics: when enemies first see the character in Revealing/Exposed/Naked clothing at combat start, they gain Lust per coverage level + bonus caps. Humanoid enemies only harass AFTER they have Lust (or after a successful Seduction that turn). Horny enemies harass every other round regardless. Disciplined enemies only harass above 50% max Lust. Harassment is rolled like an attack (enemy skill vs character defense); each success = enemy and character both gain 1d4 Lust. At 50% max Lust: enemy suffers -1 die to all non-harassment actions. At MAX Lust: all enemies attempt rape simultaneously — roll all Rape Attempt dice as one pool. Character defends normally. Armor Rape Protection negates up to its rating in enemy successes. If even ONE success gets through after defense and Rape Protection, the character is pinned and raped. Rape = penetrative sex using enemy's dick size. Satisfaction is reciprocal. Orgasm during rape = lose (Satisfaction - Lust) Sanity (unless Rape fetish is held). After rape: enemies may leave or take character captive. Defeat (HP=0) also results in rape and/or capture.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Sex Skills and Pleasure",
+        "keys": [
+          "sex skill",
+          "blowjob",
+          "handjob",
+          "titjob",
+          "buttjob",
+          "thighjob",
+          "footjob",
+          "sex",
+          "pleasure dice",
+          "dick size",
+          "dick bonus",
+          "gangbang"
+        ],
+        "content": "Nine Sex Skills, each with Pleasure dice and Endurance costs: Blowjob (1d10, cost 5), Buttjob (1d6+Butt, cost 4), Footjob (1d6+Feet, cost 4), Handjob (1d6+Hand, cost 3), Masturbation/Lesbian (1d6, cost 4), Sex Consensual (1d6+Dick, cost 5), Sex Dominant (1d6+Dick, cost 5), Thighjob (1d6+Thigh, cost 4), Titjob (1d6+Tit, cost 4). Each success on the Sex Skill roll lets you roll the skill's Pleasure dice once. Flat bonuses (trait bonuses, dick size) are added at the end, NOT multiplied per success. Dick sizes: Tiny (1d6+2), Small (2d6+3), Regular (3d6+5), Huge (4d6+10), Enormous (5d6+15), Impossible (6d6+20). For creatures larger than Normal size, apply -1 die malus to Sex Skill rolls for each size above Normal (Huge = -1, Enormous = -2, etc.). Using a Sex Skill on more than one person costs Endurance per additional partner. Gang Bangs: double the base dick bonus for a second partner, then add +1d6 per additional participant. If multiple creature types participate, use the largest/strongest creature's stats as base.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Mind Break",
+        "keys": [
+          "mind break",
+          "mind broken",
+          "mindbreak",
+          "break",
+          "mental breakdown",
+          "corruption gain"
+        ],
+        "content": "Mind Break occurs when Sanity reaches 0 during sex. Roll on the appropriate Mind Break table depending on the creature type: Regular (humans), Greenskin (goblins/orcs), Beast, Beastmen, Tentacles, Slimes, Dark Elves, Demons, or Dragons. Each table has 20 results ranging from increased daily Lust to gaining new Fetishes or Corruption. Some Mind Break results grant permanent bonuses (Resist: +3 max Sanity, regain 10 Sanity). Corruption gained this way can trigger Minor or Major Corruption table rolls. The Succubus Seal (Minor Corruption) causes daily Lust gain and forces Major Corruption rolls on subsequent Mind Breaks. Full Succubus transformation (Major Corruption 20) changes the character's resource economy: HP/MP/Stamina/Sanity become based on Satisfaction from sex; lose 10 of each daily without sex. Each Mind Break also permanently raises the character's Lust threshold by 1 (e.g. 0/10/20 → 0/11/22 → 0/12/24).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Armor, Coverage, and Damage Reduction",
+        "keys": [
+          "armor",
+          "coverage",
+          "covered",
+          "revealing",
+          "exposed",
+          "naked",
+          "damage reduction",
+          "armor HP",
+          "rape protection"
+        ],
+        "content": "Armor has four Coverage layers in descending order: Covered (full concealment, no Lust caused, no harassment possible), Revealing (shows enough for Lust-on-sight + bonuses capped at +1 each, harassment enabled), Exposed (underwear-level, 2d4 Lust on sight + bonuses capped at +2 each), Naked (no protection, 2d4 Lust on sight + no bonus cap). Each layer grants: Armor HP (extra HP above character HP, depleted first), Damage Reduction (subtracted from each incoming success, minimum 1 damage per hit), and Rape Protection (negates that many enemy successes on rape attempts). When a layer's Armor HP reaches 0, armor degrades to the next layer. Heavy armor (plate, breastplate): damage per hit affects armor HP first, repaired via Blacksmithing (Str+Int, 2 successes + tools restores 1 layer). Light armor (leather, padded): repaired via Sewing (Dex+Int, 2 successes + kit restores 1 layer). Robes: minimal protection but grant +10 MP to casters. Armor qualities: Quality (+1 Damage Reduction per tier, 50% base cost), Exquisite (+1 die to Persuasion/Intimidation, 50% base cost). Armor degrades visually and mechanically as layers are stripped away.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Defeat, captivity, and recovery",
+        "keys": [
+          "defeat",
+          "knocked out",
+          "captivity",
+          "captive",
+          "captured",
+          "regeneration",
+          "healing",
+          "rest",
+          "recover"
+        ],
+        "content": "When HP reaches 0: knocked out. Enemies will rape and/or take the character captive. Regeneration after defeat is automatic — use the Regeneration skill value (Bod+End) as base HP recovered; each additional success on Regeneration roll adds +2 HP. In captivity: lose 1 skill advance per day. May escape via opportunities presented by captors. Regeneration is also rolled daily: base HP recovered = Regeneration pool (Bod+End), +2 per success. Only advance Regeneration when HP has reached 0. Lodging at a tavern: heal +20 HP, +20 Stamina, +20 MP, +1 Sanity (costs 50 Gold including a Good Meal). Rations: heal 5 HP + 5 MP (cost 15 Gold). Good Meal: heal +10 HP, +10 MP, +1 Sanity (cost 25 Gold). Drinking ale: heal 1 Sanity per drink (cost 5 Gold); roll Resistance after first drink or become drunk. Sleep in the wild: half Regeneration (rounded up), +10 Stamina, +10 MP, 0 Sanity.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Renown — Fame, Reputation, Vigilance, Criminal, Corruption",
+        "keys": [
+          "fame",
+          "reputation",
+          "vigilance",
+          "criminal",
+          "corruption",
+          "renown",
+          "black market",
+          "jail"
+        ],
+        "content": "Five renown tracks. FAME: earned by completing guild missions (+1 per mission in a region). At 10 in a region, gain +1 permanent Fame (baseline for all subsequent regions). Higher Fame = more dangerous and lucrative missions. REPUTATION: sexual conduct renown. Sleeping around raises it; affects how NPCs react to the character. High Reputation = people consider you a slut. VIGILANCE: authority alertness. Raised by committing crimes while caught. Each day in that region, roll d10; if result ≤ Vigilance, encounter local forces. Reduce by surrendering and going to jail (1 day per Vigilance point, lose 1 skill advance per day). CRIMINAL: underworld renown. Raised by committing crimes and escaping. Gates access to crime missions and black market. CORRUPTION: permanent taint from dark magic, demonic encounters, or Mind Break results. Each Corruption point blocks Blessings. At higher levels, religious authorities see you as a threat. Unlike other renown, Corruption is personal — does NOT reset per region. Cannot be reduced except by specific atonement mechanics.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Reference: Classes overview",
+        "keys": [
+          "class",
+          "soldier",
+          "dragon knight",
+          "barbarian",
+          "ranger",
+          "thief",
+          "mage",
+          "priest",
+          "bard",
+          "paladin"
+        ],
+        "content": "Nine classes. SOLDIER (Heavy armor): professional warrior, Blacksmithing/Intimidation, Power Through (heal 10 HP for 5 Sanity under half HP, once/fight), Brace (+1 Armor for 1 round, 5 Stamina), Armorer (+20% armor HP). DRAGON KNIGHT (Heavy): monster slayer, +2 damage vs Huge+, Elemental Resistance (+3 DR vs elements), Taming (seduce dragons to recruit). BARBARIAN (Light): Berserk (-2 defense, attack twice/round for +2 damage, no Lewd Damage taken, 3 rounds, costs 5 Sanity+Stamina), Relentless (+1 Armor), Butt-Naked (+2 attack/+1 defense while naked). RANGER (Light): Taming (seduce beasts), Master Explorer (+0.5 Exploration), Hunter's Eye (+2 attack dice vs one foe for combat, costs 3 Sanity). THIEF (Light): Strike from Shadows (Sneak Attack carries over excess kills), Luck of Thieves (+10% gold), Stalker (-1 darkness penalty), Armor Piercing (ignore 3 DR for 2 rounds, 4 Sanity). MAGE (Robes): Spellcasting (3 spells at start), Spell Burst (+1 die casting for 5 Stamina/round), Mind Strain (d10: gain double MP rolled, lose equal Sanity), Knowledge is Power (+1 spell damage per knowledge item). PRIEST (Garments): Miracles (3 Major Blessings), Meditating (reduce Lust by 2 per 1 Sanity spent during rest), Holy Caster (+1 miracle damage per 2 Major Blessings), Oaths grant bonus Blessings. BARD (Light): Spellcasting (2 spells), Magic Whispers (spend 3 MP for +1 die to social tests), Magic Art (dance/music/singing advance = +spell dice), Performance (regain 1 Sanity per success), Distraction (use social skill as defense; excess successes cause effects). PALADIN (Heavy): Miracles (2 Major Blessings), Penance (5 damage taken = -1 Lust), Fervor (+1 die vs undead/demons), Holy Fighter (+1 damage per 2 Major Blessings), Oaths same as Priest.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Reference: Races overview",
+        "keys": [
+          "race",
+          "human",
+          "dwarf",
+          "elf",
+          "high elf",
+          "wild elf",
+          "amazon",
+          "halfling",
+          "gnome",
+          "beastgirl",
+          "racial trait",
+          "ancestry"
+        ],
+        "content": "Eight playable races. HUMANS: balanced (all stats 2, max 5), +2 extra Traits, Strong-Minded (lose 1 less Sanity above 3 lost / 2 less above 10), Lusty (+1 Lust/day). DWARVES: Body + Willpower focused (3 max 7), Thick + Headstrong I starting, Hearty (good food/alcohol = 1d4 Lust), Healthy (+2 Regeneration dice), Tough II (+15 HP), Small Folk (cannot be Tall). HIGH ELVES: Agility + Intelligence focused (3 max 7), Slender + Smart I starting, Allure (every 3rd attack is Grope), Magical Affinity (+1 spell), Pretty Face II (+1 Lust in Seduction, +1 Lust enemies first sight). WILD ELVES: Agility + Perception focused (3 max 7), Slender + Sharp Senses I, Allure, Eternal Vitality (spend 1 less Stamina; 2 less above 10), Pretty Face II. AMAZONS: Strength + Endurance focused (3 max 7), Tall I + Athletic I, Fascinated by Strength (1d4 Lust on Champion-trait/large enemies), Hard Hitting (+1 melee damage). HALFLINGS: Dexterity + Perception focused (3 max 7), Small I + Sharp Senses I, Fun-Size (double dick bonus during penetration), Subtle (+1 die Sneaking/Perception), Small Folk. GNOMES: Intelligence + Charisma focused (3 max 7), Smart I + Expressive I, Fun-Size, Thrifty Casting (-1 MP for spells under 10, -2 for 10+), Diligent (-1 Learning Success needed, +1 die to Service/Teaching/Studying), Small Folk. BEASTGIRLS: Agility + Endurance focused (3 max 7), Agile I + Athletic I, Heat (+10 Lust every 3 days), Claws (+5 Fist damage), Instincts (+1 die Hunting/ambush Reaction).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Fetishes",
+        "keys": [
+          "fetish",
+          "fetishes",
+          "kink",
+          "desire",
+          "sexual interest"
+        ],
+        "content": "Fetishes grant bonus Lust and Satisfaction in specific situations. Start with 2 (roll d20 twice). Categories: Beasts (1d4 Lust on sight, +1 Satisfaction die), Beastmen, Greenskins, Gangbang, Rape (lose no Sanity if Satisfaction > Lust during rape), Masochist (+1 Satisfaction die with Cruel-trait partners), Dominant (+1 Satisfaction die in dominant sex, +1d4 Lust on defeating Champion), Tentacles, Slimes, Captivity (+1d4 Lust when chained/collared), Bi-Sexual (+1d4 Lust on attractive females, +1 Satisfaction die with women), Demons, Voyeurism (+1d4 Lust watching sex, +1 die masturbating while watching), Dragons, Love-Making (+1 die for consensual one-partner sex), Prostitution (+1 die sex for money, +1d4 Lust servicing for money), Exhibitionism (+1d4 Lust wearing Exposed clothes, starting day in them, being seen; +1 Satisfaction die during public sex), Submissive (+1d4 Lust on combat defeat), Huge Dick (+1d4 Lust on seeing large penises, +1 Satisfaction die), Exotic. Taking a fetish multiple times increases the dice (2×Beast = 2d4 Lust, +2 Satisfaction dice). Virgin trait halves external Lust (rounded down), piercing sex removes the trait, first-time rape = -10 Sanity. Fetishes also make masturbation recovery stronger (resets diminishing returns when situation involves a fetish).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Character Traits (Physical, Mental, Character)",
+        "keys": [
+          "trait",
+          "traits",
+          "physical trait",
+          "mental trait",
+          "character trait",
+          "busty",
+          "athletic",
+          "agile",
+          "pretty face",
+          "tough"
+        ],
+        "content": "Three trait categories. PHYSICAL TRAITS (8 at creation): Athletic (+1/+2 Endurance), Fit (+1 End + Greater Endurance ability, II = Sexdurance), Booty (+1 Body, +1 Butt-Bonus per tier I-III), Busty (+1 Body, +1 Tit-Bonus I-III), Agile (+1 Agility, +1 Thigh-Bonus I-III), Small (+1 Dex, Small Target; Tiny = +2 Dex), Nimble (+1 Agility, +1 Foot-Bonus I-III), Dexterous (+1 Dex, +1 Hand-Bonus I-III), Slender (+1 Agi, Quick Strike; Lithe = +2 Agi), Thick (+1 Body, all sex bonuses +1, +1 Stamina cost; Stocky = +1 Body, all sex bonuses +1, Greater Body), Strong (+1/+2 Str I-III), Tall (+1 Str, Extra Reach; Huge = +1 Str, Greater Strength). MENTAL TRAITS: Sharp Senses (+1/+2 Per I-III), Smart (+1/+2 Int I-III), Headstrong (+1/+2 Wil I-III), Expressive (+1/+2 Cha I-III). CHARACTER TRAITS (bonus count varies by race): Alchemist Apprentice, Ancient Heirloom, Blessed Child, Bookworm, Corrupted (start with Minor/Major Corruption), Criminal (start with 5 Criminal), Experienced (+2 Trained Sex Skills), Flexible (+1 Pleasure in consensual sex), Free Skills (2 Trained Regular Skills), Linguist (+1 language), Magician's Student (1 Arcane Spell scroll), Magic Storage (+10 MP, stackable), Martial Training (1 Trained Combat Skill), Noble (+500 Gold, +1 Fame), Pretty Face (+1 Lust in Seduction out of combat, +1 Lust enemies first sight, stackable), Prude (-1 Lust when groped), Tough (+10 HP, stackable), Virgin (halve external Lust, no trained Sex Skills), Well-Equipped (+1 weapon quality or Covered armor upgrade).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Reference: Arcane Spells",
+        "keys": [
+          "arcane spell",
+          "spell",
+          "spellcasting",
+          "magic",
+          "cast",
+          "mp cost",
+          "arcane",
+          "dark magic",
+          "greater spell"
+        ],
+        "content": "Arcane Spells use the Arcane Spells combat skill (Wil+Int). MP is spent before rolling; failed roll still costs MP. Three categories. MINOR SPELLS (available at creation): Clean (MP 2, wash filth), Light (MP 2, dispels darkness, prevents sneaking), Magical Dart (MP 3, 6 damage per success). GREATER SPELLS (require finding teacher or scroll): Burning Field (MP 10, AoE melee/short, 12 fire damage/success), Chain Lightning (MP 12, hits scattered enemies, 10 damage/success, jumps), Electric Strike (MP 7, melee/short/long, 8 damage +3 vs 3+ DR armor), Flame Toss (MP 6, 14 damage/success), Fire Arrow (MP 7, long range, 10 damage, -2 dice in melee), Freeze (MP 8, AoE slow, 7 damage, -1 to enemy actions), Illusion (MP 10, decoy clone, dispels on touch), Shock (MP 8, stuns 1 round per 2 successes), Wind Push (MP 10, knockback + 10 damage). DARK MAGIC (illegal, +1 Corruption per spell): Charm (MP 8, 3 Lust/success), Curse (MP 6, enemy -2 dice), Dark Blast (MP 8, AoE 12 damage/success, takes 1 HP self-damage per enemy hit), Pain (MP 7, ignores armor, 7 damage/success), Raise Undead (MP 10, animate corpse with halved HP, -2 dice, lasts 1 day), Summon Demon (MP 12, ritual requiring orgasm + 25 HP blood to summon Succubus/Minor Demon), Summon Tentacles (MP 10, 8 attacks, 8 damage each, also tentacle sex at 5d6+10 Satisfaction). Learning spells requires gold payment + Arcane Spells roll meeting Learning Successes.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Reference: Miracles and Blessings",
+        "keys": [
+          "miracle",
+          "miracles",
+          "blessing",
+          "holy",
+          "prayer",
+          "oath",
+          "holy damage",
+          "altar",
+          "shrine"
+        ],
+        "content": "Miracles use the Miracles combat skill (Wil+Cha). MP is spent before rolling; failed roll still costs MP. Holy Damage adds the enemy's Corruption as bonus damage (flat, not per success). BLESSINGS are gained by praying at shrines/altars (one try per altar, no Sanity boost allowed): 2-4 successes = Minor Blessing table, 5 = Blessing table, 6+ = Major Blessing table. MINOR BLESSINGS (d20): Fertility (+1d6 Satisfaction during penetrative sex, 1 day), Heal (10 HP + 10 Stamina), Luck (3 free dice for the day), Pure Thoughts (-10 Lust), Clear Mind (+10 MP + 5 Sanity), Invigorated (+1 damage all attacks/spells, 1 day). MAJOR BLESSINGS (d20): Heal Spell (MP 5, heal 5 HP/success), Purify Evil (kill demons via orgasm), Holy Bolt (MP 7, 9 damage/success + Corruption bonus), Antidote (MP 2, cure poison), Wall of Faith (MP 10, shield vs ranged/AoE), Destroy Evil (+1 damage vs corrupted), Sacred Flames (MP 12, AoE 12 holy damage, double vs undead), Protection against Lewdness (-1 Lust from all sources), Sacred Seal (blocks penetration once, 10 MP to regen), Holy Aura (+1 die Persuasion/Intimidation; 3 Sanity to blind enemies -1 die for 1 round), Protection Miracle (MP 10, nullify attacks equal to successes), Holy Blade (MP 5, enchant weapon for Holy Damage), Purification Bolt (MP 7, 3 damage + double Corruption), Magic Resistance (+1 armor vs spells), Tranquility of Mind (MP 8, reduce enemy Lust by 5), Willpower (+10 Sanity). OATHS: Priest/Paladin choose one — Purity (Virgin trait = +2 Blessings), Charity (max 100 Gold, donate 1000 = Minor Blessing), Protection (save innocents = Minor Blessing), Righteousness (defeat Champion of Chaos = Minor Blessing), Conquest (defeat 2 Champions = Minor Blessing). Cannot have any Corruption to benefit from Blessings.",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Weapon qualities and combat abilities",
+        "keys": [
+          "weapon",
+          "quality",
+          "enchantment",
+          "combat ability",
+          "ability",
+          "technique",
+          "stamina cost"
+        ],
+        "content": "Weapons have base damage + attribute bonus per success. Base weapons: Fists (2+Str), Dagger (3+Str, 50 Gold), Sword/Mace/Axe/Spear one-handed (4+Str, 100 Gold), Two-handed sword/axe/hammer/spear (5+Str, 150 Gold), Halberd (5+Str, 150 Gold), Staff one-handed (3+Str, +10 MP, 140 Gold), Staff two-handed (4+Str, +20 MP, 180 Gold), Small Bow (3+Per, 100 Gold), Longbow (4+Per, long range, 200 Gold), Crossbow (3+Per, 100 Gold), Heavy Crossbow (4+Per, long range, 200 Gold), Throwing Knives (2+Per, 100 Gold), Shield (1 DR, +1 die vs ranged, 100 Gold), Tower Shield (2 DR, +2 die vs ranged, -1 attack die, 200 Gold). QUALITIES: Quality (+2 damage per tier, 50% base cost, stackable), Fire Damage (+1 fire damage/success, 100% base cost), Holy Damage (holy damage bonus vs Corruption, 100% base cost), Greater Channeling on staves (+1 spell/miracle damage, 50% base). COMBAT ABILITIES (learned via skill advances): Armor Sunder (ignore armor for 1 turn, 7 Stamina), Beat Blade (4 successes = disarm), Bleed Strike (1d4 DoT/success for 3 rounds, 4 Stamina), Brutal Strike (double Str bonus, -1 die, 5 Stamina), Dash Attack (no range penalty, 5 Stamina), Disarm-Parry (2 excess parry successes = disarm), Extra Reach (enemies -1 Dodge die vs you), Finesse Style (+1 Parry die with one 1H weapon), Flurry Attacks (hit adjacent enemy with same roll, 3 Stamina), Ground Pound (AoE knockback, 5 Stamina), Long Range Strikes (attack from Short with spear/halberd), Marksman (+1 die at Long Range), Positioning (+1 attack die after perfect dodge), Quick Strike (always go first), Rain of Arrows (AoE bow attack, 10 Stamina), Reach Advantage (keep distance while dodging), Sexdurance (-2 Stamina cost for Sex Skills), Short Ranged Fighting (no melee penalty with short bows/crossbows), Small Target (-2 dice vs ranged, -1/-2 vs larger melee), Stun Strike (stun instead of damage, 4 Stamina), Violent Hack (+10 base damage for 2 rounds, 7 Stamina), Wide Swing (attack all in melee, 5 Stamina).",
+        "selective": false,
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Optional Sub-Agents — what they do and how to enable",
+        "keys": [
+          "sub-agent",
+          "sub agents",
+          "subagent",
+          "additional agent",
+          "additionalagent",
+          "state-mutator",
+          "state mutator",
+          "state-reminder",
+          "state reminder",
+          "combat-adjudicator",
+          "combat adjudicator",
+          "lore-query",
+          "lore query",
+          "npc-bookkeeper",
+          "npc bookkeeper",
+          "enable agent",
+          "Settings → Agents",
+          "agent toggle"
+        ],
+        "content": "The Marinara-RPG ruleset bundle ships five OPTIONAL pre-generation sub-agents that focus the main narration model on specific tasks. They are installed DISABLED by default — flip them on individually in Marinara's Settings → Agents panel. Each adds one model call per turn while enabled, so enable only what your campaign needs.\n\nThe five sub-agents:\n\n1. **state-mutator** — Instructs the narration model to emit hidden `[mrrp-state: ...]` tags inside narration when the story changes a character's HP, Lust, Satisfaction, Stamina, Sanity, MP, conditions, or inventory. The extension parses these tags, applies the change to the floating sheet, and shows a confirmation toast. Without this enabled, you have to mutate the sheet by hand. Enable when: you want narration to drive the sheet automatically.\n\n2. **state-reminder** — Surfaces a short bulleted list of current player character state (HP, MP, Stamina, Sanity, Lust, Gold, conditions, equipped gear, armor coverage) at the top of every turn so the narration model stays mechanically honest between messages. Enable when: long sessions or complex sheets, the model is forgetting your stats.\n\n3. **combat-adjudicator** — Wakes up only when combat is active. Restates initiative, weapon styles, attack/defense formulas, Seduction/Harassment rules, and active conditions in Lewd Attack's terms before each turn. Outputs nothing (literally \"No combat active.\") in social or ambient scenes. Enable when: you run heavy-mechanics combat encounters.\n\n4. **lore-query** — Wakes up only when the latest user message is a rules question (e.g., \"How does Seduction work in combat?\", \"What dice does a Blowjob roll?\"). Answers from the installed lorebook + system RAW. Outputs nothing (\"No rules query.\") otherwise. Enable when: you frequently ask the model rules questions mid-RP.\n\n5. **npc-bookkeeper** — Tracks active and recently-engaged NPC HP, Lust, conditions, tactical state, and telegraphed intentions across turns. Outputs nothing (\"No NPCs to track.\") when no NPCs are in scene. Enable when: combat or social scenes with multiple named NPCs you want continuity on.\n\nHow to enable: Marinara → Settings → Agents → find the agent (named \"MRRP: <System> — <Role>\") → toggle on. The agent persists across chats; toggle off any time.",
+        "position": 1,
+        "tokenBudget": 2000
+      },
+      {
+        "name": "Attribute: Strength (STR)",
+        "keys": [
+          "Strength",
+          "STR"
+        ],
+        "content": "Lewd Attack attribute. Strength (STR) [Physical] — Raw physical power. Melee damage bonus, lifting, grappling.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Body (BOD)",
+        "keys": [
+          "Body",
+          "BOD"
+        ],
+        "content": "Lewd Attack attribute. Body (BOD) [Physical] — Constitution and physique. HP calculation, resistance, soak.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Agility (AGI)",
+        "keys": [
+          "Agility",
+          "AGI"
+        ],
+        "content": "Lewd Attack attribute. Agility (AGI) [Physical] — Speed, grace, coordination. Dodging, acrobatics, many combat skills.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Endurance (END)",
+        "keys": [
+          "Endurance",
+          "END"
+        ],
+        "content": "Lewd Attack attribute. Endurance (END) [Physical] — Stamina and resilience. Stamina pool, many skills, survival.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Dexterity (DEX)",
+        "keys": [
+          "Dexterity",
+          "DEX"
+        ],
+        "content": "Lewd Attack attribute. Dexterity (DEX) [Physical] — Fine motor control. Precision tasks, sex skills, thievery.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Perception (PER)",
+        "keys": [
+          "Perception",
+          "PER"
+        ],
+        "content": "Lewd Attack attribute. Perception (PER) [Mental] — Senses and awareness. Spotting, tracking, ranged attacks.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Willpower (WIL)",
+        "keys": [
+          "Willpower",
+          "WIL"
+        ],
+        "content": "Lewd Attack attribute. Willpower (WIL) [Mental] — Mental fortitude. MP calculation, Sanity, persuasion, resisting.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Intelligence (INT)",
+        "keys": [
+          "Intelligence",
+          "INT"
+        ],
+        "content": "Lewd Attack attribute. Intelligence (INT) [Mental] — Reasoning and knowledge. Spellcasting, studying, crafting.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Charisma (CHA)",
+        "keys": [
+          "Charisma",
+          "CHA"
+        ],
+        "content": "Lewd Attack attribute. Charisma (CHA) [Mental] — Force of personality. Seduction, persuasion, performance, miracles.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Blacksmithing",
+        "keys": [
+          "Blacksmithing"
+        ],
+        "content": "Lewd Attack skill. Blacksmithing. Str+Int. Repair heavy armor.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Bluffing",
+        "keys": [
+          "Bluffing"
+        ],
+        "content": "Lewd Attack skill. Bluffing. Int+Cha. Deceive, swindle, lie.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Climbing",
+        "keys": [
+          "Climbing"
+        ],
+        "content": "Lewd Attack skill. Climbing. Str+End. Scale walls and terrain.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Dancing",
+        "keys": [
+          "Dancing"
+        ],
+        "content": "Lewd Attack skill. Dancing. Agi+Cha. Entertain crowds, earn coin.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Gambling",
+        "keys": [
+          "Gambling"
+        ],
+        "content": "Lewd Attack skill. Gambling. Dex+Cha. Cards, dice, cheating at games.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Haggle",
+        "keys": [
+          "Haggle"
+        ],
+        "content": "Lewd Attack skill. Haggle. Int+Cha. Bargain better prices.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Hunting",
+        "keys": [
+          "Hunting"
+        ],
+        "content": "Lewd Attack skill. Hunting. Agi+End. Track and kill prey for food.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Intimidation",
+        "keys": [
+          "Intimidation"
+        ],
+        "content": "Lewd Attack skill. Intimidation. Str+Cha. Threaten, frighten, force compliance.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Investigation",
+        "keys": [
+          "Investigation"
+        ],
+        "content": "Lewd Attack skill. Investigation. Per+Int. Find hidden things, traps, secrets.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Labor",
+        "keys": [
+          "Labor"
+        ],
+        "content": "Lewd Attack skill. Labor. Str+End. Hard physical work for coin.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Lockpicking",
+        "keys": [
+          "Lockpicking"
+        ],
+        "content": "Lewd Attack skill. Lockpicking. Dex+Int. Open locks on doors and chests.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Persuasion",
+        "keys": [
+          "Persuasion"
+        ],
+        "content": "Lewd Attack skill. Persuasion. Wil+Cha. Convince others through reason.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Playing Music",
+        "keys": [
+          "Playing Music"
+        ],
+        "content": "Lewd Attack skill. Playing Music. Dex+Cha. Entertain with instruments, earn coin.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Seduction",
+        "keys": [
+          "Seduction"
+        ],
+        "content": "Lewd Attack skill. Seduction. Dex+Cha. Sway with charm, in or out of combat.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Tracking",
+        "keys": [
+          "Tracking"
+        ],
+        "content": "Lewd Attack skill. Tracking. End+Per. Follow tracks through the wild.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Reaction",
+        "keys": [
+          "Reaction"
+        ],
+        "content": "Lewd Attack skill. Reaction. Agi+Int. Avoid traps and sudden dangers.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Resistance",
+        "keys": [
+          "Resistance"
+        ],
+        "content": "Lewd Attack skill. Resistance. Bod+Wil. Withstand poison, intoxication, illness.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Regeneration",
+        "keys": [
+          "Regeneration"
+        ],
+        "content": "Lewd Attack skill. Regeneration. Bod+End. Daily HP recovery, death-save skill.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Running",
+        "keys": [
+          "Running"
+        ],
+        "content": "Lewd Attack skill. Running. Agi+End. Chase, flee, close distance.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Service",
+        "keys": [
+          "Service"
+        ],
+        "content": "Lewd Attack skill. Service. End+Dex. Work as servant, wench, or attendant.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Sewing",
+        "keys": [
+          "Sewing"
+        ],
+        "content": "Lewd Attack skill. Sewing. Dex+Int. Repair light armor and clothes.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Singing",
+        "keys": [
+          "Singing"
+        ],
+        "content": "Lewd Attack skill. Singing. Int+Cha. Entertain with voice, earn coin.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Sneaking",
+        "keys": [
+          "Sneaking"
+        ],
+        "content": "Lewd Attack skill. Sneaking. Agi+Int. Move unseen, ambush enemies.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Stealing",
+        "keys": [
+          "Stealing"
+        ],
+        "content": "Lewd Attack skill. Stealing. Dex+Per. Pickpocket, lift valuables.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Studying",
+        "keys": [
+          "Studying"
+        ],
+        "content": "Lewd Attack skill. Studying. Int+End. Memorize books, learn knowledge.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Teaching",
+        "keys": [
+          "Teaching"
+        ],
+        "content": "Lewd Attack skill. Teaching. Int+End. Share knowledge for coin.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Arcane Spells",
+        "keys": [
+          "Arcane Spells"
+        ],
+        "content": "Lewd Attack skill. Arcane Spells. Wil+Int. Cast learned arcane spells in combat.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Axes",
+        "keys": [
+          "Axes"
+        ],
+        "content": "Lewd Attack skill. Axes. Str+End. One-handed and two-handed axe combat.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Blocking",
+        "keys": [
+          "Blocking"
+        ],
+        "content": "Lewd Attack skill. Blocking. Agi+Bod. Defend with shield; +1 die vs ranged.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Bows",
+        "keys": [
+          "Bows"
+        ],
+        "content": "Lewd Attack skill. Bows. Str+Per. Shortbows and longbows at range.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Brawling",
+        "keys": [
+          "Brawling"
+        ],
+        "content": "Lewd Attack skill. Brawling. Str+Agi. Unarmed strikes, fists and kicks.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Crossbows",
+        "keys": [
+          "Crossbows"
+        ],
+        "content": "Lewd Attack skill. Crossbows. Dex+Per. Crossbows and heavy crossbows at range.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Daggers",
+        "keys": [
+          "Daggers"
+        ],
+        "content": "Lewd Attack skill. Daggers. Dex+Agi. Quick blades, throwing knives.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Dodging",
+        "keys": [
+          "Dodging"
+        ],
+        "content": "Lewd Attack skill. Dodging. Agi+Per. Default defense; works vs all attack types.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Grappling",
+        "keys": [
+          "Grappling"
+        ],
+        "content": "Lewd Attack skill. Grappling. Str+Bod. Wrestle, pin, throw, or restrain enemies.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Halberds",
+        "keys": [
+          "Halberds"
+        ],
+        "content": "Lewd Attack skill. Halberds. Bod+Agi. Two-handed polearm combat.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Maces",
+        "keys": [
+          "Maces"
+        ],
+        "content": "Lewd Attack skill. Maces. Str+Bod. One-handed and two-handed crushing weapons.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Miracles",
+        "keys": [
+          "Miracles"
+        ],
+        "content": "Lewd Attack skill. Miracles. Wil+Cha. Cast holy blessings and miracles.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Parrying",
+        "keys": [
+          "Parrying"
+        ],
+        "content": "Lewd Attack skill. Parrying. Str+Dex. Deflect with weapon; riposte on excess successes.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Spears",
+        "keys": [
+          "Spears"
+        ],
+        "content": "Lewd Attack skill. Spears. Agi+End. One-handed and two-handed thrusting weapons.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Staffs",
+        "keys": [
+          "Staffs"
+        ],
+        "content": "Lewd Attack skill. Staffs. Bod+Dex. One-handed or two-handed; grants +MP to casters.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Swords",
+        "keys": [
+          "Swords"
+        ],
+        "content": "Lewd Attack skill. Swords. Str+Agi. One-handed and two-handed blade combat.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Throwing",
+        "keys": [
+          "Throwing"
+        ],
+        "content": "Lewd Attack skill. Throwing. Agi+Per. Hurl knives, axes, or objects accurately.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Blowjob",
+        "keys": [
+          "Blowjob"
+        ],
+        "content": "Lewd Attack skill. Blowjob. Dex+Cha. Oral service. Pleasure: 1d10, End cost: 5.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Buttjob",
+        "keys": [
+          "Buttjob"
+        ],
+        "content": "Lewd Attack skill. Buttjob. Bod+End. Butt-rubbing. Pleasure: 1d6+Butt, End cost: 4.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Footjob",
+        "keys": [
+          "Footjob"
+        ],
+        "content": "Lewd Attack skill. Footjob. Agi+Dex. Foot service. Pleasure: 1d6+Feet, End cost: 4.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Handjob",
+        "keys": [
+          "Handjob"
+        ],
+        "content": "Lewd Attack skill. Handjob. Dex+End. Hand service. Pleasure: 1d6+Hand, End cost: 3.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Masturbation/Lesbian",
+        "keys": [
+          "Masturbation/Lesbian"
+        ],
+        "content": "Lewd Attack skill. Masturbation/Lesbian. Dex+Int. Self-pleasure or with another woman. Pleasure: 1d6.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Sex Consensual",
+        "keys": [
+          "Sex Consensual"
+        ],
+        "content": "Lewd Attack skill. Sex Consensual. Agi+End. Penetrative sex, taking initiative. Reciprocal Pleasure: 1d6+Dick.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Sex Dominant",
+        "keys": [
+          "Sex Dominant"
+        ],
+        "content": "Lewd Attack skill. Sex Dominant. Str+End. Dominant penetrative sex, including coerced. Reciprocal Pleasure: 1d6+Dick.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Thighjob",
+        "keys": [
+          "Thighjob"
+        ],
+        "content": "Lewd Attack skill. Thighjob. Agi+Bod. Thigh-rubbing. Pleasure: 1d6+Thigh, End cost: 4.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Titjob",
+        "keys": [
+          "Titjob"
+        ],
+        "content": "Lewd Attack skill. Titjob. Bod+Cha. Breast service. Pleasure: 1d6+Tit, End cost: 4.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Bleeding",
+        "keys": [
+          "Bleeding"
+        ],
+        "content": "Lewd Attack condition. Bleeding — Lose HP per round until healed or bandaged. Amount depends on source.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Burning",
+        "keys": [
+          "Burning"
+        ],
+        "content": "Lewd Attack condition. Burning — Fire DoT. Extinguish via water, Clean spell, or Dodge roll (each success removes 1 Burning).",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Exhausted",
+        "keys": [
+          "Exhausted"
+        ],
+        "content": "Lewd Attack condition. Exhausted — Stamina reaches 0. -2 dice to ALL tests until rest restores Stamina above 0.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Poisoned",
+        "keys": [
+          "Poisoned"
+        ],
+        "content": "Lewd Attack condition. Poisoned — Varies by source. Antidote Miracle or potion cures. Damage/interval per poison type.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Slimed",
+        "keys": [
+          "Slimed"
+        ],
+        "content": "Lewd Attack condition. Slimed — +1 per slime enemy per round. Each stack gives -1 die to attack/defense/movement. Wash to remove.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Bukkake'd",
+        "keys": [
+          "Bukkake'd"
+        ],
+        "content": "Lewd Attack condition. Bukkake'd — Covered in cum. -1 die to Agility-based tests, attacks, and defense. Wash or Clean to remove.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Darkness",
+        "keys": [
+          "Darkness"
+        ],
+        "content": "Lewd Attack condition. Darkness — Night/caves. -3 Perception. Affects all Perception-based skills. Torch reduces to -1.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Frustrated",
+        "keys": [
+          "Frustrated"
+        ],
+        "content": "Lewd Attack condition. Frustrated — Failed to orgasm during sex. -1 die for next 3 tests.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Satisfied",
+        "keys": [
+          "Satisfied"
+        ],
+        "content": "Lewd Attack condition. Satisfied — Orgasm achieved (Satisfaction > Lust). +1 die for next 3 tests that day.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Mind Broken",
+        "keys": [
+          "Mind Broken"
+        ],
+        "content": "Lewd Attack condition. Mind Broken — Sanity reached 0 during sex. Roll on appropriate Mind Break table. Permanent consequences.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Hit Points",
+        "keys": [
+          "Hit Points"
+        ],
+        "content": "Lewd Attack derived stat. Hit Points — formula: 2*Body + Agility + Strength + Endurance + Willpower",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Magic Points",
+        "keys": [
+          "Magic Points"
+        ],
+        "content": "Lewd Attack derived stat. Magic Points — formula: 2*Willpower + 2*Intelligence + Endurance + Charisma",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Stamina",
+        "keys": [
+          "Stamina"
+        ],
+        "content": "Lewd Attack derived stat. Stamina — formula: Strength + 3*Endurance + Agility + Willpower",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Sanity",
+        "keys": [
+          "Sanity"
+        ],
+        "content": "Lewd Attack derived stat. Sanity — formula: Endurance + Perception + 2*Willpower + Intelligence + Charisma",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Lust",
+        "keys": [
+          "Lust"
+        ],
+        "content": "Lewd Attack derived stat. Lust — formula: Daily accumulation (1d4+0 base) plus situational modifiers. Thresholds at 10 and 20.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Satisfaction",
+        "keys": [
+          "Satisfaction"
+        ],
+        "content": "Lewd Attack derived stat. Satisfaction — formula: Accumulated during sex from Sex Skill rolls. Compare to Lust to determine orgasm.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Gold",
+        "keys": [
+          "Gold"
+        ],
+        "content": "Lewd Attack derived stat. Gold — formula: Currency tracked from loot, work, and purchases.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Fame",
+        "keys": [
+          "Fame"
+        ],
+        "content": "Lewd Attack derived stat. Fame — formula: Known for heroic deeds. +1 per mission completed in a region. At 10, gain +1 permanent.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Reputation",
+        "keys": [
+          "Reputation"
+        ],
+        "content": "Lewd Attack derived stat. Reputation — formula: Sexual conduct renown. Higher = people consider you a slut. Gated social effects.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Corruption",
+        "keys": [
+          "Corruption"
+        ],
+        "content": "Lewd Attack derived stat. Corruption — formula: Permanent taint from dark magic, demonic encounters, or Mind Break. Blocks Blessings.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Criminal",
+        "keys": [
+          "Criminal"
+        ],
+        "content": "Lewd Attack derived stat. Criminal — formula: Underworld renown. Raised by committing crimes and escaping. Gates black-market access.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Difficulty ladder reference",
+        "keys": [
+          "DC",
+          "difficulty",
+          "target number",
+          "TN",
+          "threshold",
+          "thresholds"
+        ],
+        "content": "Lewd Attack difficulty ladder. Threshold values needed for success:\n- Easy (threshold 1) — A bare pass; trivial for someone with the right skill.\n- Standard (threshold 2) — Default difficulty for most tests.\n- Hard (threshold 3) — Demands real competence.\n- Very Hard (threshold 4) — Even a trained character may fail.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      }
+    ]
+  },
+  "regexScripts": [
+    {
+      "enabled": true,
+      "findRegex": "\\[skill_check:\\s*dc=\"(\\d+)\"\\s+rolls=\"(\\d+)\"(?:\\s+modifier=\"([+-]?\\d+)\")?(?:\\s+total=\"(-?\\d+)\")?\\s+result=\"(success|failure|critical|fumble)\"\\s*\\]",
+      "replaceString": "$5 — rolled against difficulty $1",
+      "trimStrings": [],
+      "placement": [
+        "ai_output"
+      ],
+      "flags": "gi",
+      "promptOnly": false,
+      "order": 100,
+      "minDepth": null,
+      "maxDepth": null,
+      "name": "skill_check tag → Lewd Attack surface"
+    },
+    {
+      "enabled": true,
+      "findRegex": "\\bDC\\s+(\\d+)\\b",
+      "replaceString": "difficulty $1",
+      "trimStrings": [],
+      "placement": [
+        "ai_output"
+      ],
+      "flags": "gi",
+      "promptOnly": false,
+      "order": 110,
+      "minDepth": null,
+      "maxDepth": null,
+      "name": "DC mention → Lewd Attack difficulty"
+    }
+  ],
+  "customTools": [
+    {
+      "name": "lewd_attack_reference",
+      "description": "Returns canonical Lewd Attack reference: dice, resolution, difficulty ladder, attributes, skills. Call when the GM needs authoritative ruleset detail mid-narration.",
+      "parametersSchema": {},
+      "executionType": "static",
+      "webhookUrl": null,
+      "staticResult": "# Lewd Attack — canonical reference\n\nA solo-play sexual-fantasy RPG using d6 dice pools. Each skill rolls two stats worth of d6s, counting successes per proficiency tier (Untrained 5-6, Trained 4-6, Expert 3-6). Opposed tests in combat, difficulty-based outside combat.\n\n## Dice\n- Type: `d6`\n- Notation: `Nd6, count successes`\n\n## Resolution\n- Mode: `dice-pool`\n- Pool formula: Stat + Stat (two attributes per skill, per the skill's own pair)\n- Default target: 5\n\n## Difficulty ladder\n- **Easy** (threshold 1) — A bare pass; trivial for someone with the right skill.\n- **Standard** (threshold 2) — Default difficulty for most tests.\n- **Hard** (threshold 3) — Demands real competence.\n- **Very Hard** (threshold 4) — Even a trained character may fail.\n\n## Attributes\n- **Strength** (STR) [Physical] — Raw physical power. Melee damage bonus, lifting, grappling.\n- **Body** (BOD) [Physical] — Constitution and physique. HP calculation, resistance, soak.\n- **Agility** (AGI) [Physical] — Speed, grace, coordination. Dodging, acrobatics, many combat skills.\n- **Endurance** (END) [Physical] — Stamina and resilience. Stamina pool, many skills, survival.\n- **Dexterity** (DEX) [Physical] — Fine motor control. Precision tasks, sex skills, thievery.\n- **Perception** (PER) [Mental] — Senses and awareness. Spotting, tracking, ranged attacks.\n- **Willpower** (WIL) [Mental] — Mental fortitude. MP calculation, Sanity, persuasion, resisting.\n- **Intelligence** (INT) [Mental] — Reasoning and knowledge. Spellcasting, studying, crafting.\n- **Charisma** (CHA) [Mental] — Force of personality. Seduction, persuasion, performance, miracles.\n\n## Skills\n- **Blacksmithing** — Str+Int. Repair heavy armor.\n- **Bluffing** — Int+Cha. Deceive, swindle, lie.\n- **Climbing** — Str+End. Scale walls and terrain.\n- **Dancing** — Agi+Cha. Entertain crowds, earn coin.\n- **Gambling** — Dex+Cha. Cards, dice, cheating at games.\n- **Haggle** — Int+Cha. Bargain better prices.\n- **Hunting** — Agi+End. Track and kill prey for food.\n- **Intimidation** — Str+Cha. Threaten, frighten, force compliance.\n- **Investigation** — Per+Int. Find hidden things, traps, secrets.\n- **Labor** — Str+End. Hard physical work for coin.\n- **Lockpicking** — Dex+Int. Open locks on doors and chests.\n- **Persuasion** — Wil+Cha. Convince others through reason.\n- **Playing Music** — Dex+Cha. Entertain with instruments, earn coin.\n- **Seduction** — Dex+Cha. Sway with charm, in or out of combat.\n- **Tracking** — End+Per. Follow tracks through the wild.\n- **Reaction** — Agi+Int. Avoid traps and sudden dangers.\n- **Resistance** — Bod+Wil. Withstand poison, intoxication, illness.\n- **Regeneration** — Bod+End. Daily HP recovery, death-save skill.\n- **Running** — Agi+End. Chase, flee, close distance.\n- **Service** — End+Dex. Work as servant, wench, or attendant.\n- **Sewing** — Dex+Int. Repair light armor and clothes.\n- **Singing** — Int+Cha. Entertain with voice, earn coin.\n- **Sneaking** — Agi+Int. Move unseen, ambush enemies.\n- **Stealing** — Dex+Per. Pickpocket, lift valuables.\n- **Studying** — Int+End. Memorize books, learn knowledge.\n- **Teaching** — Int+End. Share knowledge for coin.\n- **Arcane Spells** — Wil+Int. Cast learned arcane spells in combat.\n- **Axes** — Str+End. One-handed and two-handed axe combat.\n- **Blocking** — Agi+Bod. Defend with shield; +1 die vs ranged.\n- **Bows** — Str+Per. Shortbows and longbows at range.\n- **Brawling** — Str+Agi. Unarmed strikes, fists and kicks.\n- **Crossbows** — Dex+Per. Crossbows and heavy crossbows at range.\n- **Daggers** — Dex+Agi. Quick blades, throwing knives.\n- **Dodging** — Agi+Per. Default defense; works vs all attack types.\n- **Grappling** — Str+Bod. Wrestle, pin, throw, or restrain enemies.\n- **Halberds** — Bod+Agi. Two-handed polearm combat.\n- **Maces** — Str+Bod. One-handed and two-handed crushing weapons.\n- **Miracles** — Wil+Cha. Cast holy blessings and miracles.\n- **Parrying** — Str+Dex. Deflect with weapon; riposte on excess successes.\n- **Spears** — Agi+End. One-handed and two-handed thrusting weapons.\n- **Staffs** — Bod+Dex. One-handed or two-handed; grants +MP to casters.\n- **Swords** — Str+Agi. One-handed and two-handed blade combat.\n- **Throwing** — Agi+Per. Hurl knives, axes, or objects accurately.\n- **Blowjob** — Dex+Cha. Oral service. Pleasure: 1d10, End cost: 5.\n- **Buttjob** — Bod+End. Butt-rubbing. Pleasure: 1d6+Butt, End cost: 4.\n- **Footjob** — Agi+Dex. Foot service. Pleasure: 1d6+Feet, End cost: 4.\n- **Handjob** — Dex+End. Hand service. Pleasure: 1d6+Hand, End cost: 3.\n- **Masturbation/Lesbian** — Dex+Int. Self-pleasure or with another woman. Pleasure: 1d6.\n- **Sex Consensual** — Agi+End. Penetrative sex, taking initiative. Reciprocal Pleasure: 1d6+Dick.\n- **Sex Dominant** — Str+End. Dominant penetrative sex, including coerced. Reciprocal Pleasure: 1d6+Dick.\n- **Thighjob** — Agi+Bod. Thigh-rubbing. Pleasure: 1d6+Thigh, End cost: 4.\n- **Titjob** — Bod+Cha. Breast service. Pleasure: 1d6+Tit, End cost: 4.",
+      "scriptBody": null,
+      "enabled": true
+    }
+  ]
+}
