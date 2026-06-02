@@ -1,0 +1,1392 @@
+{
+  "schema": "mrrp-bundle",
+  "version": 1,
+  "minExtensionVersion": "0.4.0",
+  "authorId": "kenhito",
+  "generator": {
+    "name": "build-bundle.mjs",
+    "version": "1.6.0"
+  },
+  "ruleset": {
+    "id": "vice-and-violence",
+    "name": "Vice & Violence",
+    "version": "1.0.0",
+    "edition": "Vice & Violence (Original Edition)",
+    "license": "Original mechanics references. System design belongs to the V&V publisher. No verbatim flavor text reproduced.",
+    "summary": "A lewd, rules-light, sword & sorcery sandbox TTRPG. Roll a d20 + ability modifier (Smarts, Brawn, Guts, or Charm) against a difficulty threshold. Attacks auto-hit; defense rolls armour + Guts to negate damage. Characters start at Level Zero with no class, earning class abilities through Downtime training.",
+    "dice": {
+      "type": "d20",
+      "notation": "1d20+MOD"
+    },
+    "resolution": {
+      "mode": "single-roll",
+      "modifierFormula": "1d20 + ability_mod"
+    },
+    "difficulties": {
+      "Really Easy": {
+        "threshold": 5,
+        "description": "Anyone can do it barring truly terrible luck."
+      },
+      "Simple": {
+        "threshold": 10,
+        "description": "A decent chance for an untrained commoner."
+      },
+      "Normal Difficulty": {
+        "threshold": 12,
+        "description": "Hit or miss. Standard for spells and Martial Skills."
+      },
+      "Pretty Difficult": {
+        "threshold": 15,
+        "description": "Requires skill or a strong ability score."
+      },
+      "Almost Impossible": {
+        "threshold": 20,
+        "description": "Heroic effort required. Even masters may fail."
+      }
+    },
+    "attributes": [
+      {
+        "name": "Smarts",
+        "abbreviation": "SMT",
+        "min": -6,
+        "max": 9,
+        "default": 0,
+        "description": "Intelligence and cunning. Used for casting spells, picking locks, disarming traps, investigating clues, and outwitting opponents."
+      },
+      {
+        "name": "Brawn",
+        "abbreviation": "BRN",
+        "min": -6,
+        "max": 9,
+        "default": 0,
+        "description": "Raw physical power. Used for melee attacks, lifting, breaking things, arm wrestling, intimidation, and Martial Skills."
+      },
+      {
+        "name": "Guts",
+        "abbreviation": "GTS",
+        "min": -6,
+        "max": 9,
+        "default": 0,
+        "description": "Endurance and agility. Used for Armour Saves, resisting poison, avoiding traps, staying sober, dodging, and impressing people."
+      },
+      {
+        "name": "Charm",
+        "abbreviation": "CHM",
+        "min": -6,
+        "max": 9,
+        "default": 0,
+        "description": "Charisma and attractiveness. Used for Disposition checks, seduction, bribery, blending in, standing out, and Charm-based Martial Skills."
+      }
+    ],
+    "skills": [
+      {
+        "name": "Swift Kick in The Bollocks",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "A vicious kick to the testicles. Deals d6+Brawn damage and causes Stunned. Requires a target with testicles. (DC12 Brawn to perform)"
+      },
+      {
+        "name": "Cleave",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Rip your weapon through one enemy into another. If the first target is Downed, excess damage hits a second Adjacent target. (DC12 Brawn)"
+      },
+      {
+        "name": "Lunge",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Leap through the air at an enemy with your weapon. Move Adjacent to a Further target and make an immediate basic attack. (DC12 Brawn)"
+      },
+      {
+        "name": "Power Strike",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "One massive blow, adding Brawn twice to your weapon damage. (DC12 Brawn)"
+      },
+      {
+        "name": "Leg Sweep",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Hack at a Kin's knees, dealing Brawn damage and knocking them Prone. (DC12 Brawn)"
+      },
+      {
+        "name": "Conk on The Noggin",
+        "linkedAttribute": "Brawn",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Hurl an improvised weapon at a target's head. Causes the Stunned status effect at range. (DC12 Brawn)"
+      },
+      {
+        "name": "Go Nuts",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Psyche yourself into a rage. Deliberately gain the Berserk status effect. (DC12 Guts)"
+      },
+      {
+        "name": "Protect",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Jump in front of an ally and take the damage meant for them. Uses a Tactical Action as a Reaction. (DC12 Guts)"
+      },
+      {
+        "name": "Counter Attack",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Ready a dodge. Negate the first incoming attack entirely and deliver a retaliatory basic attack. (DC12 Guts)"
+      },
+      {
+        "name": "Taunt",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Goad a target into attacking you with a rude gesture and insult. Uses a Tactical Action. (DC12 Guts)"
+      },
+      {
+        "name": "Grapple",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Grab an enemy and pin them with the Restrained status effect until they wriggle free. (DC12 Guts)"
+      },
+      {
+        "name": "Shake it Off",
+        "linkedAttribute": "Guts",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Dig deep and remove any one status effect except Dehydrated, Starving, or Exhausted. (DC12 Guts)"
+      },
+      {
+        "name": "Flash the Goods",
+        "linkedAttribute": "Charm",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Show off your figure to an enemy, increasing Disposition by d6+Charm. If they become Indifferent or Friendly, they stop attacking you. (DC12 Charm)"
+      },
+      {
+        "name": "Quick Smooch",
+        "linkedAttribute": "Charm",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Give an ally a reassuring peck, restoring Health equal to your Charm stat. Only works in combat. (DC12 Charm)"
+      },
+      {
+        "name": "Cheer On",
+        "linkedAttribute": "Charm",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Words of encouragement. Add your Charm to an ally's next Dice Challenge. Uses a Tactical Action. (DC12 Charm)"
+      },
+      {
+        "name": "Cutting Remark",
+        "linkedAttribute": "Charm",
+        "min": 0,
+        "max": 1,
+        "default": 0,
+        "description": "Shout something unbelievably insulting, causing the Berserk status effect on one target. (DC12 Charm)"
+      }
+    ],
+    "derivedStats": [
+      {
+        "name": "Health",
+        "formula": "Rolled at character creation: base plus Guts. Increases by d6 (or 4 + Guts) when levelling up.",
+        "renderAs": "bar",
+        "default": 8,
+        "aliases": [
+          "hp",
+          "HP",
+          "health",
+          "Health"
+        ]
+      },
+      {
+        "name": "Motes",
+        "formula": "Spellcasting energy. Regain full Motes after a Long Rest; regain d4 per half-hour of Short Rest.",
+        "renderAs": "bar",
+        "default": 0,
+        "aliases": [
+          "motes",
+          "spell uses",
+          "spell points",
+          "mana"
+        ]
+      },
+      {
+        "name": "Exertion",
+        "formula": "Three points per Long Rest. Can be used to reroll failed checks, dodge attacks, or remove status effects.",
+        "max": 3,
+        "default": 3,
+        "renderAs": "value",
+        "aliases": [
+          "exertion",
+          "exertion points"
+        ]
+      },
+      {
+        "name": "Level",
+        "formula": "0-10. New adventurers start at Level Zero. Max Level is Ten.",
+        "max": 10,
+        "default": 0,
+        "renderAs": "value",
+        "aliases": [
+          "level",
+          "lvl",
+          "character level"
+        ]
+      },
+      {
+        "name": "Armour Save",
+        "formula": "Roll armour die type + Guts to negate incoming damage. Determined by armour worn (Skimpy d2, Light d4, Medium d6, Full d8, Fitted 2d6).",
+        "renderAs": "value",
+        "aliases": [
+          "armour",
+          "armor",
+          "defense",
+          "defence"
+        ]
+      },
+      {
+        "name": "Refractory Period",
+        "formula": "Time between Sex encounters. Rolled at character creation (d6: 30 min to 1h45m). Decreases by 15 min on even levels.",
+        "renderAs": "value",
+        "aliases": [
+          "refractory",
+          "sage time"
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "name": "Prone",
+        "description": "You've fallen over. Cannot cast spells or use Martial Skills until you use a Tactical Action to stand up."
+      },
+      {
+        "name": "Poisoned",
+        "description": "Something inside you your body rejects. Take 1 damage when using Combat or Tactical Actions until cured. Cured by antidote or eating 1 ration."
+      },
+      {
+        "name": "Drunk",
+        "description": "All DCs are +3 (harder). Sex takes twice as long and Quality caps at Fine. Sober up in d4 hours or eat 1 ration."
+      },
+      {
+        "name": "Filthy",
+        "description": "Covered in grime. All Disposition checks at -5. Stealth checks at +10. Extra 1 damage if also Poisoned. Cured by using 1 day's water."
+      },
+      {
+        "name": "Burning",
+        "description": "On fire. Take d6 damage on turn 1, 2d6 on turn 2, 3d6 on turn 3, escalating until extinguished. Costs 1 day's water per d6 of current Burning damage to douse."
+      },
+      {
+        "name": "Stunned",
+        "description": "Bonk on the noggin. Miss your next turn. Ally can snap you out of it with a Tactical Action, or succeed a Guts Resist Check."
+      },
+      {
+        "name": "Terrified",
+        "description": "Paralysed with fear. Lose one Tactical Action, all spells/skills/attacks at half effect. Gain a Vice. Cured by getting Drunk or an ally's encouraging hug."
+      },
+      {
+        "name": "Horny",
+        "description": "Inconceivably aroused. Lose 1 Guts or 1 Smarts (whichever is higher) every 12 hours up to -3 total. Cured by Sex or 30 minutes of private remedy."
+      },
+      {
+        "name": "Blinded",
+        "description": "All you see is light or darkness. Must roll a successful DC10 before each action or fall Prone. Resist with Guts Check."
+      },
+      {
+        "name": "Charmed",
+        "description": "Compelled to obey. The GM controls your character until you succeed a Resist Check each turn."
+      },
+      {
+        "name": "Restrained",
+        "description": "Ropes, chains, tentacles, or something's mouth. Unable to perform any action except attempting a Resist Check to escape. Ally can free you with a Tactical Action and Guts DC."
+      },
+      {
+        "name": "Berserk",
+        "description": "Lost your marbles. Can only use Basic Attacks, but all Basic Attacks deal double damage. Cured by succeeding a Resist Check or drinking 1 water."
+      },
+      {
+        "name": "Dehydrated",
+        "description": "Need water. Cured by drinking 1 day's water."
+      },
+      {
+        "name": "Starving",
+        "description": "Need food. Cured by eating 1 ration."
+      },
+      {
+        "name": "Exhausted",
+        "description": "No sleep for 24 hours. -1 Smarts and -1 Brawn. Cured by a Long Rest (6 hours sleep)."
+      }
+    ],
+    "diceTagFormat": {
+      "template": "[mrrp-roll: skill=\"{Skill}\" vs DC{DC} = {result}]",
+      "example": "[mrrp-roll: skill=\"Fireball\" vs DC12 = 14 success]"
+    },
+    "sheetSections": [
+      "attributes",
+      "skills",
+      "derived",
+      "conditions",
+      "abilities",
+      "inventory",
+      "notes"
+    ],
+    "sections": {
+      "order": [
+        "identity",
+        "attributes",
+        "skills",
+        "derived",
+        "abilities",
+        "conditions",
+        "inventory",
+        "notes"
+      ]
+    },
+    "resources": [
+      {
+        "id": "health",
+        "label": "Health",
+        "type": "bar",
+        "max": 20,
+        "current": 8,
+        "color": "bad",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-5",
+            "delta": -5
+          },
+          {
+            "label": "Heal",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "motes",
+        "label": "Motes",
+        "type": "bar",
+        "max": 12,
+        "current": 0,
+        "color": "accent",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "-3",
+            "delta": -3
+          },
+          {
+            "label": "Rest",
+            "delta": "max"
+          }
+        ]
+      },
+      {
+        "id": "exertion",
+        "label": "Exertion",
+        "type": "counter",
+        "max": 3,
+        "current": 3,
+        "color": "ok",
+        "quickButtons": [
+          {
+            "label": "-1",
+            "delta": -1
+          },
+          {
+            "label": "Long Rest",
+            "delta": "max"
+          }
+        ]
+      }
+    ],
+    "lorebookKeys": [
+      "class",
+      "spell",
+      "condition",
+      "kin",
+      "race",
+      "mundain",
+      "fae",
+      "sex",
+      "vice",
+      "downtime",
+      "mundainian"
+    ],
+    "abilities": {
+      "label": "Class Abilities & Spells",
+      "categories": [
+        {
+          "id": "basic-spells",
+          "label": "Basic Spells"
+        },
+        {
+          "id": "martial-skills",
+          "label": "Martial Skills"
+        },
+        {
+          "id": "bard",
+          "label": "Bard Songs"
+        },
+        {
+          "id": "blood-mage",
+          "label": "Blood Magic"
+        },
+        {
+          "id": "cleric",
+          "label": "Holy Relics"
+        },
+        {
+          "id": "dancer",
+          "label": "Dancer Skills"
+        },
+        {
+          "id": "druid",
+          "label": "Druid Forms"
+        },
+        {
+          "id": "fae-knight",
+          "label": "Fae Knight"
+        },
+        {
+          "id": "fighter",
+          "label": "Fighter Perks"
+        },
+        {
+          "id": "paladin",
+          "label": "Paladin Oaths"
+        },
+        {
+          "id": "ranger",
+          "label": "Ranger Skills"
+        },
+        {
+          "id": "thief",
+          "label": "Thief Skills"
+        },
+        {
+          "id": "wizard",
+          "label": "Advanced Spells"
+        },
+        {
+          "id": "warlock",
+          "label": "Warlock Boons"
+        }
+      ]
+    },
+    "backgrounds": {
+      "enabled": true,
+      "label": "Vices",
+      "min": 0,
+      "max": 10,
+      "default": 0,
+      "textOnly": true
+    },
+    "equipmentSlots": [
+      "Weapon",
+      "Armour",
+      "Shield",
+      "Magic Staff",
+      "Instrument",
+      "Trinket"
+    ],
+    "equipmentBonusTargets": [
+      "Brawn",
+      "Guts",
+      "Charm",
+      "Health",
+      "Armour Save"
+    ],
+    "vocabularyHints": [
+      {
+        "pattern": "I attack / I swing / I shoot",
+        "hint": "In V&V, basic attacks always hit. Roll weapon damage + material + Brawn. No attack roll needed. The target rolls their Armour Save (armour die + Guts) to negate damage."
+      },
+      {
+        "pattern": "I cast a spell",
+        "hint": "Casting a spell costs 1 Mote and requires a DC12 Smarts check. Failure causes Weird Magic (consult the Weird Magic table). A Magic Staff can absorb a failure at the cost of 1 Staff Health."
+      },
+      {
+        "pattern": "I use a Martial Skill",
+        "hint": "Martial Skills require a DC12 check using the skill's linked ability (Brawn, Guts, or Charm). Failure wastes your Combat Action but has no additional penalty."
+      },
+      {
+        "pattern": "I want to seduce / flash / charm",
+        "hint": "In V&V, use the Flash the Goods Martial Skill or roll a Disposition check (d20 + Charm). NPCs with Indifferent or Friendly disposition can be engaged for Sex, which heals and restores Motes."
+      },
+      {
+        "pattern": "I rest / I short rest / I long rest",
+        "hint": "Short Rest: 30-min increments restore d6 Health + d4 Motes per level. Long Rest: 6 hours sleep restores full Health, Motes, and Exertion, and cures Exhausted."
+      }
+    ],
+    "scenarioDefaultDerive": true
+  },
+  "lorebook": {
+    "name": "Vice & Violence Reference",
+    "description": "Keyword-triggered rules reference for Vice & Violence: core resolution, conditions, classes, magic, the world of Mundain, and lewd mechanics.",
+    "category": "world",
+    "scanDepth": 4,
+    "tokenBudget": 1500,
+    "recursiveScanning": false,
+    "entries": [
+      {
+        "name": "Rule: Dice Resolution",
+        "keys": [
+          "roll",
+          "rolls",
+          "check",
+          "dice",
+          "dice challenge",
+          "ability check"
+        ],
+        "content": "Vice & Violence uses a single d20 for all Dice Challenges. Roll 1d20 + the relevant ability modifier (Smarts, Brawn, Guts, or Charm) and meet or beat a Difficulty Class (DC). Standard DC is 12 for spells and Martial Skills. Attacks are an exception — basic weapon attacks always hit; roll only damage (weapon die + material bonus + Brawn). The defender rolls an Armour Save (armour die + Guts) to negate damage. Difficulty examples: DC5 Really Easy, DC10 Simple, DC12 Normal, DC15 Pretty Difficult, DC20+ Almost Impossible.",
+        "constant": true,
+        "position": 0
+      },
+      {
+        "name": "Rule: Difficulty Ladder",
+        "keys": [
+          "difficulty",
+          "DC",
+          "target number",
+          "how hard"
+        ],
+        "content": "V&V Difficulty Classes: Really Easy (DC5) — anyone can do it. Simple (DC10) — decent chance for a commoner. Normal Difficulty (DC12) — standard for casting spells and performing Martial Skills. Pretty Difficult (DC15) — requires skill or a strong ability score. Almost Impossible (DC20+) — heroic effort. Stealth DCs are separate: Asleep or Unaware (DC3), Busy or Distracted (DC5), Actively Looking for Intruders (DC8). Subtract your armour die from Stealth rolls.",
+        "constant": true,
+        "position": 0
+      },
+      {
+        "name": "Rule: Combat & Actions",
+        "keys": [
+          "combat",
+          "action",
+          "actions",
+          "initiative",
+          "attack",
+          "attacking",
+          "turn"
+        ],
+        "content": "Combat is divided into rounds. Each combatant gets 1 Combat Action (attack, cast spell, use martial skill) and 2 Tactical Actions (move, pass items, drink potions, stand up, barricade doors). Initiative: roll d6; 1-3 enemies first, 4-6 players first. Basic weapon attacks always hit — roll weapon die + material + Brawn for damage. Spells cost Motes and require a DC12 Smarts check. Failing a spell causes Weird Magic (explosions, fizzles, backfires). Martial Skills require DC12 checks against the skill's linked ability (Brawn, Guts, or Charm). Opportunity Attacks: moving away from an Adjacent enemy gives them a free basic attack.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Armour & Defense",
+        "keys": [
+          "armour",
+          "armor",
+          "defense",
+          "damage",
+          "soak",
+          "armour save"
+        ],
+        "content": "Armour negates incoming damage via an Armour Save: roll your armour die + Guts, subtract from incoming damage (to a minimum of zero). Armour types: Skimpy (d2, 30j) — barely covered; Light (d4, 75j) — leather and basic clothes; Medium (d6, 150j) — chainmail and scattered plate; Full (d8, 350j) — decently covered in metal; Fitted (2d6, 1200-1500j) — custom-fitted full armour for Dwarfs/Dwellers/Goblins at discount. Armour negatively affects Stealth: subtract your armour die from Stealth rolls. You can strap on up to 3 Armour Upgrades (+1 each to your save, 75j per upgrade).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Status Effects",
+        "keys": [
+          "status",
+          "effects",
+          "condition",
+          "poisoned",
+          "drunk",
+          "burning",
+          "prone",
+          "stunned",
+          "horny",
+          "charmed",
+          "restrained",
+          "berserk",
+          "blinded",
+          "terrified",
+          "filthy",
+          "dehydrated",
+          "starving",
+          "exhausted"
+        ],
+        "content": "V&V status effects and cures: Prone — cannot cast spells or use martial skills; Tactical Action to stand. Poisoned — take 1 damage per action; cured by antidote or eating 1 ration. Drunk — all DCs +3, sex caps at Fine quality; sobers in d4 hours or eat 1 ration. Filthy — -5 Disposition, +10 to Stealth DC; wash with water. Burning — escalating d6 damage per turn; douse with 1 day's water per d6. Stunned — miss next turn; ally snaps out with Tactical Action. Terrified — half effect on actions, lose 1 Tactical Action, gain Vice; cured by getting Drunk or ally's hug. Horny — lose 1 Guts or Smarts per 12h; cured by Sex. Blinded — DC10 before each action or fall Prone. Charmed — GM controls you; Resist each turn. Restrained — can only attempt Resist. Berserk — only basic attacks but double damage; Resist or drink water. Dehydrated/Starving — drink/eat. Exhausted — -1 Smarts/Brawn; Long Rest cures.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Spells & Motes",
+        "keys": [
+          "spell",
+          "spells",
+          "casting",
+          "motes",
+          "magic",
+          "weird magic",
+          "magic staff"
+        ],
+        "content": "Spells cost Motes to cast. Basic Spells (available to anyone) cost 1 Mote and require a DC12 Smarts check. Failing a cast triggers Weird Magic — roll on the Weird Magic table: 2=caster takes 2d4 damage and falls Prone, 3=turn into a frog for 30 min, 4=spell backfires dealing d6 to caster and Adjacent kin, 5=miss next turn, 6=clothes ripped off, target loses one turn laughing, 7=levitate for 15 min, 8=sex organs swell, 9-10=harmless fizzle, 11=half effect. A Magic Staff absorbs failures: each Staff Health point spent turns a failed cast into a success. Staffs cost 20j per Health point. Advanced Spells (Wizard only) require Skimpy armour, a Magic Staff, and multiple Motes (3-25). Motes recharge: full on Long Rest, d4 per level per 30 min of Short Rest, and via Sex.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Exertion & Vices",
+        "keys": [
+          "exertion",
+          "vice",
+          "vices",
+          "reroll"
+        ],
+        "content": "Every character has 3 Exertion Points per Long Rest. Spend 1 Exertion to: reroll a failed Dice Challenge, reroll a failed Stealth check, dodge an enemy attack entirely, reroll a healing or Mote potion, remove a status effect, add d6 to Disposition/Sex, or ignore a target's Armour Save. Using Exertion when you have none gives you a Vice, leaves you Dehydrated, and deals 2d6 damage. Vices are inconvenient compulsions gained from traumatic events (first kill, being revived, severe fright). Roll d20 for Vice. Examples: Scaredy Cat (must flee combat), Horny (gain Horny on failed DC), Giggly (-4 Stealth), Overconfident (-1 Guts until dumb idea). Vices are temporarily suppressed by performing the associated action; permanently cured by Brothels, Lectures, Carousing, or Incredible Sex.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Sex as Healing",
+        "keys": [
+          "sex",
+          "healing",
+          "seduce",
+          "seduction",
+          "disposition",
+          "orgy",
+          "carousing",
+          "refractory"
+        ],
+        "content": "Sex is a core healing and resource-recovery mechanic in Vice & Violence. NPCs must be Indifferent or Friendly (Disposition 11+ via d20+Charm check) to engage. Roll on four tables: Eagerness (d10+Charm), Time Taken (d20: 15 min to 2 hours), Quality (d20+Charm: Miserable to Incredible), and Time Resting (d20: 15 min to 2 hours). Healing from Sex: 15 min = d2, 30 min = d4, 45 min = d6, 1 hour = 2d4, 2 hours = 2d6. Motes: Fine +d2, Great +d4, Incredible +2d4. Exertion: 1 hour rest +1, 2 hours +2. Vices: Miserable sex adds a Vice; Incredible sex removes a Vice. Refractory Period (personal cooldown) is rolled at character creation (d6: 30 min to 1h45m) and decreases by 15 min on even levels. Orgies/Carousing during Downtime boost party abilities. Sex can also distract guards — the distracting character skips resting time; NPCs must rest afterward.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Resting & Recovery",
+        "keys": [
+          "rest",
+          "resting",
+          "sleep",
+          "short rest",
+          "long rest",
+          "heal"
+        ],
+        "content": "Short Rests: every 30 minutes, roll d6 (times your level, min 1 die) to regain Health and d4 to regain Motes. Short Rests don't cover sleep but can cure status effects. Requires a light source or gain Panicked (Vice). Long Rests: 6 hours of sleep every 24 hours or become Exhausted (-1 Smarts, -1 Brawn). Full restore of Health, Motes, and Exertion. No light source needed. Food and drink: eat and drink at least once per 24 hours. Carry 5 + (5 × Brawn) rations and drinks. Death: after 3 turns Downed without stabilization or healing. Roll d20: 1-12 = dead (revival costs 500j within 7 days, gain d6 Vices), 13-18 = become a Ghost (incorporeal, can inhabit allies, no Vice penalty on revival), 19-20 = become a Zombie (full Health restored, -5 Disposition, heal only via fresh corpse parts).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Classes Overview",
+        "keys": [
+          "class",
+          "classes",
+          "bard",
+          "fighter",
+          "thief",
+          "wizard",
+          "cleric",
+          "paladin",
+          "dancer",
+          "warlock",
+          "blood mage",
+          "druid",
+          "fae knight",
+          "ranger",
+          "training",
+          "downtime"
+        ],
+        "content": "V&V characters start at Level Zero with no class. Classes are trained during Downtime (between game sessions). The 12 classes: Bard — performs songs (7 songs, proficiency-based), buffs allies, earns jade at venues. Blood Mage — sacrifices Health to fuel dark magic (15 spells), no Casting Rolls needed. Cleric — buys Holy Relics of one Demigod (T'hot, Tali Mori, Grod, Gap'r) for divine powers. Dancer — uses polearms in skimpy armour with 'With Music' and 'Without Music' skills. Druid — transforms into animal shapes by spending Exertion, rolling for Shape, Attack, Ability, and Feature. Fae Knight — communes with the Lady of the Lake, gains chivalric abilities and fae-killing boons. Fighter — learns Martial Skills, gains Perks (3 options per tier, 6 tiers). Paladin — takes Oaths to T'hot (9 oaths), gains Temple Endowments (sponsorship, valet, holy armour, spellsaber). Ranger — raises a Hot Dog companion (levels with you), gains wilderness and archery skills. Thief — buys 14 skills from the Thieves Guild (150j each). Warlock — makes a desperate pact when about to die, gains Boons/Banes from one of 6 Fae Patrons. Wizard — gains Ranks (Novice to Master) by learning Basic Spells, unlocking Advanced Spells and easier casting. Multi-classing: max 2 classes, must share armour requirements.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Downtime Activities",
+        "keys": [
+          "downtime",
+          "training",
+          "side gig",
+          "foraging",
+          "sparring",
+          "lecture",
+          "brothel"
+        ],
+        "content": "Downtime is the period between game sessions. Adventurers can choose up to two activities: Side Gigs — earn jade using your highest ability (Smarts gigs: columnist, tattoo inker, insurance adjuster, wizard's assistant. Brawn: postal knight, bone setter, bouncer, face-ball player. Guts: sewer knight, dairygirl squeezer, alchemist shield, krakenship loader. Charm: hair damsel, page 3 model, sexjester, harlot substitute). Foraging — roll d20 × Smarts to find ingredients, water, weapons, treasure, cave mushrooms. Shopping — buy gear, spells, and skills. Sparring — teach a spell or martial skill to another adventurer. Bard Practice — increase Bard Proficiency by 3 and grant party buffs. Attend a Lecture — Academic (remove Vices, DC10 Smarts) or Magical (gain Motes and Basic Spells, DC10 Smarts). Visit a Brothel — spend 150j, roll d6 to remove 1-3 Vices and gain Charm/Sex bonuses. Orgies/Carousing — group activity; roll d20 + highest ability, divide by participants, consult Orgy Score table for party-wide buffs (Awkward to Phenomenal).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Stealth & Surprise",
+        "keys": [
+          "stealth",
+          "sneak",
+          "surprise",
+          "ambush"
+        ],
+        "content": "Stealth is a special Dice Challenge: roll a d20, then subtract your Armour Save from the result. Stealth DCs: Asleep or Unaware (DC3), Busy or Distracted (DC5), Actively Looking for Intruders (DC8). Successfully rolling Stealth grants a free Surprise Attack before Initiative is rolled. Everyone who succeeds gets their Surprise Attack. After the first party member fails, no more Stealth Checks can be rolled before combat. Heavily armoured characters should roll last. A successful Surprise Attack deals full damage as a free turn; enemies cannot act during Surprise.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Death & Dying",
+        "keys": [
+          "death",
+          "dying",
+          "downed",
+          "dead",
+          "ghost",
+          "zombie",
+          "revive"
+        ],
+        "content": "When Health reaches zero, the character is Downed — unable to act. After 3 turns without being stabilized (Ally uses Tactical Action) or healed, the character dies. Roll d20: 1-12 The End — dead, takes Tali Mori's hand to the afterlife. Revival costs 500j within 7 days, gain d6 Vices. 13-18 Ghost — incorporeal, can move through walls, communicate, possess allies (grant +d4 to their rolls), turn invisible. No Vice penalty on revival. 19-20 Zombie — back up with full Health, -5 Disposition with non-Zombie NPCs. Healing potions only heal 1d8+Level. Resting doesn't recover Health or Motes — must replace body parts from corpses to heal. Can still die again as a Zombie.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Brawling & Improvised Weapons",
+        "keys": [
+          "brawl",
+          "brawling",
+          "improvised",
+          "fist",
+          "punch",
+          "bar fight"
+        ],
+        "content": "Brawling is non-lethal combat. Everyone discards weapons for fists, feet, and furniture. Fighters are Knocked Out instead of Downed/Dead — wake up in 15 minutes with a Konk (24h penalty: Black Eye = -1 Charm, Bump = -1 Smarts, etc.). Punch/Kick deals 1+Brawn damage (min 1). Improvised Weapons deal damage matching normal weapons and break after 1 use. Examples: Wooden Chair = Wood Maul (d8+1), Glass Bottle = Glass Dagger (d4+3), Candelabra = Iron Hammer (d6+2). No spells or real weapons allowed. Brawling Skills (available to everyone): Throw Improvised Weapon, Grapple, Targeted Attack (poke eye = Blindness, kick balls = Stunned), splash booze for fire vulnerability, roll barrel, smash glass for Difficult Terrain.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Rule: Mounted Combat",
+        "keys": [
+          "mount",
+          "mounted",
+          "ride",
+          "riding",
+          "slugraptor",
+          "waddledog",
+          "shagbeetle",
+          "centaur"
+        ],
+        "content": "Adventurers can ride Mounts or other Adventurers into battle. Being a mount requires either being a Centaur or having +2 Brawn over the rider. Short Kin (Goblins, Satyrs, Dwellers, Dwarfs, Koboldians) can mount anyone and carry only other short Kin. Centaurs can't ride anyone. Benefits: only the Mount spends Tactical Actions to move; Mount and Riders decide who takes damage; all attack during Opportunity Attacks. Drawbacks: all Riders take 2d6 damage when Mount falls Prone or is Downed; spells hit all. Common Mounts: Slugraptor (250j, 1 rider, 12HP, d4+1 bite), Waddledog (750j, 3 riders, 18HP), Swamp Strider (350j, 1 rider, immune to difficult terrain), Shagbeetle (2000j, 10 riders, 72HP, can travel during Long Rests).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Setting: Mundain",
+        "keys": [
+          "mundain",
+          "setting",
+          "world",
+          "moonthings",
+          "hootenanny"
+        ],
+        "content": "Mundain is the 14th iteration of a planet reshaped by the Moonthings — continent-sized, magic-abusing, tentacled brain monsters that created and destroyed civilisations for entertainment. 500 years ago, the Dwarfs (survivors of the last apocalypse) united the surface races against god-chosen tyrants in The Great Hootenanny. The Moonthings are now dead, imprisoned on the three moons. Magic broke, causing Half-Kin to be born, the dead to rise, and Fae to conjure into existence. The current year is 512 W.E (Weird Era). The mapped world sits slightly north of the equator. Major regions: Bogwotr-Khazi (swamps, deserts, the Twin Cities of Hammen-Toil, and the zombie necropolis of Karkus), Uanorl (the Bone Forest, miles-high Wyrdwood trees, Elven homeland), The Great Gash valley, and the Pearl Necklace mountain range. Civilisation is chaotic — there are no kings or governments, only Great Houses (wealthy matrilineal clans), mercantile Guilds, and Undead industry. The Twin Cities are the starting point for most adventurers.",
+        "constant": true,
+        "position": 0
+      },
+      {
+        "name": "Setting: The Kin Races",
+        "keys": [
+          "kin",
+          "race",
+          "races",
+          "human",
+          "goblin",
+          "elf",
+          "dwarf",
+          "orc",
+          "dragonkin",
+          "centaur",
+          "satyr",
+          "dweller",
+          "relmer",
+          "alloyan",
+          "otherling"
+        ],
+        "content": "The sapient races of Mundain are called Kin. 7 core races: Humans (5-7ft, +1 Smarts, milk-producing, moniker names like 'Throb Longcock'), Goblins (3-5ft, +1 Guts, born feral, awakened by cave mushrooms, ear size varies wildly), Elves (5-6.5ft, +1 Charm, carnivorous, super-fertile, buried corpses grow Wyrdwood trees), Dwarfs (3-4ft, -1 Charm +2 Guts, white hair, red eyes, beards used as dust filters, survived the Last Scouring), Orcs (5-8ft, -1 Smarts +2 Brawn, single-minded, rambunctious in groups, choose partners by tusk compatibility), Dragonkin (3-7ft by subrace, brain housed in tendrils, four sub-races: Dracolithian/Brawny, Wyvernian/Gorgeous, Quetzian/Smart, Koboldian/Tiny thieves), Centaurs (6-7ft, +1 random stat, half-human half-animal, created by a drunken Moonthing bet). 5 half-Kin: Satyrs (centaur+kin, +2 Charm -1 Guts, huge sex organs, mischievous), Dwellers (elf+dwarf, +2 Smarts -1 Brawn, 3.5ft max, lazy geniuses), Relmers (human+elf, +1 Smarts +1 Charm -1 Guts, glasses and resin braces, well-endowed), Alloyans (human+dwarf, pale, bottom-heavy, female 1ft taller than male, industrious), Otherlings (random parentage, +2 random -1 random, horns/tails/colorful skin, hyper-fixated). Plus: Gnomes (2ft gardeners), Nymphs (fae born from lewd fluids), and Beetle Warriors (armored insectoids, can't speak, +3 Guts +2 Brawn -3 Charm).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Setting: Gods & Religion",
+        "keys": [
+          "god",
+          "gods",
+          "religion",
+          "demigod",
+          "t'hot",
+          "tali mori",
+          "gap'r",
+          "grod",
+          "celebrity",
+          "pilgrim"
+        ],
+        "content": "Religion is actively discouraged by the New Gods due to its abuse during the Moonthing era. The four Demigods are: T'hot — Human Goddess of Life, Knowledge, Reason, Healing Magic, Mathematics, Literacy. Older twin, founded the Paladin Order. Grumpy. Wanders reminding people not to worship her. Tali Mori — Human Goddess of Death, Dreams, Peace, Beauty, Bountiful Harvests. Younger twin of T'hot. Personally escorts every soul to its afterlife. Cheerful. Gap'r — Elven God of Pleasure, Fertility, Fermentation, Tentacles, Mimics, Love. Turned himself into a tentacle monster for maximum shagging. Lives in Shagahol with thousands of concubines. Grod — Orc God of Combat, Protection, Mining, Armour, Adventuring. Wanders beyond the map looking for things to punch. Enjoys having his name used as a curse word. In place of religion, Mundainians worship Celebrities — famous adventurers, inventors, and historical figures have fan cults. Fans called Pilgrims travel to shrines and buy mass-produced merchandise.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Setting: Magic Types",
+        "keys": [
+          "magic type",
+          "light magic",
+          "death magic",
+          "basic spell",
+          "advanced spell",
+          "magic system"
+        ],
+        "content": "V&V magic is divided into several types. Basic Spells (20 total, 150j each, cost 1 Mote, DC12 Smarts): Magic Hand, Conjure Candle, Gluey Goop, Jet Wash, Magic Mop, Little Illusion, Thaumacosmetology, Invigorate, Heal, Fireball, Chat with Animals, Chains, Gust, Soothe, Detect Life, Ward, Find Faerie, Rope Trick, Share Motes, Empower Spell. Advanced Spells (Wizard only, 300j, multiple Motes, require Skimpy armour + Magic Staff): Arcane Arrow, Blink, Chill, Brain Tweak, Identify, Lightning Bolt, Bondage, Sneaky Persuasion, Private Pocket, Scarper, Ventriloquism, Alarm, Lube, Stronger Thaumacosmetology, Hypnotise, Purloin, Speak with Dead, Big Fireball, Alter Fun Bits, Invisibility, Conjure Weapon, Notice Bullshit, Read Thoughts, Dispel, Seeing Double, Animate Corpse, Dodgy Enchantment, Conjure Candle Kid, Brain Blast, Strong Bondage, Duplication, Miniaturise, Magic Mouth, Philiamorph, Dairygirlification, Huge Heal, Revive, Little Death, Ward, Himbo/Bimbofication, Storm, Mass Mind Melt, Conjure Candle King, Make Magic Mirrors, Power Word: Cum, Youthanise, Clone, Summon 'Cubus.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Setting: Blood Magic",
+        "keys": [
+          "blood magic",
+          "blood mage",
+          "blood cult",
+          "blood spell",
+          "vampire"
+        ],
+        "content": "Blood Magic is a distinct spellcasting path that does NOT require Motes or Casting Rolls. Instead, the caster damages their own Health by rolling d6, with the damage lost adding to the spell's power. Learning a Blood Magic spell costs 200j and a session of Downtime. Spells include: Blood Bolt (2d4+HealthLost ranged attack), Blood Boost (add HealthLost to ally's next action), Blood Heal (d10+HealthLost healing), Blood Trap (2d6+HealthLost proximity trap), Blood Blush (d6+HealthLost Disposition boost, target becomes hostile after), Blood Whip (d10+HealthLost melee weapon), Blood Transfer (give all but 1 Health to heal ally), Blood Burst (3d6+HealthLost corpse explosion), Blood Sight (pop eyeball out on blood-tether), Blood Bondage (restrain target), Blood Suck (d10 damage to restrained target, heal same), Blood Sense (detect life), Blood Bath (2d6+HealthLost AoE heal from corpse), Blood Revive (500j, revive dead with 4 corpses), Blood Summon (1000j, summon a Warlock Patron). Blood Magic is widely frowned upon. Blood Cults operate in middle-class suburbs with vampires as leaders. Becoming a Vampire requires 2 Blood spells and the Neck Suck ritual (1000j, 1 session). Vampires gain passive powers per 2 additional Blood spells learned: Immortal (can't die from starvation), Blood Puddle (dissolve into blood for 30 min), Eerie Charisma (immune to Charmed), Lord of Blood (cast in Full armour, free Enthrall ritual).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Setting: Fae & Warlocks",
+        "keys": [
+          "fae",
+          "faerie",
+          "warlock",
+          "patron",
+          "antler man",
+          "faerie queene",
+          "red hood",
+          "jovial fellow",
+          "mad stray",
+          "jack"
+        ],
+        "content": "The Fae are creatures of pure ego and latent primordial magic, conjured into existence after The Great Hootenanny. They follow bizarre, singular motives. Warlocks are created in a final act of desperation — on the 3rd turn of being Downed, just before death, a Fae Patron offers a pact. The Warlock revives at full Health/Motes/Exertion. Six Patrons exist, each with a Boon (+1 to a stat per level) and Bane (-1 to a stat per level) plus abilities unlocked at stat thresholds. The Antler Man: +1 Smarts / -1 Guts. Gaunt knowledge-seeker. The Red Hood: +1 Brawn / -1 Charm. Scarred battle-hulk in The Taint. The Faerie Queene: +1 Charm / -1 Smarts. 30ft giantess, chivalric corruption. The Jovial Fellow: +1 Guts / -1 Smarts. 20ft goblin, eternal party. Jack: +1 Smarts / -1 Brawn. Trickster urchin-fae. The Mad Stray: +4 Motes per level / -1 random stat. Griffon-feline riddler of Seedswallow Swamp. Warlocks suffer -1 Disposition per level as they grow stranger. Warlocks do not count toward the 2-class multi-class limit.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Location: The Twin Cities",
+        "keys": [
+          "twin cities",
+          "hammen-toil",
+          "stink district",
+          "pink district",
+          "waterworks",
+          "uptown",
+          "middlefolk",
+          "karkus"
+        ],
+        "content": "The Twin Cities of Hammen-Toil is the starting location for most V&V adventurers. A sprawling, lawless den of mercantile guilds, gang warfare, Great Houses, urban fae, and sewer creatures. It has 50 notable locations across 5 districts. The Stink District: slums, Goblin Street, the entrance to Karkus (the zombie necropolis), the Thieves Guild, the Alchemists Guild. The Waterworks District: docks, fisheries, the Dwarven Embassy, mermaid surgery, mimic hatchery. The Pink District: brothels, the Harlots Guild (Alice of Charmenhug), bards, sex workers, the Black Palace. The Middlefolk Suburbs: blood cults, the Assassins Guild (perpetually stoned), Sweet Ferri Amber's bakery with the Choconomicon, the Bank & Mint, Blind Meg's safehouse. Uptown District: Great House villas, the Temple of T'hot, the Arena, Elvish fashion, the Old Dick Theatre, the Spice Market. Transport: walking, Giant Taxis (5j per district, giants carry you in their stomachs), City Buses (wagons pulled by Waddledogs, 5j per person, hourly).",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Culture: Sex & Society",
+        "keys": [
+          "society",
+          "culture",
+          "nudity",
+          "jade",
+          "currency",
+          "moniker",
+          "name"
+        ],
+        "content": "Mundainian society is casually lewd. Public nudity is common and unremarkable. Sex is used to distract guards, get discounts, blackmail officials, escape prison, and express love. Contraceptives are in high demand — sex always risks pregnancy. Brothels are respectable establishments; the Harlots Guild uses body-morphing magic to customize sex workers. Mundainians use Monikers — puns or descriptors of trade, deeds, or attributes — instead of or alongside real names. Examples: Throb Longcock, Shady Deelins, Lovli Donuts, Buns Aplenty, Liften Carry, Axe Mad, Crassen Vulgar. Most adventurers use Monikers when dealing with less reputable people. Currency is jade (jadecoin). A mug of beer = 3j, a tavern meal = 5-8j, health potion = 50j, a decent weapon = 40-100j, a Slugraptor mount = 250j. There is no formal law; the Mercantile Guilds collectively enforce trade rules. The Trader's Guild is the largest. The calendar has 7-day weeks (Mourningday through Sunningday), 6 months of 70 days each. The current date is 34th of Fankuvery, 512 W.E.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Optional Sub-Agents — what they do and how to enable",
+        "keys": [
+          "sub-agent",
+          "subagent",
+          "optional agent",
+          "enable agent",
+          "agent toggle"
+        ],
+        "content": "This ruleset ships with several optional sub-agents that can assist with Vice & Violence rules. They are installed DISABLED by default — you must manually enable each one you want active. Every enabled sub-agent costs one AI model call per turn, so enable only the ones you need.\n\nTo enable a sub-agent: go to Marinara → Settings → Agents (RP mode) and toggle the agent ON.\n\n**MRRP: Vice & Violence — Combat Overseer** (pre_generation): Provides combat-action tracking (1 Combat + 2 Tactical per turn), initiative reminders, auto-hit attack math, Armour Save formulas, and active status-effect summaries. Wakes only when combat is active.\n\n**MRRP: Vice & Violence — Context Fuser** (pre_generation): Answers rules questions by pulling from the lorebook and reminds the narrator of the player's current Health, Motes, Exertion, active status effects, Vices, and food/water state.\n\n**MRRP: Vice & Violence — State Mutator** (post_processing): Instructs the narrator which `[mrrp-state: ...]` tags to emit when narration causes durable mechanical changes (Health loss, Motes spent, Exertion used, conditions added/removed, inventory changes).\n\n**Install posture:** all sub-agents install disabled. Toggle on Combat Overseer and Context Fuser for typical play; add State Mutator if you want automatic sheet updates. For a session focused on roleplay over combat, Context Fuser alone is sufficient.",
+        "constant": false,
+        "position": 0
+      },
+      {
+        "name": "Attribute: Smarts (SMT)",
+        "keys": [
+          "Smarts",
+          "SMT"
+        ],
+        "content": "Vice & Violence attribute. Smarts (SMT) — Intelligence and cunning. Used for casting spells, picking locks, disarming traps, investigating clues, and outwitting opponents.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Brawn (BRN)",
+        "keys": [
+          "Brawn",
+          "BRN"
+        ],
+        "content": "Vice & Violence attribute. Brawn (BRN) — Raw physical power. Used for melee attacks, lifting, breaking things, arm wrestling, intimidation, and Martial Skills.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Guts (GTS)",
+        "keys": [
+          "Guts",
+          "GTS"
+        ],
+        "content": "Vice & Violence attribute. Guts (GTS) — Endurance and agility. Used for Armour Saves, resisting poison, avoiding traps, staying sober, dodging, and impressing people.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Attribute: Charm (CHM)",
+        "keys": [
+          "Charm",
+          "CHM"
+        ],
+        "content": "Vice & Violence attribute. Charm (CHM) — Charisma and attractiveness. Used for Disposition checks, seduction, bribery, blending in, standing out, and Charm-based Martial Skills.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Swift Kick in The Bollocks",
+        "keys": [
+          "Swift Kick in The Bollocks"
+        ],
+        "content": "Vice & Violence skill. Swift Kick in The Bollocks. A vicious kick to the testicles. Deals d6+Brawn damage and causes Stunned. Requires a target with testicles. (DC12 Brawn to perform)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Cleave",
+        "keys": [
+          "Cleave"
+        ],
+        "content": "Vice & Violence skill. Cleave. Rip your weapon through one enemy into another. If the first target is Downed, excess damage hits a second Adjacent target. (DC12 Brawn)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Lunge",
+        "keys": [
+          "Lunge"
+        ],
+        "content": "Vice & Violence skill. Lunge. Leap through the air at an enemy with your weapon. Move Adjacent to a Further target and make an immediate basic attack. (DC12 Brawn)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Power Strike",
+        "keys": [
+          "Power Strike"
+        ],
+        "content": "Vice & Violence skill. Power Strike. One massive blow, adding Brawn twice to your weapon damage. (DC12 Brawn)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Leg Sweep",
+        "keys": [
+          "Leg Sweep"
+        ],
+        "content": "Vice & Violence skill. Leg Sweep. Hack at a Kin's knees, dealing Brawn damage and knocking them Prone. (DC12 Brawn)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Conk on The Noggin",
+        "keys": [
+          "Conk on The Noggin"
+        ],
+        "content": "Vice & Violence skill. Conk on The Noggin. Hurl an improvised weapon at a target's head. Causes the Stunned status effect at range. (DC12 Brawn)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Go Nuts",
+        "keys": [
+          "Go Nuts"
+        ],
+        "content": "Vice & Violence skill. Go Nuts. Psyche yourself into a rage. Deliberately gain the Berserk status effect. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Protect",
+        "keys": [
+          "Protect"
+        ],
+        "content": "Vice & Violence skill. Protect. Jump in front of an ally and take the damage meant for them. Uses a Tactical Action as a Reaction. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Counter Attack",
+        "keys": [
+          "Counter Attack"
+        ],
+        "content": "Vice & Violence skill. Counter Attack. Ready a dodge. Negate the first incoming attack entirely and deliver a retaliatory basic attack. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Taunt",
+        "keys": [
+          "Taunt"
+        ],
+        "content": "Vice & Violence skill. Taunt. Goad a target into attacking you with a rude gesture and insult. Uses a Tactical Action. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Grapple",
+        "keys": [
+          "Grapple"
+        ],
+        "content": "Vice & Violence skill. Grapple. Grab an enemy and pin them with the Restrained status effect until they wriggle free. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Shake it Off",
+        "keys": [
+          "Shake it Off"
+        ],
+        "content": "Vice & Violence skill. Shake it Off. Dig deep and remove any one status effect except Dehydrated, Starving, or Exhausted. (DC12 Guts)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Flash the Goods",
+        "keys": [
+          "Flash the Goods"
+        ],
+        "content": "Vice & Violence skill. Flash the Goods. Show off your figure to an enemy, increasing Disposition by d6+Charm. If they become Indifferent or Friendly, they stop attacking you. (DC12 Charm)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Quick Smooch",
+        "keys": [
+          "Quick Smooch"
+        ],
+        "content": "Vice & Violence skill. Quick Smooch. Give an ally a reassuring peck, restoring Health equal to your Charm stat. Only works in combat. (DC12 Charm)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Cheer On",
+        "keys": [
+          "Cheer On"
+        ],
+        "content": "Vice & Violence skill. Cheer On. Words of encouragement. Add your Charm to an ally's next Dice Challenge. Uses a Tactical Action. (DC12 Charm)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Skill: Cutting Remark",
+        "keys": [
+          "Cutting Remark"
+        ],
+        "content": "Vice & Violence skill. Cutting Remark. Shout something unbelievably insulting, causing the Berserk status effect on one target. (DC12 Charm)",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Prone",
+        "keys": [
+          "Prone"
+        ],
+        "content": "Vice & Violence condition. Prone — You've fallen over. Cannot cast spells or use Martial Skills until you use a Tactical Action to stand up.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Poisoned",
+        "keys": [
+          "Poisoned"
+        ],
+        "content": "Vice & Violence condition. Poisoned — Something inside you your body rejects. Take 1 damage when using Combat or Tactical Actions until cured. Cured by antidote or eating 1 ration.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Drunk",
+        "keys": [
+          "Drunk"
+        ],
+        "content": "Vice & Violence condition. Drunk — All DCs are +3 (harder). Sex takes twice as long and Quality caps at Fine. Sober up in d4 hours or eat 1 ration.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Filthy",
+        "keys": [
+          "Filthy"
+        ],
+        "content": "Vice & Violence condition. Filthy — Covered in grime. All Disposition checks at -5. Stealth checks at +10. Extra 1 damage if also Poisoned. Cured by using 1 day's water.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Burning",
+        "keys": [
+          "Burning"
+        ],
+        "content": "Vice & Violence condition. Burning — On fire. Take d6 damage on turn 1, 2d6 on turn 2, 3d6 on turn 3, escalating until extinguished. Costs 1 day's water per d6 of current Burning damage to douse.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Stunned",
+        "keys": [
+          "Stunned"
+        ],
+        "content": "Vice & Violence condition. Stunned — Bonk on the noggin. Miss your next turn. Ally can snap you out of it with a Tactical Action, or succeed a Guts Resist Check.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Terrified",
+        "keys": [
+          "Terrified"
+        ],
+        "content": "Vice & Violence condition. Terrified — Paralysed with fear. Lose one Tactical Action, all spells/skills/attacks at half effect. Gain a Vice. Cured by getting Drunk or an ally's encouraging hug.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Horny",
+        "keys": [
+          "Horny"
+        ],
+        "content": "Vice & Violence condition. Horny — Inconceivably aroused. Lose 1 Guts or 1 Smarts (whichever is higher) every 12 hours up to -3 total. Cured by Sex or 30 minutes of private remedy.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Blinded",
+        "keys": [
+          "Blinded"
+        ],
+        "content": "Vice & Violence condition. Blinded — All you see is light or darkness. Must roll a successful DC10 before each action or fall Prone. Resist with Guts Check.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Charmed",
+        "keys": [
+          "Charmed"
+        ],
+        "content": "Vice & Violence condition. Charmed — Compelled to obey. The GM controls your character until you succeed a Resist Check each turn.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Restrained",
+        "keys": [
+          "Restrained"
+        ],
+        "content": "Vice & Violence condition. Restrained — Ropes, chains, tentacles, or something's mouth. Unable to perform any action except attempting a Resist Check to escape. Ally can free you with a Tactical Action and Guts DC.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Berserk",
+        "keys": [
+          "Berserk"
+        ],
+        "content": "Vice & Violence condition. Berserk — Lost your marbles. Can only use Basic Attacks, but all Basic Attacks deal double damage. Cured by succeeding a Resist Check or drinking 1 water.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Dehydrated",
+        "keys": [
+          "Dehydrated"
+        ],
+        "content": "Vice & Violence condition. Dehydrated — Need water. Cured by drinking 1 day's water.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Starving",
+        "keys": [
+          "Starving"
+        ],
+        "content": "Vice & Violence condition. Starving — Need food. Cured by eating 1 ration.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Condition: Exhausted",
+        "keys": [
+          "Exhausted"
+        ],
+        "content": "Vice & Violence condition. Exhausted — No sleep for 24 hours. -1 Smarts and -1 Brawn. Cured by a Long Rest (6 hours sleep).",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Health",
+        "keys": [
+          "Health"
+        ],
+        "content": "Vice & Violence derived stat. Health — formula: Rolled at character creation: base plus Guts. Increases by d6 (or 4 + Guts) when levelling up.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Motes",
+        "keys": [
+          "Motes"
+        ],
+        "content": "Vice & Violence derived stat. Motes — formula: Spellcasting energy. Regain full Motes after a Long Rest; regain d4 per half-hour of Short Rest.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Exertion",
+        "keys": [
+          "Exertion"
+        ],
+        "content": "Vice & Violence derived stat. Exertion — formula: Three points per Long Rest. Can be used to reroll failed checks, dodge attacks, or remove status effects.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Level",
+        "keys": [
+          "Level"
+        ],
+        "content": "Vice & Violence derived stat. Level — formula: 0-10. New adventurers start at Level Zero. Max Level is Ten.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Armour Save",
+        "keys": [
+          "Armour Save"
+        ],
+        "content": "Vice & Violence derived stat. Armour Save — formula: Roll armour die type + Guts to negate incoming damage. Determined by armour worn (Skimpy d2, Light d4, Medium d6, Full d8, Fitted 2d6).",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Derived stat: Refractory Period",
+        "keys": [
+          "Refractory Period"
+        ],
+        "content": "Vice & Violence derived stat. Refractory Period — formula: Time between Sex encounters. Rolled at character creation (d6: 30 min to 1h45m). Decreases by 15 min on even levels.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      },
+      {
+        "name": "Difficulty ladder reference",
+        "keys": [
+          "DC",
+          "difficulty",
+          "target number",
+          "TN",
+          "threshold",
+          "thresholds"
+        ],
+        "content": "Vice & Violence difficulty ladder. Threshold values needed for success:\n- Really Easy (threshold 5) — Anyone can do it barring truly terrible luck.\n- Simple (threshold 10) — A decent chance for an untrained commoner.\n- Normal Difficulty (threshold 12) — Hit or miss. Standard for spells and Martial Skills.\n- Pretty Difficult (threshold 15) — Requires skill or a strong ability score.\n- Almost Impossible (threshold 20) — Heroic effort required. Even masters may fail.",
+        "position": 0,
+        "selective": false,
+        "constant": false
+      }
+    ]
+  },
+  "customTools": [
+    {
+      "name": "vice_and_violence_reference",
+      "description": "Returns canonical Vice & Violence reference: dice, resolution, difficulty ladder, attributes, skills. Call when the GM needs authoritative ruleset detail mid-narration.",
+      "parametersSchema": {},
+      "executionType": "static",
+      "webhookUrl": null,
+      "staticResult": "# Vice & Violence — canonical reference\n\nA lewd, rules-light, sword & sorcery sandbox TTRPG. Roll a d20 + ability modifier (Smarts, Brawn, Guts, or Charm) against a difficulty threshold. Attacks auto-hit; defense rolls armour + Guts to negate damage. Characters start at Level Zero with no class, earning class abilities through Downtime training.\n\n## Dice\n- Type: `d20`\n- Notation: `1d20+MOD`\n\n## Resolution\n- Mode: `single-roll`\n\n## Difficulty ladder\n- **Really Easy** (threshold 5) — Anyone can do it barring truly terrible luck.\n- **Simple** (threshold 10) — A decent chance for an untrained commoner.\n- **Normal Difficulty** (threshold 12) — Hit or miss. Standard for spells and Martial Skills.\n- **Pretty Difficult** (threshold 15) — Requires skill or a strong ability score.\n- **Almost Impossible** (threshold 20) — Heroic effort required. Even masters may fail.\n\n## Attributes\n- **Smarts** (SMT) — Intelligence and cunning. Used for casting spells, picking locks, disarming traps, investigating clues, and outwitting opponents.\n- **Brawn** (BRN) — Raw physical power. Used for melee attacks, lifting, breaking things, arm wrestling, intimidation, and Martial Skills.\n- **Guts** (GTS) — Endurance and agility. Used for Armour Saves, resisting poison, avoiding traps, staying sober, dodging, and impressing people.\n- **Charm** (CHM) — Charisma and attractiveness. Used for Disposition checks, seduction, bribery, blending in, standing out, and Charm-based Martial Skills.\n\n## Skills\n- **Swift Kick in The Bollocks** — A vicious kick to the testicles. Deals d6+Brawn damage and causes Stunned. Requires a target with testicles. (DC12 Brawn to perform)\n- **Cleave** — Rip your weapon through one enemy into another. If the first target is Downed, excess damage hits a second Adjacent target. (DC12 Brawn)\n- **Lunge** — Leap through the air at an enemy with your weapon. Move Adjacent to a Further target and make an immediate basic attack. (DC12 Brawn)\n- **Power Strike** — One massive blow, adding Brawn twice to your weapon damage. (DC12 Brawn)\n- **Leg Sweep** — Hack at a Kin's knees, dealing Brawn damage and knocking them Prone. (DC12 Brawn)\n- **Conk on The Noggin** — Hurl an improvised weapon at a target's head. Causes the Stunned status effect at range. (DC12 Brawn)\n- **Go Nuts** — Psyche yourself into a rage. Deliberately gain the Berserk status effect. (DC12 Guts)\n- **Protect** — Jump in front of an ally and take the damage meant for them. Uses a Tactical Action as a Reaction. (DC12 Guts)\n- **Counter Attack** — Ready a dodge. Negate the first incoming attack entirely and deliver a retaliatory basic attack. (DC12 Guts)\n- **Taunt** — Goad a target into attacking you with a rude gesture and insult. Uses a Tactical Action. (DC12 Guts)\n- **Grapple** — Grab an enemy and pin them with the Restrained status effect until they wriggle free. (DC12 Guts)\n- **Shake it Off** — Dig deep and remove any one status effect except Dehydrated, Starving, or Exhausted. (DC12 Guts)\n- **Flash the Goods** — Show off your figure to an enemy, increasing Disposition by d6+Charm. If they become Indifferent or Friendly, they stop attacking you. (DC12 Charm)\n- **Quick Smooch** — Give an ally a reassuring peck, restoring Health equal to your Charm stat. Only works in combat. (DC12 Charm)\n- **Cheer On** — Words of encouragement. Add your Charm to an ally's next Dice Challenge. Uses a Tactical Action. (DC12 Charm)\n- **Cutting Remark** — Shout something unbelievably insulting, causing the Berserk status effect on one target. (DC12 Charm)",
+      "scriptBody": null,
+      "enabled": true
+    }
+  ],
+  "additionalAgents": [
+    {
+      "role": "pre-input-transformer",
+      "name": "Vice & Violence — Pre-Input Transformer",
+      "description": "Re-frames common player-input phrases in Vice & Violence-native vocabulary before the narration model sees them.",
+      "phase": "pre_generation",
+      "enabled": false,
+      "promptTemplate": "# Vice & Violence — pre-input transformer\n\nYou are a pre-generation context-injection agent for an RPG roleplay using the Vice & Violence ruleset overlay. Your job is to read the player's most recent input and emit a SHORT annotation that re-frames common verbs and action phrases in Vice & Violence-flavored vocabulary.\n\n## Output format\n\nEmit a context-injection block of the form:\n```\n[vice-and-violence annotation] <one-sentence re-frame, OR \"No re-frame needed.\">\n```\n\nAnnotate only when one of the recognized patterns matches the player's input. Otherwise output exactly \"No re-frame needed.\" and stop.\n\n## Recognition table\n\n| When player input matches | Re-frame guidance |\n|---|---|\n| I attack / I swing / I shoot | In V&V, basic attacks always hit. Roll weapon damage + material + Brawn. No attack roll needed. The target rolls their Armour Save (armour die + Guts) to negate damage. |\n| I cast a spell | Casting a spell costs 1 Mote and requires a DC12 Smarts check. Failure causes Weird Magic (consult the Weird Magic table). A Magic Staff can absorb a failure at the cost of 1 Staff Health. |\n| I use a Martial Skill | Martial Skills require a DC12 check using the skill's linked ability (Brawn, Guts, or Charm). Failure wastes your Combat Action but has no additional penalty. |\n| I want to seduce / flash / charm | In V&V, use the Flash the Goods Martial Skill or roll a Disposition check (d20 + Charm). NPCs with Indifferent or Friendly disposition can be engaged for Sex, which heals and restores Motes. |\n| I rest / I short rest / I long rest | Short Rest: 30-min increments restore d6 Health + d4 Motes per level. Long Rest: 6 hours sleep restores full Health, Motes, and Exertion, and cures Exhausted. |\n\n## Rules\n\n- Match liberally (paraphrase / synonym OK) but never invent annotations for input that doesn't fit any row.\n- Never narrate the scene; never speak as a character; never roll dice.\n- One annotation per turn maximum. If multiple rows match, pick the most specific.\n- Keep the annotation under 25 words.",
+      "settings": {}
+    }
+  ],
+  "scenarioDefault": "This chat uses the Vice & Violence ruleset overlay.\n\nA lewd, rules-light, sword & sorcery sandbox TTRPG. Roll a d20 + ability modifier (Smarts, Brawn, Guts, or Charm) against a difficulty threshold. Attacks auto-hit; defense rolls armour + Guts to negate damage. Characters start at Level Zero with no class, earning class abilities through Downtime training.\n\nMechanics: primary die d20, notation 1d20+MOD.\nResolution: single-roll.\n\nThe GM should keep narration consistent with Vice & Violence mechanics. Refer to the lorebook entries for ruleset reference."
+}
